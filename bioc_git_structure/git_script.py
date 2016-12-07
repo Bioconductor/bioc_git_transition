@@ -2,9 +2,8 @@ from git import Repo
 
 
 def create_branches(git_repository):
-""" Create branches for all release versions in bioconductor."""
-    # Make sure that its a bare repo
-    assert not repo.bare
+    """ Create branches for all release versions in bioconductor."""
+    assert not repo.bare  # Make sure that its a bare repo
     # Create a DEVEL branch
     git_repository.create_head("devel")
 
@@ -21,11 +20,12 @@ def create_branches(git_repository):
               git_repository))
         # Create a new branch
         new_branch = git_repository.create_head(branch_name)
-    return git_repository.branches
+        print("New Branch: ", new_branch)
+    return
 
 
 def delete_all_branches(git_repository):
-"""Delete all branches in repo."""
+    """Delete all branches in repo."""
     for branch in git_repository.branches:
         if branch.name == "master":
             pass
