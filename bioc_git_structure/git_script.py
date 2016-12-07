@@ -24,7 +24,7 @@ def create_branches(git_repository):
     return git_repository.branches
 
 def delete_all_branches(repo):
-	""" Delete all branches in repo."""
+    """ Delete all branches in repo."""
     for branch in repo.branches:
         if branch.name == "master":
             pass
