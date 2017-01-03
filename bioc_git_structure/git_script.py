@@ -1,5 +1,18 @@
 from git import Repo
+import os
 
+
+def git_init_recursively(path):
+    """Create git repository in all packages."""
+    # print path to all subdirectories first.
+    for package in os.listdir(path):
+        if os.path.isdir(os.path.join(path,package)):
+            pack_path = os.path.abspath(package)
+            # Create git repository
+            r = git.Repo.init(pack_path)
+            # Create all bioconductor branches
+            create_branches(path_path)
+    return
 
 def create_branches(git_repository):
     """ Create branches for all release versions in bioconductor."""
