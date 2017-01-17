@@ -123,11 +123,11 @@ def main():
 
     # Step 2
     revision = svn_get_revision(local_svn_dump)
-	print revision
-	update_file = "updt.svn"
+    print revision
+    update_file = "updt.svn"
     svn_dump_update(revision, remote_svn_server, local_svn_dump, update_file)
     # TODO: BUG here
-	update_local_svn_dump(local_svn_dump_loc, update_file)
+    update_local_svn_dump(local_svn_dump_loc, update_file)
     # Step 3: Add git remote branch, to make git package act as a server
     # Step 4: Add release branches to all packages
     # Step 5:
