@@ -2,21 +2,30 @@ from git import Repo
 import os
 
 
-def git_init_recursively(path):
-    """Create git repository in all packages."""
-    # print path to all subdirectories first.
-    for package in os.listdir(path):
-        if os.path.isdir(os.path.join(path,package)):
-            pack_path = os.path.abspath(package)
-            # Create git repository
-            r = git.Repo.init(pack_path)
+def git_init(path):
+    """Create git repository in all packages.
+
+    Change into bioconductor or Rpacks directory,
+    then run this command.
+    """
+
+    for pack in os.listdir(path):
+        if (os.path.isdir(pack) and not (".git" in pack)):
+            print os.path.abspath(pack)
+            # Create git .listdir(path) if (os.path.isdir(pack) and not (".git" in pack))]epository
+            r = Repo.init(pack_path)
             # Create all bioconductor branches
-            create_branches(path_path)
+    return
+
+
+# TODO: Import commit history
+# Check what is the deal with git-svn clone
+def import_commit_history(pack_path):
     return
 
 def create_branches(git_repository):
     """ Create branches for all release versions in bioconductor."""
-    assert not repo.bare  # Make sure that its a bare repo
+#    assert not git_repository.bare  # Make sure that its NOT a bare repo
     # Create a DEVEL branch
     git_repository.create_head("devel")
 
@@ -47,10 +56,15 @@ def delete_all_branches(git_repository):
             branch.delete(git_repository, branch.name)
     return
 
-if __name__ == '__main__':
 
-    working_tree_dir = "/Users/niteshturaga/Documents/bioc_packs/"
-    repo = Repo(working_tree_dir)
-    # Assert repo not empty
-    assert not repo.bare
-    create_branches(repo)
+def clone_from_svn(package):
+    svn_url="https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks"
+
+
+#if __name__ == '__main__':
+
+#    working_tree_dir = "/Users/niteshturaga/Documents/bioc_packs/"
+#    repo = Repo(working_tree_dir)
+#    # Assert repo not empty
+#    assert not repo.bare
+#    create_branches(repo)
