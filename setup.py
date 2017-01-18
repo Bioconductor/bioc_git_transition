@@ -8,5 +8,5 @@ setup(name='bioc_git_structure',
       author_email='nitesh.turaga@roswellpark.org',
       license='MIT',
       packages=['bioc_git_structure'],
-      install_requires=['gitpython'],
-      zip_safe=False)
+      install_requires=[],
+      zip_safe=True)
