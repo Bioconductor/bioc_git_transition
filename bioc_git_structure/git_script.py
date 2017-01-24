@@ -15,40 +15,64 @@ Usage:
 import os
 import re
 import subprocess
+import pdb
+
+def _get_pack_list(local_svn_dump):
+    """Get list of packages on SVN."""
+    result = subprocess.check_output(['svn', 'list', local_svn_dump])
+    return [item.replace('/', '') for item in result.split()]
 
 
-def svn_dump(packs):
+def svn_dump(local_svn_dump, packs):
     """
-    Summary line.
-    # NO NEED TO RERUN THIS IF THE SVN DUMP EXISTS
-    # TODO: remove hardcoded packs and update to svn list from hedgehog
+    Create git svn clone from SVN dump for each package.
 
+    The SVN dump needs to be updated daily/nightly for the rest to
+    work as planned.
+
+    Parameters
+    ----------
+    local_svn_dump : List of Bioconductor packages
+        List of Bioconductor packages obtained
+        from _get_pack_list(local_svn_dump)
+
+    Returns
+    -------
+    None
     """
-    svn_local_dump = 'file:///home/nturaga/bioconductor-svn-mirror/trunk/madman/Rpacks/'
+    package_dir = os.path.join(local_svn_dump, 'trunk/madman/Rpacks/')
     for pack in packs:
-        package_dump = svn_local_dump + pack
+        package_dump = os.path.join(package_dir, pack)
         subprocess.check_call(['git', 'svn', 'clone', package_dump])
         print("Finished git svn clone from local dump for package: ", pack)
     return
 
 
-def git_add_remote(path):
+def git_add_remote(remote_path, path):
     """
-    Summary line.
+    Add git remote to make the directory
 
-    # TODO: remove hardcoded packs and update to svn list from hedgehog
+    Usage
+    ---------
+    cd /home/nturaga/packages
+    python add_release_branches.py
 
+    Parameters
+    ----------
+    path : Path to package
     """
-    remote_path = 'nturaga@git.bioconductor.org:/home/nturaga/packages_local/'
     for pack in os.listdir(path):
-        if os.path.isdir(pack) and (".git" in os.listdir(os.path.abspath(pack))):
+        print(os.path.abspath(pack))
+        if os.path.isdir(pack) and ".git" in os.listdir(os.path.abspath(pack)):
             remote = remote_path + pack
+            print(remote)
             remote_add_cmd = ['git', 'remote', 'add', 'origin', remote]
+            print(remote_add_cmd)
             # Run remote command
             proc = subprocess.Popen(remote_add_cmd, cwd=os.path.abspath(pack))
             out, err = proc.communicate()
             print("Added remote to ", os.path.abspath(pack))
-    return out
+    return
 
 
 def svn_get_revision(svn_path):
@@ -104,57 +128,53 @@ def update_local_svn_dump(local_svn_dump_location, update_file):
 
 
 def _branch_exists(branch, working_directory):
-    """
-    Summary line.
-
-    Extended description of function.
-
-    Parameters
-    ----------
-    arg1 : int
-        Description of arg1
-    arg2 : str
-        Description of arg2
-
-    Returns
-    -------
-    int
-        Description of return value
-    """
     output = subprocess.check_output(['git', 'branch', '--list',
                                       branch], cwd=working_directory)
     return output != ''
 
 
-def add_release_branches(remote_svn_server, git_repo):
+def add_release_branches(local_svn_dump, git_repo):
     """Add release branches to each package.
 
     TODO Extended description of how this works.
+    local_svn_dump = file:///home/nturaga/bioconductor-svn-mirror/
 
     remote_svn_server: 'https://hedgehog.fhcrc.org/bioconductor/'
     git_repo: '/home/nturaga/packages_local'
     """
-    branch_url = os.path.join(remote_svn_server, "branches")
+    branch_url = os.path.join(local_svn_dump, "branches")
     # Get list of branches
     branch_list = [item.replace('/', '')
                    for item in
-                   subprocess.check_output(['svn', 'list', branch_url]).split()]
+                   subprocess.check_output(['svn', 'list', branch_url]).split()
+				   if "RELEASE" in item ]
+    print("Branch list: ", branch_list)
     for branch in branch_list:
         # Special case to avoid badly named branches in SVN
-        if 'RELEASE' in branch:
-            package_list_url = os.path.join(branch_url, branch, 'madman', 'Rpacks')
-            # Get list of packages for EACH branch
-            package_list = subprocess.check_output(['svn', 'list', package_list_url]).split()
-            for package in package_list:
+        package_list_url = os.path.join(branch_url, branch, 'madman', 'Rpacks')
+        # Get list of packages for EACH branch
+        #package_list = subprocess.check_output(['svn', 'list', package_list_url]).split()
+        package_list = _get_pack_list(package_list_url)
+        import pdb; pdb.set_trace()
+        for package in package_list:
+            print("Package: ", package)
+            bioc_git_package = os.path.join(git_repo, package)
+            if package in os.listdir(git_repo):
                 try:
-                    bioc_git_package = os.path.join(git_repo, package)
-                    if _branch_exists(branch, bioc_git_package):
-                        # Add new branch in bioconductor package location
-                        subprocess.check_call(['git', 'branch', branch],
-                                              cwd=bioc_git_package)
+                    pdb.set_trace()
+                    print bioc_git_package
+                    if not _branch_exists(branch, bioc_git_package):
+			subprocess.check_call(['git', 'branch', branch], cwd=bioc_git_package)
+                        print("Added branch {1} to package {2}".format(branch, bioc_git_package))
+                except OSError as e:
+                    print("Error: Package does not exist in repository, ",e)
+                    pass
                 except subprocess.CalledProcessError as e:
-                    print(e.output)
+                    print("Branch: ", branch, "Package: ", package, "Error: ", e.output)
+            else:
+                print("Package ", package, "not in directory")
     return "Finished adding release branches"
+
 
 
 def _svn_revision_branch_id(svn_url):
@@ -171,17 +191,16 @@ def _svn_revision_branch_id(svn_url):
 def find_branch_points(from_revision, branch, package_dir):
     cmd1 = ['git', 'log', '--format=%H', branch]
     branch_root = subprocess.check_output(cmd1, cwd=package_dir).split()[-1]
+    print("Branch root", branch_root)
     # Be careful, as there is an empty string at end of list
-    commits = subprocess.check_output(['git', 'svn', 'log', '--oneline',
-                                       '--show-commit', 'master']).split("\n")
+    commits = subprocess.check_output(['git', 'svn', 'log', '--oneline','--show-commit', 'master'],cwd=package_dir).split("\n")
 
     commits = [item for item in commits if len(item) != 0]
 
     for commit in commits:
         commit_info = commit.split(" | ")
         revision = commit_info[0].strip()
-        sha1 = subprocess.check_output(['git', 'log', '-n', '1',
-                                        '--format=%H', commit_info[1].strip()])
+        sha1 = subprocess.check_output(['git', 'log', '-n', '1','--format=%H', commit_info[1].strip()],cwd=package_dir)
         if (int(revision[1:]) < int(from_revision[branch])):
             branch_point = (branch_root, sha1)
             return branch_point
@@ -205,24 +224,27 @@ def add_commit_history(local_svn_dump):
         revision = _svn_revision_branch_id(svn_branch_url)
         d[branch] = revision
 
-    packs = _get_pack_list(local_svn_dump)
-    for package in packs:
-        for branch in branch_list:
-            cwd = os.path.join("/home/nturaga/packages_local", package)
-            branch_point = find_branch_points(d, branch, cwd)
-            if branch_point:
-                root, sha1 = branch_point
-                with open(os.path.join(cwd, ".git/info/grafts"), 'a') as f:
-                    f.write(root + " " + sha1)
-                graft_range = root + ".." + branch
-                subprocess.check_call(['git', 'filter-branch', '--', graft_range])
+    for branch in branch_list:
+        pdb.set_trace()
+        packs = _get_pack_list(os.path.join(branch_url, branch, 'madman','Rpacks'))
+        for package in packs:
+            cwd = os.path.join("/home/nturaga/packages", package)
+            print("packge_dir: ", cwd)
+            try:
+                branch_point = find_branch_points(d, branch, cwd)
+                if branch_point:
+                    root, sha1 = branch_point
+                    with open(os.path.join(cwd, ".git/info/grafts"), 'a') as f:
+                        f.write(root + " " + sha1)
+                    graft_range = root + ".." + branch
+                    subprocess.check_call(['git', 'filter-branch', '--', graft_range],cwd=cwd)
+            except OSError as e:
+                print("Package not found", package)
+                print(e)
+                pass
     return
 
 
-def _get_pack_list(local_svn_dump):
-    """ Get list of packages on SVN."""
-    result = subprocess.check_output(['svn', 'list', local_svn_dump])
-    return [item.replace('/', '') for item in result.split()]
 
 
 def main():
@@ -240,27 +262,33 @@ def main():
     Step 3: Add git remote path.
     Step 4: Add release branches to each package in 'git package local repo'
     """
-    # Initial set up
-    packs = _get_pack_list()
-    # Create a local dump of SVN packages
-    # svn_dump(packs)
 
     # Step 1
     local_svn_dump = 'file:///home/nturaga/bioconductor-svn-mirror/'
     local_svn_dump_location = "bioconductor-svn-mirror/"
     remote_svn_server = 'https://hedgehog.fhcrc.org/bioconductor'
 
+
+    # Initial set up
+    packs = _get_pack_list(local_svn_dump)
+    # Create a local dump of SVN packages
+    # svn_dump(packs)
+
     # Step 2
     revision = svn_get_revision(local_svn_dump)
     print revision
     update_file = "updt.svn"
-    svn_dump_update(revision, remote_svn_server, local_svn_dump, update_file)
+#    svn_dump_update(revision, remote_svn_server, local_svn_dump, update_file)
     # TODO: BUG here
-    update_local_svn_dump(local_svn_dump_location, update_file)
+#    update_local_svn_dump(local_svn_dump_location, update_file)
     # Step 3: Add git remote branch, to make git package act as a server
 
     # Step 4: Add release branches to all   packages
     # Step 5:
+    git_repo = "/home/nturaga/packages"
+#    add_release_branches(local_svn_dump, git_repo)
+    add_commit_history(local_svn_dump)
+
     return
 
 
