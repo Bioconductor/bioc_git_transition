@@ -1,12 +1,12 @@
 from setuptools import setup
 
-setup(name='bioc_git_structure',
+setup(name='bioc_git_transition',
       version='0.1',
-      description='Set up bioconductor git structure',
-      url='http://github.com/nturaga/bioc_git_structure',
+      description="Module gives functionality for Bioconductor's Git transition",
+      url='https://github.com/Bioconductor/bioc_git_transition.git',
       author='nturaga',
       author_email='nitesh.turaga@roswellpark.org',
       license='MIT',
-      packages=['bioc_git_structure'],
+      packages=['bioc_git_transition'],
       install_requires=[],
       zip_safe=True)
