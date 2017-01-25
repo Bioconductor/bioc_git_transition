@@ -16,6 +16,15 @@ import subprocess
 import svn_dump as sd
 
 
+def get_branch_list(branch_url):
+    """Get list of branches."""
+    branch_list = [item.replace('/', '')
+                   for item in
+                   subprocess.check_output(['svn', 'list', branch_url]).split()
+                   if "RELEASE" in item]
+    return branch_list
+
+
 def git_add_remote(remote_path, path):
     """
     Add git remote to make the directory.
@@ -50,6 +59,30 @@ def _branch_exists(branch, working_directory):
     return output != ''
 
 
+def add_orphan_branch_points(branch, package_url, package_dir):
+    """Add orphan branch."""
+    # Configure remote svn url
+    config_remote_url = ['git', 'config', '--add',
+                         'svn-remote.' + branch + '.url', package_url]
+    subprocess.check_call(config_remote_url, cwd=package_dir)
+    # Configure remote svn 'fetch' url
+    config_remote_fetch = ['git', 'config', '--add',
+                           'svn-remote.' + branch + '.fetch',
+                           ':refs/remotes/git-svn-' + branch]
+    subprocess.check_call(config_remote_fetch, cwd=package_dir)
+    # Fetch
+    fetch = ['git', 'svn', 'fetch', 'git-svn-' + branch]
+    subprocess.check_call(fetch, cwd=package_dir)
+    # Checkout and change to branch
+    checkout = ['git', 'checkout', '-b', branch, 'git-svn-' + branch]
+    subprocess.check_call(checkout, cwd=package_dir)
+    # Rebase
+    subprocess.check_call(['git', 'svn', 'rebase'], cwd=package_dir)
+    # Checkout master
+    subprocess.check_call(['git', 'checkout', 'master'], cwd=package_dir)
+    return
+
+
 def add_release_branches(local_svn_dump, git_repo):
     """Add release branches to each package.
 
@@ -59,30 +92,29 @@ def add_release_branches(local_svn_dump, git_repo):
     remote_svn_server: 'https://hedgehog.fhcrc.org/bioconductor/'
     git_repo: '/home/nturaga/packages_local'
     """
-    branch_url = os.path.join(local_svn_dump, "branches")
     # Get list of branches
-    branch_list = [item.replace('/', '')
-                   for item in
-                   subprocess.check_output(['svn', 'list', branch_url]).split()
-                   if "RELEASE" in item]
+    branch_url = os.path.join(local_svn_dump, "branches")
+    branch_list = get_branch_list(local_svn_dump)
+
     print("Branch list: ", branch_list)
+
     for branch in branch_list:
         # Special case to avoid badly named branches in SVN
         package_list_url = os.path.join(branch_url, branch, 'madman', 'Rpacks')
         # Get list of packages for EACH branch
         package_list = sd.get_pack_list(package_list_url)
-        # TODO: Remove PDB trace
         for package in package_list:
-            print("Package: ", package)
-            bioc_git_package = os.path.join(git_repo, package)
+
+            git_package_dir = os.path.join(git_repo, package)
+            package_url = os.path.join(package_list_url, package)
+            print("git_package_dir:\n %s, package_url:\n %s" %
+                  (git_package_dir, package_url))
             if package in os.listdir(git_repo):
                 try:
-                    print bioc_git_package
-                    if not _branch_exists(branch, bioc_git_package):
-                        subprocess.check_call(['git', 'branch', branch],
-                                              cwd=bioc_git_package)
-                        print("Added branch %s to package %s" %
-                              (branch, bioc_git_package))
+                    if not _branch_exists(branch, git_package_dir):
+                        add_orphan_branch_points(branch, package_url,
+                                                 git_package_dir)
+                        print("Added orphan branch in %s " % git_package_dir)
                 except OSError as e:
                     print("Error: Package does not exist in repository, ", e)
                     pass
