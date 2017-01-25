@@ -16,11 +16,12 @@ import subprocess
 
 def get_pack_list(local_svn_dump):
     """Get list of packages on SVN."""
-    result = subprocess.check_output(['svn', 'list', local_svn_dump])
+    package_dir = os.path.join(local_svn_dump, 'trunk/madman/Rpacks/')
+    result = subprocess.check_output(['svn', 'list', package_dir])
     return [item.replace('/', '') for item in result.split()]
 
 
-def svn_dump(local_svn_dump, packs):
+def svn_dump(local_svn_dump, packs, dump_location):
     """
     Create git svn clone from SVN dump for each package.
 
@@ -40,12 +41,13 @@ def svn_dump(local_svn_dump, packs):
     package_dir = os.path.join(local_svn_dump, 'trunk/madman/Rpacks/')
     for pack in packs:
         package_dump = os.path.join(package_dir, pack)
-        subprocess.check_call(['git', 'svn', 'clone', package_dump])
+        subprocess.check_call(['git', 'svn', 'clone', package_dump],
+                              cwd=dump_location)
         print("Finished git svn clone from local dump for package: ", pack)
     return
 
 
-def svn_get_revision(svn_path):
+def svn_get_revision(local_svn_dump):
     """
     Summary line.
 
@@ -53,7 +55,7 @@ def svn_get_revision(svn_path):
 
     """
     # Get revision number
-    p = subprocess.Popen(["svn", "info", svn_path],
+    p = subprocess.Popen(["svn", "info", local_svn_dump],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     revision = [line.split(":")[1].strip() for line in out.split("\n")
@@ -86,8 +88,7 @@ def svn_dump_update(revision, remote_svn_server, local_svn_dump, update_file):
 # TODO: This doesn't work like expected
 def update_local_svn_dump(local_svn_dump_location, update_file):
     """Update Local SVN dump."""
-    proc = subprocess.Popen(['svnadmin', 'load', local_svn_dump_location,
-                             '<', update_file])
-    out, err = proc.communicate()
+    cmd = 'svnadmin load ' + local_svn_dump_location + ' < ' + os.path.abspath(update_file)
+    subprocess.call(cmd, shell=True)
     print("Finished dump update")
-    return out
+    return
