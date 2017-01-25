@@ -59,22 +59,29 @@ def _branch_exists(branch, working_directory):
     return output != ''
 
 
-def add_orphan_branch_points(branch, package_url, package_dir):
+svn_root = "file:///home/nturaga/bioconductor-svn-mirror"
+repo_dir = "/home/nturaga/packages"
+
+# TODO: construct branch_url within this function (package_url)
+def add_orphan_branch_points(svn_root, release, repo_dir, package):
     """Add orphan branch."""
+    package_url = svn_root + '/branches/' + release + '/madman/Rpacks/' + package 
+    package_dir = os.path.join(repo_dir, package)
+    print(package_url)
     # Configure remote svn url
     config_remote_url = ['git', 'config', '--add',
-                         'svn-remote.' + branch + '.url', package_url]
+                         'svn-remote.' + release + '.url', package_url]
     subprocess.check_call(config_remote_url, cwd=package_dir)
-    # Configure remote svn 'fetch' url
+    #  remote svn 'fetch' url
     config_remote_fetch = ['git', 'config', '--add',
-                           'svn-remote.' + branch + '.fetch',
-                           ':refs/remotes/git-svn-' + branch]
+                           'svn-remote.' + release + '.fetch',
+                           ':refs/remotes/git-svn-' + release]
     subprocess.check_call(config_remote_fetch, cwd=package_dir)
     # Fetch
-    fetch = ['git', 'svn', 'fetch', 'git-svn-' + branch]
+    fetch = ['git', 'svn', 'fetch', release]
     subprocess.check_call(fetch, cwd=package_dir)
     # Checkout and change to branch
-    checkout = ['git', 'checkout', '-b', branch, 'git-svn-' + branch]
+    checkout = ['git', 'checkout', '-b', release, 'git-svn-' + release]
     subprocess.check_call(checkout, cwd=package_dir)
     # Rebase
     subprocess.check_call(['git', 'svn', 'rebase'], cwd=package_dir)
@@ -94,15 +101,17 @@ def add_release_branches(local_svn_dump, git_repo):
     """
     # Get list of branches
     branch_url = os.path.join(local_svn_dump, "branches")
-    branch_list = get_branch_list(local_svn_dump)
-
+ 	# TODO: Sort branch list based on the order of RELEASE
+    branch_list = get_branch_list(branch_url)
     print("Branch list: ", branch_list)
 
     for branch in branch_list:
         # Special case to avoid badly named branches in SVN
         package_list_url = os.path.join(branch_url, branch, 'madman', 'Rpacks')
         # Get list of packages for EACH branch
+        print(package_list_url)
         package_list = sd.get_pack_list(package_list_url)
+#        import pdb; pdb.set_trace()
         for package in package_list:
 
             git_package_dir = os.path.join(git_repo, package)
@@ -111,9 +120,9 @@ def add_release_branches(local_svn_dump, git_repo):
                   (git_package_dir, package_url))
             if package in os.listdir(git_repo):
                 try:
+                    print("in the try statement")
                     if not _branch_exists(branch, git_package_dir):
-                        add_orphan_branch_points(branch, package_url,
-                                                 git_package_dir)
+                        add_orphan_branch_points(svn_root, branch,repo_dir, package)
                         print("Added orphan branch in %s " % git_package_dir)
                 except OSError as e:
                     print("Error: Package does not exist in repository, ", e)
@@ -125,6 +134,7 @@ def add_release_branches(local_svn_dump, git_repo):
                 print("Package %s not in directory" % package)
     return "Finished adding release branches"
 
+add_release_branches(svn_root, "/home/nturaga/packages")
 
 def _svn_revision_branch_id(svn_url):
     """SVN stop on copy."""
