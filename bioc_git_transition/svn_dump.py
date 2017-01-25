@@ -13,11 +13,12 @@ Usage:
 import os
 import subprocess
 
-
-def get_pack_list(local_svn_dump):
+# TODO: THERE IS A BUG HERE
+def get_pack_list(path):
     """Get list of packages on SVN."""
-    package_dir = os.path.join(local_svn_dump, 'trunk/madman/Rpacks/')
-    result = subprocess.check_output(['svn', 'list', package_dir])
+   # if 'trunk/madman/Rpacks' not in path:
+   #     path = os.path.join(path, 'trunk/madman/Rpacks/')
+    result = subprocess.check_output(['svn', 'list', path])
     return [item.replace('/', '') for item in result.split()]
 
 
