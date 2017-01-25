@@ -65,7 +65,9 @@ def run_transition():
     gs.add_release_branches(local_svn_dump, git_repo)
 
     # Step 5: Add commit history
-#    gs.add_commit_history(local_svn_dump)
+    gs.add_commit_history(local_svn_dump)
+    # Step 6: Make Git repo bare
+    gs.create_bare_repos(git_repo)
     return
 
 
