@@ -31,7 +31,7 @@ def get_branch_list(svn_root):
                    if "RELEASE" in item]
     # Reverse branch list based on RELEASE version number
     branch_list = sorted(branch_list, key=LooseVersion)
-    return branch_list.revers()
+    return branch_list.reverse()
 
 
 def git_remote_add(name, remote_url, cwd):
