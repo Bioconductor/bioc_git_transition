@@ -34,40 +34,40 @@ def run_transition():
     Step 4: Add release branches to each package in 'git package local repo'
     """
     # Step 0
-    local_svn_dump = 'file:///home/nturaga/bioconductor-svn-mirror/'
+    svn_root = 'file:///home/nturaga/bioconductor-svn-mirror/'
     dump_location = "bioconductor-svn-mirror/"
     remote_svn_server = 'https://hedgehog.fhcrc.org/bioconductor'
-    git_repo = "/home/nturaga/packages"
+    repo_dir = "/home/nturaga/packages"
     update_file = "updt.svn"
 
-    if not os.path.isdir(git_repo):
-        os.mkdir(git_repo)
+    if not os.path.isdir(repo_dir):
+        os.mkdir(repo_dir)
 
     # Step 1: Initial set up, get list of packs from trunk
-    # TODO: BUG HERE in getting pack list
-    packs = sd.get_pack_list(local_svn_dump)
+    package_url = os.path.join(svn_root, 'trunk', 'madman', 'Rpacks')
+    packs = sd.get_pack_list(package_url)
     # Create a local dump of SVN packages in a location
-    sd.svn_dump(local_svn_dump, packs, git_repo)
+    sd.svn_dump(svn_root, packs, repo_dir)
 
     # Step 2: Update
-    revision = sd.svn_get_revision(local_svn_dump)
-    sd.svn_dump_update(revision, remote_svn_server, local_svn_dump,
+    revision = sd.svn_get_revision(svn_root)
+    sd.svn_dump_update(revision, remote_svn_server, svn_root,
                        update_file)
     sd.update_local_svn_dump(dump_location, update_file)
 
     # Step 3: Add git remote branch, to make git package act as a server
     remote_path = "nturaga@git.bioconductor.org:/home/nturaga/packages/"
-    os.chdir(git_repo)
-    gs.git_add_remote(remote_path, git_repo)
+    os.chdir(repo_dir)
+    gs.git_add_remote(remote_path, repo_dir)
     os.chdir("..")
 
     # Step 4: Add release branches to all   packages
-    gs.add_release_branches(local_svn_dump, git_repo)
+    gs.add_release_branches(svn_root, repo_dir)
 
     # Step 5: Add commit history
-    gs.add_commit_history(local_svn_dump)
+    gs.add_commit_history(svn_root)
     # Step 6: Make Git repo bare
-    gs.create_bare_repos(git_repo)
+    gs.create_bare_repos(repo_dir)
     return
 
 
