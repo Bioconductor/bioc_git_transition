@@ -26,30 +26,25 @@ def get_branch_list(svn_root):
     return branch_list
 
 
-def git_add_remote(remote_path, path):
-    """
-    Add git remote to make the directory.
+def git_remote_add(name, remote_url, cwd):
+    """Git remote add."""
+    cmd = ['git', 'remote', 'add', name, remote_url]
+    subprocess.check_call(cmd, cwd=cwd)
+    return
 
-    Usage
-    ---------
-    cd /home/nturaga/packages
-    python add_release_branches.py
 
-    Parameters
-    ----------
-    path : Path to package
+def add_remote(remote_url, repo_dir):
+    """Add git remote to make the directory.
+
+    Usage: cd /home/nturaga/packages and run function.
     """
-    for pack in os.listdir(path):
-        print(os.path.abspath(pack))
-        if os.path.isdir(pack) and ".git" in os.listdir(os.path.abspath(pack)):
-            remote = remote_path + pack
-            print(remote)
-            remote_add_cmd = ['git', 'remote', 'add', 'origin', remote]
-            print(remote_add_cmd)
+    for package in os.listdir(repo_dir):
+        if ((os.path.isdir(package)) and
+                (".git" in os.listdir(os.path.abspath(package)))):
+            remote = remote_url + package
             # Run remote command
-            proc = subprocess.Popen(remote_add_cmd, cwd=os.path.abspath(pack))
-            out, err = proc.communicate()
-            print("Added remote to ", os.path.abspath(pack))
+            git_remote_add('origin', remote, os.path.abspath(package))
+            print("Added remote to package: %s" % package)
     return
 
 
@@ -60,13 +55,11 @@ def _branch_exists(branch, working_directory):
     return output != ''
 
 
-svn_root = "file:///home/nturaga/bioconductor-svn-mirror"
-repo_dir = "/home/nturaga/packages"
-
 # TODO: construct branch_url within this function (package_url)
 def add_orphan_branch_points(svn_root, release, repo_dir, package):
     """Add orphan branch."""
-    package_url = svn_root + '/branches/' + release + '/madman/Rpacks/' + package 
+    package_url = (svn_root + '/branches/' + release +
+                   '/madman/Rpacks/' + package)
     package_dir = os.path.join(repo_dir, package)
     print(package_url)
     # Configure remote svn url
@@ -91,19 +84,19 @@ def add_orphan_branch_points(svn_root, release, repo_dir, package):
     return
 
 
-def add_release_branches(local_svn_dump, git_repo):
+def add_release_branches(svn_root, repo_dir):
     """Add release branches to each package.
 
     TODO Extended description of how this works.
-    local_svn_dump = file:///home/nturaga/bioconductor-svn-mirror/
+    svn_root = file:///home/nturaga/bioconductor-svn-mirror/
 
     remote_svn_server: 'https://hedgehog.fhcrc.org/bioconductor/'
-    git_repo: '/home/nturaga/packages_local'
+    repo_dir: '/home/nturaga/packages_local'
     """
     # Get list of branches
-    branch_url = os.path.join(local_svn_dump, "branches")
- 	# TODO: Sort branch list based on the order of RELEASE
-    branch_list = get_branch_list(local_svn_dump)
+    branch_url = os.path.join(svn_root, "branches")
+    # TODO: Sort branch list based on the order of RELEASE
+    branch_list = get_branch_list(svn_root)
     print("Branch list: ", branch_list)
 
     for branch in branch_list:
@@ -115,15 +108,16 @@ def add_release_branches(local_svn_dump, git_repo):
 #        import pdb; pdb.set_trace()
         for package in package_list:
 
-            git_package_dir = os.path.join(git_repo, package)
+            git_package_dir = os.path.join(repo_dir, package)
             package_url = os.path.join(package_list_url, package)
             print("git_package_dir:\n %s, package_url:\n %s" %
                   (git_package_dir, package_url))
-            if package in os.listdir(git_repo):
+            if package in os.listdir(repo_dir):
                 try:
                     print("in the try statement")
                     if not _branch_exists(branch, git_package_dir):
-                        add_orphan_branch_points(svn_root, branch,repo_dir, package)
+                        add_orphan_branch_points(svn_root, branch,
+                                                 repo_dir, package)
                         print("Added orphan branch in %s " % git_package_dir)
                 except OSError as e:
                     print("Error: Package does not exist in repository, ", e)
@@ -135,7 +129,6 @@ def add_release_branches(local_svn_dump, git_repo):
                 print("Package %s not in directory" % package)
     return "Finished adding release branches"
 
-#add_release_branches(svn_root, "/home/nturaga/packages")
 
 def _svn_revision_branch_id(svn_url):
     """SVN stop on copy."""
@@ -144,6 +137,7 @@ def _svn_revision_branch_id(svn_url):
     # parse output
     revision_id = re.findall('\(from [^:]+:([0-9]+)', output)[-1]
     return revision_id
+
 
 def find_branch_points(from_revision, repo_dir, package, release):
     """Find branch points in the git revision history."""
@@ -155,7 +149,7 @@ def find_branch_points(from_revision, repo_dir, package, release):
     commits = subprocess.check_output(['git', 'svn', 'log',
                                        '--oneline', '--show-commit', 'master'],
                                       cwd=package_dir).split("\n")
-	# Remove new line char artifact
+    # Remove new line char artifact
     commits = [item for item in commits if len(item) != 0]
 
     for commit in commits:
@@ -163,9 +157,10 @@ def find_branch_points(from_revision, repo_dir, package, release):
         revision = commit_info[0].strip()
         if (int(revision[1:]) <= int(from_revision[release])):
             sha1 = subprocess.check_output(['git', 'log', '-n', '1',
-                                            '--format=%H', commit_info[1].strip()],
+                                            '--format=%H',
+                                            commit_info[1].strip()],
                                            cwd=package_dir)
-			# Make tuple and strip sha's for whitespace
+            # Make tuple and strip sha's for whitespace
             branch_point = (branch_root.strip(), sha1.strip())
             return branch_point
     return None
@@ -181,17 +176,6 @@ def release_revision_dict(svn_root, branch_list):
     return d
 
 
-branch_url = os.path.join(svn_root, "branches")
-    # Get list of branches
-branch_list = [item.replace('/', '')
-               for item in
-               subprocess.check_output(['svn', 'list', branch_url]).split()
-               if 'RELEASE' in item]
-d = release_revision_dict(svn_root, branch_list)
-for k,v in d.iteritems():
-    print k, v
-
-
 def graft(repo_dir, package, release, d):
     cwd = os.path.join(repo_dir, package)
     print("packge_dir: ", cwd)
@@ -201,16 +185,12 @@ def graft(repo_dir, package, release, d):
         with open(os.path.join(cwd, ".git/info/grafts"), 'a') as f:
             f.write(offspring_sha1 + " " + parent_sha1 + "\n")
         graft_range = parent_sha1 + ".." + release
-        subprocess.check_call(['git', 'filter-branch', '--force',   
+        subprocess.check_call(['git', 'filter-branch', '--force',
                                '--', graft_range], cwd=cwd)
     return
-    
-graft("/home/nturaga", "Biostrings", "RELEASE_3_4", d)
-graft("/home/nturaga", "Biostrings", "RELEASE_3_3", d)
-graft("/home/nturaga", "Biostrings", "RELEASE_3_2", d)
 
 
-def add_commit_history(local_svn_dump, repo_dir):
+def add_commit_history(svn_root, repo_dir):
     """
     Add commit history by fixing b.
 
@@ -218,14 +198,15 @@ def add_commit_history(local_svn_dump, repo_dir):
     are placed in the specific branch.
     """
     # Get list of branches
-    branch_list = get_branch_list(local_svn_dump)
-    d = release_revision_dict(local_svn_dump, branch_list)
+    branch_list = get_branch_list(svn_root)
+    d = release_revision_dict(svn_root, branch_list)
+    branch_url = svn_root + "branches"
     for release in branch_list:
         packs = sd.get_pack_list(os.path.join(branch_url, release,
                                               'madman', 'Rpacks'))
         for package in packs:
             try:
-                graft(repo_dir, package, release, d)    
+                graft(repo_dir, package, release, d)
             except OSError as e:
                 print("Package not found", package)
                 print(e)
@@ -235,22 +216,20 @@ def add_commit_history(local_svn_dump, repo_dir):
 
 def bare_repo(repo_dir, destination_dir, package):
     """Make a bare git repo."""
-    cmd = ['git', 'clone', '--bare', os.path.join(repo_dir,package)]
+    cmd = ['git', 'clone', '--bare', os.path.join(repo_dir, package)]
     subprocess.check_call(cmd, cwd=destination_dir)
     return
 
-bare_repo("/home/nturaga", "packages_dest", "Biostrings")
 
 def create_bare_repos(repo_dir, destination_dir):
     for package in os.listdir(os.path.abspath(repo_dir)):
         try:
             bare_repo(repo_dir, destination_dir, package)
-        except CalledProcessError as e:
-            print("Package: %s, Error creating bare repository: %s" % (package, e))
+        except subprocess.CalledProcessError as e:
+            print("Package: %s, Error creating bare repository: %s" % (
+                  package, e))
             pass
         except OSError as e:
             print("Package: %s, Error: %s" % (package, e))
             pass
     return
-
- 

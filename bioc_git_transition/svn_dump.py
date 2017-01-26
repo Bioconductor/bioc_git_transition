@@ -13,11 +13,12 @@ Usage:
 import os
 import subprocess
 
+
 # TODO: THERE IS A BUG HERE
 def get_pack_list(path):
     """Get list of packages on SVN."""
-   # if 'trunk/madman/Rpacks' not in path:
-   #     path = os.path.join(path, 'trunk/madman/Rpacks/')
+    # if 'trunk/madman/Rpacks' not in path:
+    # path = os.path.join(path, 'trunk/madman/Rpacks/')
     result = subprocess.check_output(['svn', 'list', path])
     return [item.replace('/', '') for item in result.split()]
 
@@ -89,7 +90,8 @@ def svn_dump_update(revision, remote_svn_server, local_svn_dump, update_file):
 # TODO: This doesn't work like expected
 def update_local_svn_dump(local_svn_dump_location, update_file):
     """Update Local SVN dump."""
-    cmd = 'svnadmin load ' + local_svn_dump_location + ' < ' + os.path.abspath(update_file)
+    cmd = ('svnadmin load ' + local_svn_dump_location + ' < '
+                            + os.path.abspath(update_file))
     subprocess.call(cmd, shell=True)
     print("Finished dump update")
     return

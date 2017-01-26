@@ -44,22 +44,22 @@ def run_transition():
         os.mkdir(git_repo)
 
     # Step 1: Initial set up, get list of packs from trunk
-	# TODO: BUG HERE in getting pack list
-#    packs = sd.get_pack_list(local_svn_dump)
+    # TODO: BUG HERE in getting pack list
+    packs = sd.get_pack_list(local_svn_dump)
     # Create a local dump of SVN packages in a location
-#    sd.svn_dump(local_svn_dump, packs, git_repo)
+    sd.svn_dump(local_svn_dump, packs, git_repo)
 
     # Step 2: Update
-#    revision = sd.svn_get_revision(local_svn_dump)
-#    sd.svn_dump_update(revision, remote_svn_server, local_svn_dump,
-#                       update_file)
-#    sd.update_local_svn_dump(dump_location, update_file)
+    revision = sd.svn_get_revision(local_svn_dump)
+    sd.svn_dump_update(revision, remote_svn_server, local_svn_dump,
+                       update_file)
+    sd.update_local_svn_dump(dump_location, update_file)
 
     # Step 3: Add git remote branch, to make git package act as a server
     remote_path = "nturaga@git.bioconductor.org:/home/nturaga/packages/"
-#    os.chdir(git_repo)
-#    gs.git_add_remote(remote_path, git_repo)
-#    os.chdir("..")
+    os.chdir(git_repo)
+    gs.git_add_remote(remote_path, git_repo)
+    os.chdir("..")
 
     # Step 4: Add release branches to all   packages
     gs.add_release_branches(local_svn_dump, git_repo)
