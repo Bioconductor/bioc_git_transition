@@ -14,16 +14,24 @@ import os
 import re
 import subprocess
 import svn_dump as sd
+from distutils.version import LooseVersion
 
 
 def get_branch_list(svn_root):
-    """Get list of branches."""
+    """Get list of branches.
+    Input:
+        svn_root path.
+    Return:
+        List of branches in the reverse order of releases, i.e, latest first.
+    """
     branch_url = svn_root + "branches"
     branch_list = [item.replace('/', '')
                    for item in
                    subprocess.check_output(['svn', 'list', branch_url]).split()
                    if "RELEASE" in item]
-    return branch_list
+    # Reverse branch list based on RELEASE version number
+    branch_list = sorted(branch_list, key=LooseVersion)
+    return branch_list.revers()
 
 
 def git_remote_add(name, remote_url, cwd):
@@ -57,9 +65,16 @@ def _branch_exists(branch, working_directory):
 
 # TODO: construct branch_url within this function (package_url)
 def add_orphan_branch_points(svn_root, release, repo_dir, package):
-    """Add orphan branch."""
-    package_url = (svn_root + '/branches/' + release +
-                   '/madman/Rpacks/' + package)
+    """Add orphan branch.
+
+    Configure the remote and fetch urls for git-svn. Then, fetch from the
+    svn remote repository. Checkout from the release branch, and rebase it to
+    the fetched commits. Checkout master at the end.
+    """
+    package_url = os.path.join(svn_root, 'branches', release, 'madman',
+                               'Rpacks', package)
+    # package_url = (svn_root + '/branches/' + release +
+    #    '/madman/Rpacks/' + package)
     package_dir = os.path.join(repo_dir, package)
     print(package_url)
     # Configure remote svn url
@@ -87,10 +102,8 @@ def add_orphan_branch_points(svn_root, release, repo_dir, package):
 def add_release_branches(svn_root, repo_dir):
     """Add release branches to each package.
 
-    TODO Extended description of how this works.
+    TODO: Extended description of how this works.
     svn_root = file:///home/nturaga/bioconductor-svn-mirror/
-
-    remote_svn_server: 'https://hedgehog.fhcrc.org/bioconductor/'
     repo_dir: '/home/nturaga/packages_local'
     """
     # Get list of branches
@@ -167,6 +180,7 @@ def find_branch_points(from_revision, repo_dir, package, release):
 
 
 def release_revision_dict(svn_root, branch_list):
+    """Make a dictionary with key = svn_release and value = revision_id."""
     d = {}  # Dictionary
     branch_url = svn_root + "/branches"
     for release in branch_list:
@@ -177,6 +191,11 @@ def release_revision_dict(svn_root, branch_list):
 
 
 def graft(repo_dir, package, release, d):
+    """Write graft file in each pacakage, connecting the branches.
+
+    The graft file contains the parent commit_id and the orphan-branch
+    commit_id. It connects the two by adding the commit history.
+    """
     cwd = os.path.join(repo_dir, package)
     print("packge_dir: ", cwd)
     branch_point = find_branch_points(d, repo_dir, package, release)
@@ -222,6 +241,7 @@ def bare_repo(repo_dir, destination_dir, package):
 
 
 def create_bare_repos(repo_dir, destination_dir):
+    """Create bare repos in the repository directory."""
     for package in os.listdir(os.path.abspath(repo_dir)):
         try:
             bare_repo(repo_dir, destination_dir, package)

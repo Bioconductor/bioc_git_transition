@@ -58,7 +58,7 @@ def run_transition():
     # Step 3: Add git remote branch, to make git package act as a server
     remote_path = "nturaga@git.bioconductor.org:/home/nturaga/packages/"
     os.chdir(repo_dir)
-    gs.git_add_remote(remote_path, repo_dir)
+    gs.add_remote(remote_path, repo_dir)
     os.chdir("..")
 
     # Step 4: Add release branches to all   packages
