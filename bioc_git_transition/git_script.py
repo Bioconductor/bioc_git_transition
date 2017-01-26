@@ -30,13 +30,21 @@ def get_branch_list(svn_root):
                    subprocess.check_output(['svn', 'list', branch_url]).split()
                    if "RELEASE" in item]
     # Reverse branch list based on RELEASE version number
-    branch_list = sorted(branch_list, key=LooseVersion)
-    return branch_list.reverse()
+    # branch_list = sorted(branch_list, key=LooseVersion)
+    # return branch_list.reverse()
+    return branch_list
 
 
 def git_remote_add(name, remote_url, cwd):
     """Git remote add."""
     cmd = ['git', 'remote', 'add', name, remote_url]
+    subprocess.check_call(cmd, cwd=cwd)
+    return
+
+
+def git_remote_remove(name, cwd):
+    """Git remote remove."""
+    cmd = ['git', 'remote', 'remove', name]
     subprocess.check_call(cmd, cwd=cwd)
     return
 

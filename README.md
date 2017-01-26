@@ -13,7 +13,7 @@ are limited to a `List of available packages` (refer below).
 
 * Clone a package:
 
-  `git clone ubuntu@git.bioconductor.org:/packages/<package_of_choice>`
+  `git clone ubuntu@git.bioconductor.org:/packages/<package_of_choice>.git`
 
 * See the branches available:
 
@@ -23,7 +23,7 @@ are limited to a `List of available packages` (refer below).
 
 * Checkout branch and see if the commit history is correct (most important step):
 
-  `git checkout -b RELEASE_2_14 remotes/origin/RELEASE_2_14`
+  `git checkout RELEASE_2_14`
 
   `git log`
 

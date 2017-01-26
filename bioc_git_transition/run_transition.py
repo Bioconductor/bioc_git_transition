@@ -55,19 +55,21 @@ def run_transition():
                        update_file)
     sd.update_local_svn_dump(dump_location, update_file)
 
-    # Step 3: Add git remote branch, to make git package act as a server
-    remote_path = "nturaga@git.bioconductor.org:/home/nturaga/packages/"
-    os.chdir(repo_dir)
-    gs.add_remote(remote_path, repo_dir)
-    os.chdir("..")
-
     # Step 4: Add release branches to all   packages
     gs.add_release_branches(svn_root, repo_dir)
 
     # Step 5: Add commit history
     gs.add_commit_history(svn_root)
+
+    # Step 3: Add git remote branch, to make git package act as a server
+    remote_path = "nturaga@git.bioconductor.org:/packages/"
+    os.chdir(repo_dir)
+    gs.add_remote(remote_path, repo_dir)
+    os.chdir("..")
+
     # Step 6: Make Git repo bare
-    gs.create_bare_repos(repo_dir)
+    destination_dir = "/home/nturaga/packages"
+    gs.create_bare_repos(repo_dir, destination_dir)
     return
 
 
