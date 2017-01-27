@@ -17,7 +17,7 @@ are limited to a `List of available packages` (refer below).
 
 * See the branches available:
 
-  ` cd /package/ABarray`
+  ` cd ABarray`
 
   ` git branch -a`
 
