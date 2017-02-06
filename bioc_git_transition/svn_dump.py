@@ -12,6 +12,7 @@ Usage:
 """
 import os
 import subprocess
+import logging as log
 
 
 # TODO: THERE IS A BUG HERE
@@ -45,7 +46,7 @@ def svn_dump(local_svn_dump, packs, dump_location):
         package_dump = os.path.join(package_dir, pack)
         subprocess.check_call(['git', 'svn', 'clone', package_dump],
                               cwd=dump_location)
-        print("Finished git svn clone from local dump for package: ", pack)
+        log.debug("Finished git-svn clone for package: %s" % pack)
     return
 
 
@@ -74,7 +75,6 @@ def svn_dump_update(revision, remote_svn_server, local_svn_dump, update_file):
     """
     # Get svn dump updates, from (revision + 1) till HEAD
     rev = "-r" + str(revision + 1) + ":HEAD"
-    print("revision + 1: ", rev)
     f = open(update_file, 'w')
     proc = subprocess.Popen(['svnrdump', 'dump', remote_svn_server,
                             rev, '--incremental'], stdout=f,
@@ -83,7 +83,7 @@ def svn_dump_update(revision, remote_svn_server, local_svn_dump, update_file):
     # Write dump update to file
     f.flush()
     f.close()
-    print("Finshed dump to local file")
+    log.debug("Finshed dump to local file: %s" % update_file)
     return ret_code
 
 
@@ -93,5 +93,5 @@ def update_local_svn_dump(local_svn_dump_location, update_file):
     cmd = ('svnadmin load ' + local_svn_dump_location + ' < '
                             + os.path.abspath(update_file))
     subprocess.call(cmd, shell=True)
-    print("Finished dump update")
+    log.debug("Finished dump update")
     return

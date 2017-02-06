@@ -10,11 +10,13 @@ Author: Nitesh Turaga
 Ideas taken from Jim Hester's code in Bioconductor/mirror
 """
 
+
 import os
 import re
 import subprocess
-import svn_dump as sd
-from distutils.version import LooseVersion
+from svn_dump import get_pack_list
+# Logging configuration
+import logging as log
 
 
 def get_branch_list(svn_root):
@@ -30,6 +32,7 @@ def get_branch_list(svn_root):
                    subprocess.check_output(['svn', 'list', branch_url]).split()
                    if "RELEASE" in item]
     # Reverse branch list based on RELEASE version number
+    #  from distutils.version import LooseVersion
     # branch_list = sorted(branch_list, key=LooseVersion)
     # return branch_list.reverse()
     return branch_list
@@ -39,6 +42,13 @@ def git_remote_add(name, remote_url, cwd):
     """Git remote add."""
     cmd = ['git', 'remote', 'add', name, remote_url]
     subprocess.check_call(cmd, cwd=cwd)
+    return
+
+
+def git_remote_rename(package_dir, orignal_name, new_name):
+    "Git remote rename."
+    cmd = ['git', 'remote', 'rename', orignal_name, new_name]
+    subprocess.check_call(cmd, cwd=package_dir)
     return
 
 
@@ -60,7 +70,7 @@ def add_remote(remote_url, repo_dir):
             remote = remote_url + package
             # Run remote command
             git_remote_add('origin', remote, os.path.abspath(package))
-            print("Added remote to package: %s" % package)
+            log.info("Added remote to package: %s" % package)
     return
 
 
@@ -84,7 +94,6 @@ def add_orphan_branch_points(svn_root, release, repo_dir, package):
     # package_url = (svn_root + '/branches/' + release +
     #    '/madman/Rpacks/' + package)
     package_dir = os.path.join(repo_dir, package)
-    print(package_url)
     # Configure remote svn url
     config_remote_url = ['git', 'config', '--add',
                          'svn-remote.' + release + '.url', package_url]
@@ -118,36 +127,35 @@ def add_release_branches(svn_root, repo_dir):
     branch_url = os.path.join(svn_root, "branches")
     # TODO: Sort branch list based on the order of RELEASE
     branch_list = get_branch_list(svn_root)
-    print("Branch list: ", branch_list)
-
     for branch in branch_list:
         # Special case to avoid badly named branches in SVN
         package_list_url = os.path.join(branch_url, branch, 'madman', 'Rpacks')
         # Get list of packages for EACH branch
-        print(package_list_url)
-        package_list = sd.get_pack_list(package_list_url)
+        package_list = get_pack_list(package_list_url)
 #        import pdb; pdb.set_trace()
         for package in package_list:
 
             git_package_dir = os.path.join(repo_dir, package)
             package_url = os.path.join(package_list_url, package)
-            print("git_package_dir:\n %s, package_url:\n %s" %
-                  (git_package_dir, package_url))
+            log.info("git_package_dir:\n %s, package_url:\n %s" %
+                     (git_package_dir, package_url))
             if package in os.listdir(repo_dir):
                 try:
-                    print("in the try statement")
+                    log.info("Adding release branches to package: %s"
+                             % package)
                     if not _branch_exists(branch, git_package_dir):
                         add_orphan_branch_points(svn_root, branch,
                                                  repo_dir, package)
-                        print("Added orphan branch in %s " % git_package_dir)
+                        log.info("Orphan branch added: %s" % git_package_dir)
                 except OSError as e:
-                    print("Error: Package does not exist in repository, ", e)
+                    log.Error("Error: Package missing in repository")
+                    log.Error(e)
                     pass
                 except subprocess.CalledProcessError as e:
-                    print("Branch: %s, Package: %s, Error: %s" %
-                          branch, package, e.output)
+                    log.Error("Branch: %s, Package: %s, Error: %s" %
+                                branch, package, e.output)
             else:
-                print("Package %s not in directory" % package)
+                log.warning("Package %s not in directory" % package)
     return "Finished adding release branches"
 
 
@@ -165,7 +173,6 @@ def find_branch_points(from_revision, repo_dir, package, release):
     package_dir = os.path.join(repo_dir, package)
     cmd1 = ['git', 'log', '--format=%H', release]
     branch_root = subprocess.check_output(cmd1, cwd=package_dir).split()[-1]
-    print("Branch root", branch_root)
     # Be careful, as there is an empty string at end of list
     commits = subprocess.check_output(['git', 'svn', 'log',
                                        '--oneline', '--show-commit', 'master'],
@@ -205,7 +212,7 @@ def graft(repo_dir, package, release, d):
     commit_id. It connects the two by adding the commit history.
     """
     cwd = os.path.join(repo_dir, package)
-    print("packge_dir: ", cwd)
+    log.info("Graft package directory: %s" % cwd)
     branch_point = find_branch_points(d, repo_dir, package, release)
     if branch_point:
         offspring_sha1, parent_sha1 = branch_point
@@ -229,20 +236,20 @@ def add_commit_history(svn_root, repo_dir):
     d = release_revision_dict(svn_root, branch_list)
     branch_url = svn_root + "branches"
     for release in branch_list:
-        packs = sd.get_pack_list(os.path.join(branch_url, release,
-                                              'madman', 'Rpacks'))
+        packs = get_pack_list(os.path.join(branch_url, release,
+                                           'madman', 'Rpacks'))
         for package in packs:
             try:
                 graft(repo_dir, package, release, d)
             except OSError as e:
-                print("Package not found", package)
-                print(e)
+                log.Error("Package not found: %s" % package)
+                log.Error(e)
                 pass
     return
 
 
 def bare_repo(repo_dir, destination_dir, package):
-    """Make a bare git repo."""
+    """Make a bare git repo from repo_dir."""
     cmd = ['git', 'clone', '--bare', os.path.join(repo_dir, package)]
     subprocess.check_call(cmd, cwd=destination_dir)
     return
@@ -254,10 +261,10 @@ def create_bare_repos(repo_dir, destination_dir):
         try:
             bare_repo(repo_dir, destination_dir, package)
         except subprocess.CalledProcessError as e:
-            print("Package: %s, Error creating bare repository: %s" % (
-                  package, e))
+            log.Error("Package: %s, Error creating bare repository: %s" % (
+                         package, e))
             pass
         except OSError as e:
-            print("Package: %s, Error: %s" % (package, e))
+            log.Error("Package: %s, Error: %s" % (package, e))
             pass
     return

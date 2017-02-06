@@ -15,6 +15,9 @@ Usage:
 import git_script as gs
 import svn_dump as sd
 import os
+import logging as log
+log.basicConfig(filename='transition.log', level=log.DEBUG)
+log.debug("Bioconductor Transition Log File: \n")
 
 
 # TODO: make this a function with arguments
@@ -39,6 +42,13 @@ def run_transition():
     remote_svn_server = 'https://hedgehog.fhcrc.org/bioconductor'
     repo_dir = "/home/nturaga/packages"
     update_file = "updt.svn"
+
+    # Log debug statements
+    log.debug("svn_root %s: \n" % svn_root)
+    log.debug("dump_location %s: \n" % dump_location)
+    log.debug("remote_svn_server %s: \n" % remote_svn_server)
+    log.debug("repo_dir %s: \n" % repo_dir)
+    log.debug("update_file %s: \n" % update_file)
 
     if not os.path.isdir(repo_dir):
         os.mkdir(repo_dir)
