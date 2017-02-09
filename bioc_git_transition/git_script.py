@@ -152,8 +152,8 @@ def add_release_branches(svn_root, repo_dir):
                     log.Error(e)
                     pass
                 except subprocess.CalledProcessError as e:
-                    log.Error("Branch: %s, Package: %s, Error: %s" %
-                                branch, package, e.output)
+                    log.Error("Branch: %s, Package: %s, Error: %s"
+                              % (branch, package, e.output))
             else:
                 log.warning("Package %s not in directory" % package)
     return "Finished adding release branches"
