@@ -10,27 +10,16 @@ Author: Nitesh Turaga
 """
 import os
 import subprocess
-from clone_new_package import clone
-from git_script import git_remote_add
+# from clone_new_package import clone
+from git_api import git_remote_add
+from git_api import git_checkout
+from git_api import git_clone
 import logging as log
 
 
 # TODO: Edit destination dir
 edit_repo = "/home/nturaga/clones"
 SERVER = 'ubuntu@git.bioconductor.org:'
-
-
-def git_checkout(branch, cwd, new=False):
-    """Git checkout branch.
-
-    new=False, this option specifies if branch is already created or not.
-    """
-    if new:
-        cmd = ['git', 'checkout', '-b', branch]
-    else:
-        cmd = ['git', 'checkout', branch]
-    subprocess.check_call(cmd, cwd=cwd)
-    return
 
 
 def extract_developmentURL(package):
@@ -48,16 +37,16 @@ def extract_developmentURL(package):
 
 
 # TODO: Edit the package url as the remote repo changes
-def edit_repo(repo_dir, edit_repo, package):
+def edit_repo(bioc_git_repo, edit_repo, package):
     """
-    Clone a package from repo_dir to make changes.
+    Clone a package from bioc_git_repo to make changes.
 
     Use this function to set up a clone of an existing bioconductor-git
     package, to make changes and push back to the git-server.
     """
-    log.info("Set up a clone of package: %s, to push changes to repo_dir")
-    package_url = SERVER + repo_dir + "/" + package
-    clone(edit_repo, package_url, bare=False)
+    log.info("Set up a clone of package: %s, to push changes to bioc_git_repo")
+    repository = SERVER + bioc_git_repo + "/" + package
+    git_clone(repository, edit_repo, bare=False)
     developmentURL = extract_developmentURL(os.path.join(edit_repo, package))
     git_remote_add('upstream', developmentURL,
                    cwd=os.path.join(edit_repo, package))
@@ -68,12 +57,12 @@ def edit_repo(repo_dir, edit_repo, package):
 # 1386  git remote -v
 # 1387  git pull -Xtheirs --no-edit upstream master
 
-def clone_all_edit_repo(repo_dir):
+def clone_all_edit_repo(bioc_git_repo):
     """Clone all packages in git server to a location,
         where contents may be edited.
     """
-    for package in os.listdir(repo_dir):
-        edit_repo(repo_dir, package)
+    for package in os.listdir(bioc_git_repo):
+        edit_repo(bioc_git_repo, package)
     return
 
 

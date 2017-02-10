@@ -40,24 +40,24 @@ def run_transition():
     svn_root = 'file:///home/nturaga/bioconductor-svn-mirror/'
     dump_location = "bioconductor-svn-mirror/"
     remote_svn_server = 'https://hedgehog.fhcrc.org/bioconductor'
-    repo_dir = "/home/nturaga/packages"
+    bioc_git_repo = "/packages"
     update_file = "updt.svn"
 
     # Log debug statements
     log.debug("svn_root %s: \n" % svn_root)
     log.debug("dump_location %s: \n" % dump_location)
     log.debug("remote_svn_server %s: \n" % remote_svn_server)
-    log.debug("repo_dir %s: \n" % repo_dir)
+    log.debug("bioc_git_repo %s: \n" % bioc_git_repo)
     log.debug("update_file %s: \n" % update_file)
 
-    if not os.path.isdir(repo_dir):
-        os.mkdir(repo_dir)
+    if not os.path.isdir(bioc_git_repo):
+        os.mkdir(bioc_git_repo)
 
     # Step 1: Initial set up, get list of packs from trunk
     package_url = os.path.join(svn_root, 'trunk', 'madman', 'Rpacks')
     packs = sd.get_pack_list(package_url)
     # Create a local dump of SVN packages in a location
-    sd.svn_dump(svn_root, packs, repo_dir)
+    sd.svn_dump(svn_root, packs, bioc_git_repo)
 
     # Step 2: Update
     revision = sd.svn_get_revision(svn_root)
@@ -66,20 +66,20 @@ def run_transition():
     sd.update_local_svn_dump(dump_location, update_file)
 
     # Step 4: Add release branches to all   packages
-    gs.add_release_branches(svn_root, repo_dir)
+    gs.add_release_branches(svn_root, bioc_git_repo)
 
     # Step 5: Add commit history
     gs.add_commit_history(svn_root)
 
     # Step 3: Add git remote branch, to make git package act as a server
     remote_path = "nturaga@git.bioconductor.org:/packages/"
-    os.chdir(repo_dir)
-    gs.add_remote(remote_path, repo_dir)
+    os.chdir(bioc_git_repo)
+    gs.add_remote(bioc_git_repo, remote_path)
     os.chdir("..")
 
     # Step 6: Make Git repo bare
     destination_dir = "/home/nturaga/packages"
-    gs.create_bare_repos(repo_dir, destination_dir)
+    gs.create_bare_repos(bioc_git_repo, destination_dir)
     return
 
 

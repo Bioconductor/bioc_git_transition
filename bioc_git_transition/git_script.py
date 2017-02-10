@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """Bioconductor Git script docstrings.
 
 This module provides functions for working with the Bioconductor
@@ -15,8 +14,22 @@ import os
 import re
 import subprocess
 from svn_dump import get_pack_list
+from git_api import git_remote_add
+from git_api import git_filter_branch
+from git_api import git_branch_exists
+from git_api import git_svn_rebase
+from git_api import git_checkout
+from git_api import git_svn_fetch
+from git_api import git_clone
 # Logging configuration
 import logging as log
+
+svn_root = 'file:///home/nturaga/bioconductor-svn-mirror/'
+dump_location = "bioconductor-svn-mirror/"
+remote_svn_server = 'https://hedgehog.fhcrc.org/bioconductor'
+bioc_git_repo = "/home/nturaga/packages"
+update_file = "updt.svn"
+remote_url = "ubuntu@git.bioconductor.org:/packages/"
 
 
 def get_branch_list(svn_root):
@@ -38,33 +51,12 @@ def get_branch_list(svn_root):
     return branch_list
 
 
-def git_remote_add(name, remote_url, cwd):
-    """Git remote add."""
-    cmd = ['git', 'remote', 'add', name, remote_url]
-    subprocess.check_call(cmd, cwd=cwd)
-    return
-
-
-def git_remote_rename(package_dir, orignal_name, new_name):
-    "Git remote rename."
-    cmd = ['git', 'remote', 'rename', orignal_name, new_name]
-    subprocess.check_call(cmd, cwd=package_dir)
-    return
-
-
-def git_remote_remove(name, cwd):
-    """Git remote remove."""
-    cmd = ['git', 'remote', 'remove', name]
-    subprocess.check_call(cmd, cwd=cwd)
-    return
-
-
-def add_remote(remote_url, repo_dir):
+def add_remote(bioc_git_repo, remote_url="ubuntu@git.bioconductor.org:/packages/"):
     """Add git remote to make the directory.
 
     Usage: cd /home/nturaga/packages and run function.
     """
-    for package in os.listdir(repo_dir):
+    for package in os.listdir(bioc_git_repo):
         if ((os.path.isdir(package)) and
                 (".git" in os.listdir(os.path.abspath(package)))):
             remote = remote_url + package
@@ -74,26 +66,19 @@ def add_remote(remote_url, repo_dir):
     return
 
 
-def _branch_exists(branch, working_directory):
-    """Check if branch exists in git repo."""
-    output = subprocess.check_output(['git', 'branch', '--list',
-                                      branch], cwd=working_directory)
-    return output != ''
-
-
 # TODO: construct branch_url within this function (package_url)
-def add_orphan_branch_points(svn_root, release, repo_dir, package):
+def add_orphan_branch_points(svn_root, release, bioc_git_repo, package):
     """Add orphan branch.
 
     Configure the remote and fetch urls for git-svn. Then, fetch from the
     svn remote repository. Checkout from the release branch, and rebase it to
     the fetched commits. Checkout master at the end.
     """
-    package_url = os.path.join(svn_root, 'branches', release, 'madman',
+    branch_url = svn_root + 'branches'
+    package_url = os.path.join(branch_url, release, 'madman',
                                'Rpacks', package)
-    # package_url = (svn_root + '/branches/' + release +
-    #    '/madman/Rpacks/' + package)
-    package_dir = os.path.join(repo_dir, package)
+    package_dir = os.path.join(bioc_git_repo, package)
+    # TODO: add git config to git_api
     # Configure remote svn url
     config_remote_url = ['git', 'config', '--add',
                          'svn-remote.' + release + '.url', package_url]
@@ -104,24 +89,23 @@ def add_orphan_branch_points(svn_root, release, repo_dir, package):
                            ':refs/remotes/git-svn-' + release]
     subprocess.check_call(config_remote_fetch, cwd=package_dir)
     # Fetch
-    fetch = ['git', 'svn', 'fetch', release]
-    subprocess.check_call(fetch, cwd=package_dir)
+    git_svn_fetch(release, cwd=package_dir)
     # Checkout and change to branch
     checkout = ['git', 'checkout', '-b', release, 'git-svn-' + release]
     subprocess.check_call(checkout, cwd=package_dir)
     # Rebase
-    subprocess.check_call(['git', 'svn', 'rebase'], cwd=package_dir)
+    git_svn_rebase(cwd=package_dir)
     # Checkout master
-    subprocess.check_call(['git', 'checkout', 'master'], cwd=package_dir)
+    git_checkout('master', cwd=package_dir, new=False)
     return
 
 
-def add_release_branches(svn_root, repo_dir):
+def add_release_branches(svn_root, bioc_git_repo):
     """Add release branches to each package.
 
     TODO: Extended description of how this works.
     svn_root = file:///home/nturaga/bioconductor-svn-mirror/
-    repo_dir: '/home/nturaga/packages_local'
+    bioc_git_repo: '/home/nturaga/packages_local'
     """
     # Get list of branches
     branch_url = os.path.join(svn_root, "branches")
@@ -135,17 +119,17 @@ def add_release_branches(svn_root, repo_dir):
 #        import pdb; pdb.set_trace()
         for package in package_list:
 
-            git_package_dir = os.path.join(repo_dir, package)
+            git_package_dir = os.path.join(bioc_git_repo, package)
             package_url = os.path.join(package_list_url, package)
             log.info("git_package_dir:\n %s, package_url:\n %s" %
                      (git_package_dir, package_url))
-            if package in os.listdir(repo_dir):
+            if package in os.listdir(bioc_git_repo):
                 try:
                     log.info("Adding release branches to package: %s"
                              % package)
-                    if not _branch_exists(branch, git_package_dir):
+                    if not git_branch_exists(branch, git_package_dir):
                         add_orphan_branch_points(svn_root, branch,
-                                                 repo_dir, package)
+                                                 bioc_git_repo, package)
                         log.info("Orphan branch added: %s" % git_package_dir)
                 except OSError as e:
                     log.Error("Error: Package missing in repository")
@@ -168,9 +152,9 @@ def _svn_revision_branch_id(svn_url):
     return revision_id
 
 
-def find_branch_points(from_revision, repo_dir, package, release):
+def find_branch_points(from_revision, bioc_git_repo, package, release):
     """Find branch points in the git revision history."""
-    package_dir = os.path.join(repo_dir, package)
+    package_dir = os.path.join(bioc_git_repo, package)
     cmd1 = ['git', 'log', '--format=%H', release]
     branch_root = subprocess.check_output(cmd1, cwd=package_dir).split()[-1]
     # Be careful, as there is an empty string at end of list
@@ -205,26 +189,25 @@ def release_revision_dict(svn_root, branch_list):
     return d
 
 
-def graft(repo_dir, package, release, d):
+def graft(bioc_git_repo, package, release, d):
     """Write graft file in each pacakage, connecting the branches.
 
     The graft file contains the parent commit_id and the orphan-branch
     commit_id. It connects the two by adding the commit history.
     """
-    cwd = os.path.join(repo_dir, package)
+    cwd = os.path.join(bioc_git_repo, package)
     log.info("Graft package directory: %s" % cwd)
-    branch_point = find_branch_points(d, repo_dir, package, release)
+    branch_point = find_branch_points(d, bioc_git_repo, package, release)
     if branch_point:
         offspring_sha1, parent_sha1 = branch_point
         with open(os.path.join(cwd, ".git/info/grafts"), 'a') as f:
             f.write(offspring_sha1 + " " + parent_sha1 + "\n")
         graft_range = parent_sha1 + ".." + release
-        subprocess.check_call(['git', 'filter-branch', '--force',
-                               '--', graft_range], cwd=cwd)
+        git_filter_branch(graft_range, cwd=cwd)
     return
 
 
-def add_commit_history(svn_root, repo_dir):
+def add_commit_history(svn_root, bioc_git_repo):
     """
     Add commit history by fixing b.
 
@@ -240,7 +223,7 @@ def add_commit_history(svn_root, repo_dir):
                                            'madman', 'Rpacks'))
         for package in packs:
             try:
-                graft(repo_dir, package, release, d)
+                graft(bioc_git_repo, package, release, d)
             except OSError as e:
                 log.Error("Package not found: %s" % package)
                 log.Error(e)
@@ -248,18 +231,11 @@ def add_commit_history(svn_root, repo_dir):
     return
 
 
-def bare_repo(repo_dir, destination_dir, package):
-    """Make a bare git repo from repo_dir."""
-    cmd = ['git', 'clone', '--bare', os.path.join(repo_dir, package)]
-    subprocess.check_call(cmd, cwd=destination_dir)
-    return
-
-
-def create_bare_repos(repo_dir, destination_dir):
+def create_bare_repos(bioc_git_repo, destination_dir):
     """Create bare repos in the repository directory."""
-    for package in os.listdir(os.path.abspath(repo_dir)):
+    for package in os.listdir(os.path.abspath(bioc_git_repo)):
         try:
-            bare_repo(repo_dir, destination_dir, package)
+            git_clone(package, destination_dir, bare=True)
         except subprocess.CalledProcessError as e:
             log.Error("Package: %s, Error creating bare repository: %s" % (
                          package, e))
