@@ -53,10 +53,6 @@ def edit_repo(bioc_git_repo, edit_repo, package):
     return
 
 
-# 1385  git remote add upstream https://github.com/Bioconductor/spbtest3.git
-# 1386  git remote -v
-# 1387  git pull -Xtheirs --no-edit upstream master
-
 def clone_all_edit_repo(bioc_git_repo):
     """Clone all packages in git server to a location,
         where contents may be edited.

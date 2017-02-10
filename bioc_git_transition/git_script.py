@@ -51,7 +51,7 @@ def get_branch_list(svn_root):
     return branch_list
 
 
-def add_remote(bioc_git_repo, remote_url="ubuntu@git.bioconductor.org:/packages/"):
+def add_remote(bioc_git_repo, remote_url):
     """Add git remote to make the directory.
 
     Usage: cd /home/nturaga/packages and run function.
