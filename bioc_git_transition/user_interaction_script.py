@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Bioconductor Git user interaction script docstrings.
+"""Bioconductor Git repo user interaction script docstrings.
 
 This module provides functions for working with the Bioconductor
 `git` repository. This module gives the bioconductor core team,
@@ -10,20 +10,18 @@ Author: Nitesh Turaga
 """
 import os
 import subprocess
-# from clone_new_package import clone
 from git_api import git_remote_add
 from git_api import git_checkout
 from git_api import git_clone
 import logging as log
 
 
-# TODO: Edit destination dir
 edit_repo = "/home/nturaga/clones"
 SERVER = 'ubuntu@git.bioconductor.org:'
 
 
-def extract_developmentURL(package):
-    """Extract DevelopmentURL from DESCRIPTION file."""
+def extract_development_url(package):
+    """Extract `DevelopmentURL` from DESCRIPTION file."""
     description = os.path.join(package, 'DESCRIPTION')
     with open(description, 'r') as f:
         doc = f.read()
@@ -47,15 +45,18 @@ def edit_repo(bioc_git_repo, edit_repo, package):
     log.info("Set up a clone of package: %s, to push changes to bioc_git_repo")
     repository = SERVER + bioc_git_repo + "/" + package
     git_clone(repository, edit_repo, bare=False)
-    developmentURL = extract_developmentURL(os.path.join(edit_repo, package))
-    git_remote_add('upstream', developmentURL,
+    development_url = extract_development_url(os.path.join(edit_repo, package))
+    git_remote_add('upstream', development_url,
                    cwd=os.path.join(edit_repo, package))
     return
 
 
 def clone_all_edit_repo(bioc_git_repo):
-    """Clone all packages in git server to a location,
-        where contents may be edited.
+    """Clone all packages in git server.
+
+    This clone of the entire git server is located on a seperate instance,
+    where contents of the pacakges may be edited. Following the modifications
+    in the `edit_repo`, the contents can be pushed to the `bioc_git_repo`.
     """
     for package in os.listdir(bioc_git_repo):
         edit_repo(bioc_git_repo, package)
@@ -87,8 +88,10 @@ def daily_fetch_branch(edit_repo, package, branch):
 
 
 def daily_fetch(edit_repo, branch):
-    """Daily fetch  needs to be run by the build system on
-        the branch being updated e.g `master` or `RELEASE_3_4`
+    """Daily fetch of every package in the edit_repo.
+
+    Daily fetch  needs to be run by the build system on
+    the branch being updated e.g `master` or `RELEASE_3_4`
     """
     for package in os.listdir(edit_repo):
         daily_fetch_branch(edit_repo, package, branch)
@@ -142,8 +145,7 @@ def release_branch(edit_repo, package, new_release):
     git_checkout(branch="master", cwd=package_dir, new=False)
     # on master, version bump, release = False
     version_bump(package, release=False)
-    commit_message("bump x.y.z versions to even 'y' prior to creation of "
-                   + new_release, package_dir)
+    commit_message("bump x.y.z versions to even 'y' prior to creation of " + new_release, package_dir)
 
     # IN THE BRANCH, version bump release=True
     git_checkout(branch=new_release, cwd=package_dir, new=True)
@@ -157,8 +159,7 @@ def release_branch(edit_repo, package, new_release):
     # version bump release=True
     version_bump(package, release=True)
     # Commit message
-    commit_message("bump x.y.z versions to odd 'y' after creation of "
-                   + new_release, package_dir)
+    commit_message("bump x.y.z versions to odd 'y' after creation of " + new_release, package_dir)
     log.info("New branch created for package %s" % package)
     return
 

@@ -46,6 +46,10 @@ def svn_dump(local_svn_dump, packs, dump_location):
         package_dump = os.path.join(package_dir, pack)
         subprocess.check_call(['git', 'svn', 'clone', package_dump],
                               cwd=dump_location)
+        # TODO: git svn clone
+        # --rewrite-root=https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/BiocInstaller
+        # --authors-file=users_and_user_db.txt
+        # file:///home/nturaga/bioconductor-svn-mirror/trunk/madman/Rpacks/BiocInstaller
         log.debug("Finished git-svn clone for package: %s" % pack)
     return
 

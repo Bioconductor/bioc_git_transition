@@ -7,7 +7,6 @@ This module provides functions for working with the Bioconductor
 and commit history to each branch as needed.
 
 Author: Nitesh Turaga
-Ideas taken from Jim Hester's code in Bioconductor/mirror
 """
 import logging as log
 from git_api import git_clone

@@ -34,6 +34,7 @@ remote_url = "ubuntu@git.bioconductor.org:/packages/"
 
 def get_branch_list(svn_root):
     """Get list of branches.
+
     Input:
         svn_root path.
     Return:
@@ -66,7 +67,6 @@ def add_remote(bioc_git_repo, remote_url):
     return
 
 
-# TODO: construct branch_url within this function (package_url)
 def add_orphan_branch_points(svn_root, release, bioc_git_repo, package):
     """Add orphan branch.
 
@@ -74,7 +74,7 @@ def add_orphan_branch_points(svn_root, release, bioc_git_repo, package):
     svn remote repository. Checkout from the release branch, and rebase it to
     the fetched commits. Checkout master at the end.
     """
-    branch_url = svn_root + 'branches'
+    branch_url = os.path.join(svn_root, "branches")
     package_url = os.path.join(branch_url, release, 'madman',
                                'Rpacks', package)
     package_dir = os.path.join(bioc_git_repo, package)
@@ -132,11 +132,11 @@ def add_release_branches(svn_root, bioc_git_repo):
                                                  bioc_git_repo, package)
                         log.info("Orphan branch added: %s" % git_package_dir)
                 except OSError as e:
-                    log.Error("Error: Package missing in repository")
-                    log.Error(e)
+                    log.error("Error: Package missing in repository")
+                    log.error(e)
                     pass
                 except subprocess.CalledProcessError as e:
-                    log.Error("Branch: %s, Package: %s, Error: %s"
+                    log.error("Branch: %s, Package: %s, Error: %s"
                               % (branch, package, e.output))
             else:
                 log.warning("Package %s not in directory" % package)
@@ -225,22 +225,25 @@ def add_commit_history(svn_root, bioc_git_repo):
             try:
                 graft(bioc_git_repo, package, release, d)
             except OSError as e:
-                log.Error("Package not found: %s" % package)
-                log.Error(e)
+                log.error("Package not found: %s" % package)
+                log.error(e)
                 pass
     return
 
 
 def create_bare_repos(bioc_git_repo, destination_dir):
-    """Create bare repos in the repository directory."""
+    """Create bare repos in the repository directory.
+
+    This needs to be run from within the bioc_git_repo directory.
+    """
     for package in os.listdir(os.path.abspath(bioc_git_repo)):
         try:
-            git_clone(package, destination_dir, bare=True)
+            git_clone(os.path.join(bioc_git_repo, package), destination_dir, bare=True)
         except subprocess.CalledProcessError as e:
-            log.Error("Package: %s, Error creating bare repository: %s" % (
-                         package, e))
+            log.error("Package: %s, Error creating bare repository: %s" % (
+                      package, e))
             pass
         except OSError as e:
-            log.Error("Package: %s, Error: %s" % (package, e))
+            log.error("Package: %s, Error: %s" % (package, e))
             pass
     return

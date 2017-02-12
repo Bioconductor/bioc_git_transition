@@ -1,5 +1,14 @@
-import os
+"""Git API.
+
+This module provides functions for working with the Bioconductor
+`git` repository. It gives the required Git API to work it the
+bioconductor git server.
+
+Author: Nitesh Turaga
+"""
 import subprocess
+import ntpath
+import os
 
 
 def git_remote_add(name, remote_url, cwd):
@@ -10,7 +19,7 @@ def git_remote_add(name, remote_url, cwd):
 
 
 def git_remote_rename(package_dir, orignal_name, new_name):
-    "Git remote rename."
+    """Git remote rename."""
     cmd = ['git', 'remote', 'rename', orignal_name, new_name]
     subprocess.check_call(cmd, cwd=package_dir)
     return
@@ -37,11 +46,19 @@ def git_filter_branch(graft_range, cwd):
     return
 
 
+# TODO: Test, this once
+# --rewrite-root=https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/BiocInstaller
+# --authors-file=users_and_user_db.txt
+
 def git_svn_rebase(cwd):
     """Git svn rebase a package."""
     cmd = ['git', 'svn', 'rebase']
     subprocess.check_call(cmd, cwd=cwd)
     return
+
+# TODO:
+# --rewrite-root=https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/BiocInstaller
+# --authors-file=users_and_user_db.txt
 
 
 def git_svn_fetch(branch, cwd):
@@ -66,13 +83,20 @@ def git_checkout(branch, cwd, new=False):
     return
 
 
+def path_leaf(path):
+    head, tail = ntpath.split(path)
+    return tail or ntpath.basename(head)
+
+
 def git_clone(repository, directory, bare=True):
     """Make a clone of a git repository.
 
     Package will be cloned in `directory`, and if `bare=True`
     are bare repository is created, else a regular clone.
+    git clone --bare packages/Biostrings temp/Biostrings.git
     """
-    destination = os.path.join(directory, repository.split("/")[-1])
+    destination = os.path.join(directory, path_leaf(repository))
+    destination = destination + ".git"
     if bare:
         cmd = ['git', 'clone', '--bare', repository, destination]
     else:
@@ -80,4 +104,3 @@ def git_clone(repository, directory, bare=True):
         cmd = ['git', 'clone', repository, destination]
     subprocess.check_call(cmd)
     return destination
-
