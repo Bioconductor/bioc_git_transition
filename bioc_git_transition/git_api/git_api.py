@@ -104,3 +104,4 @@ def git_clone(repository, directory, bare=True):
         cmd = ['git', 'clone', repository, destination]
     subprocess.check_call(cmd)
     return destination
+

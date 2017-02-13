@@ -19,7 +19,6 @@ import logging as log
 edit_repo = "/home/nturaga/clones"
 SERVER = 'ubuntu@git.bioconductor.org:'
 
-
 def extract_development_url(package):
     """Extract `DevelopmentURL` from DESCRIPTION file."""
     description = os.path.join(package, 'DESCRIPTION')
@@ -35,7 +34,7 @@ def extract_development_url(package):
 
 
 # TODO: Edit the package url as the remote repo changes
-def edit_repo(bioc_git_repo, edit_repo, package):
+def set_edit_repo(bioc_git_repo, edit_repo, package):
     """
     Clone a package from bioc_git_repo to make changes.
 
