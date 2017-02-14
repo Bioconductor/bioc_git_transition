@@ -24,7 +24,20 @@ def get_pack_list(path):
     return [item.replace('/', '') for item in result.split()]
 
 
-def svn_dump(local_svn_dump, packs, dump_location):
+def get_package_list(svn_root, manifest_file):
+    """Get the package list from Bioconductor manifest file."""
+    manifest = os.path.join(svn_root, "trunk", "madman", "Rpacks",
+                            manifest_file)
+    cmd = ['svn', 'cat', manifest]
+    out = subprocess.check_output(cmd)
+    # with open(manifest, 'r') as f:
+    doc = out.split("\n")
+    package_list = [line.replace("Package: ", "").strip()
+                    for line in doc if line.startswith("Package")]
+    return package_list
+
+
+def svn_dump(svn_root, packs, svn_root_dir):
     """
     Create git svn clone from SVN dump for each package.
 
@@ -33,28 +46,26 @@ def svn_dump(local_svn_dump, packs, dump_location):
 
     Parameters
     ----------
-    local_svn_dump : List of Bioconductor packages
+    svn_root : List of Bioconductor packages
         List of Bioconductor packages obtained
-        from _get_pack_list(local_svn_dump)
+        from _get_pack_list(svn_root)
 
     Returns
     -------
     None
     """
-    package_dir = os.path.join(local_svn_dump, 'trunk/madman/Rpacks/')
+    package_dir = os.path.join(svn_root, 'trunk/madman/Rpacks/')
     for pack in packs:
         package_dump = os.path.join(package_dir, pack)
         subprocess.check_call(['git', 'svn', 'clone', package_dump],
-                              cwd=dump_location)
-        # TODO: git svn clone
-        # --rewrite-root=https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/BiocInstaller
-        # --authors-file=users_and_user_db.txt
-        # file:///home/nturaga/bioconductor-svn-mirror/trunk/madman/Rpacks/BiocInstaller
+                              cwd=svn_root_dir)
+        # TODO: git svn clone --rewrite-root=https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/BiocInstaller
+        # --authors-file=users_and_user_db.txt file:///home/nturaga/bioconductor-svn-mirror/trunk/madman/Rpacks/BiocInstaller
         log.debug("Finished git-svn clone for package: %s" % pack)
     return
 
 
-def svn_get_revision(local_svn_dump):
+def svn_get_revision(svn_root):
     """
     Summary line.
 
@@ -62,7 +73,7 @@ def svn_get_revision(local_svn_dump):
 
     """
     # Get revision number
-    p = subprocess.Popen(["svn", "info", local_svn_dump],
+    p = subprocess.Popen(["svn", "info", svn_root],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     revision = [line.split(":")[1].strip() for line in out.split("\n")
@@ -70,7 +81,7 @@ def svn_get_revision(local_svn_dump):
     return int(revision[0])
 
 
-def svn_dump_update(revision, remote_svn_server, local_svn_dump, update_file):
+def svn_dump_update(revision, remote_svn_server, update_file):
     """
     Summary line.
 
@@ -92,9 +103,9 @@ def svn_dump_update(revision, remote_svn_server, local_svn_dump, update_file):
 
 
 # TODO: This doesn't work like expected
-def update_local_svn_dump(local_svn_dump_location, update_file):
+def update_local_svn_dump(svn_root_dir, update_file):
     """Update Local SVN dump."""
-    cmd = ('svnadmin load ' + local_svn_dump_location + ' < '
+    cmd = ('svnadmin load ' + svn_root_dir + ' < '
                             + os.path.abspath(update_file))
     subprocess.call(cmd, shell=True)
     log.debug("Finished dump update")
