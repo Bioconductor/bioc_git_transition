@@ -24,7 +24,7 @@ def get_pack_list(path):
     return [item.replace('/', '') for item in result.split()]
 
 
-def get_package_list(svn_root, manifest_file):
+def manifest_package_list(svn_root, manifest_file):
     """Get the package list from Bioconductor manifest file."""
     manifest = os.path.join(svn_root, "trunk", "madman", "Rpacks",
                             manifest_file)
@@ -57,9 +57,11 @@ def svn_dump(svn_root, packs, svn_root_dir):
     package_dir = os.path.join(svn_root, 'trunk/madman/Rpacks/')
     for pack in packs:
         package_dump = os.path.join(package_dir, pack)
-        subprocess.check_call(['git', 'svn', 'clone', package_dump],
-                              cwd=svn_root_dir)
-        # TODO: git svn clone --rewrite-root=https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/BiocInstaller
+        cmd = ['git', 'svn', 'clone', '--authors-file=user_db.txt',
+               package_dump]
+        subprocess.check_call(cmd, cwd=svn_root_dir)
+        # TODO: git svn clone
+        # --rewrite-root=https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/BiocInstaller
         # --authors-file=users_and_user_db.txt file:///home/nturaga/bioconductor-svn-mirror/trunk/madman/Rpacks/BiocInstaller
         log.debug("Finished git-svn clone for package: %s" % pack)
     return
