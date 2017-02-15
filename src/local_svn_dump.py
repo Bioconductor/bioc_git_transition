@@ -15,10 +15,12 @@ import subprocess
 import logging as log
 
 
-class svn_dump(object):
+class LocalSvnDump(object):
+    """Local SVN dump."""
 
-    def __init__(self, svn_root, bioc_git_repo, users_db):
-        """
+    def __init__(self, svn_root, bioc_git_repo, users_db, remote_svn_server):
+        """Initialize Loval SVN dump.
+
         Usage:
         svn_root = 'file:///home/nturaga/bioconductor-svn-mirror/'
         # Initialize dump
@@ -29,7 +31,7 @@ class svn_dump(object):
         self.svn_root = svn_root
         self.svn_root_dir = svn_root.replace("file://", "")
         self.users_db = users_db
-        self.remote_svn_server = 'https://hedgehog.fhcrc.org/bioconductor'
+        self.remote_svn_server = remote_svn_server
         self.bioc_git_repo = bioc_git_repo
 
     def get_pack_list(self, branch="trunk"):
@@ -45,6 +47,7 @@ class svn_dump(object):
 
     def manifest_package_list(self, manifest_file):
         """Get the package list from Bioconductor manifest file.
+
         Usage:
             dump.manifest_package_list("bioc_3.4.manifest")
         """
@@ -75,9 +78,7 @@ class svn_dump(object):
         return
 
     def svn_get_revision(self):
-        """
-        Get revision of current SVN server.
-        """
+        """Get revision of current SVN server."""
         # Get revision number
         p = subprocess.Popen(["svn", "info", self.svn_root],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -89,9 +90,7 @@ class svn_dump(object):
         return
 
     def svn_dump_update(self, update_file):
-        """
-        Update SVN dump.
-        """
+        """Update SVN dump."""
         # Get svn dump updates, from (revision + 1) till HEAD
         rev = "-r" + str(self.revision + 1) + ":HEAD"
         with open(update_file, 'w') as f:
@@ -108,8 +107,8 @@ class svn_dump(object):
     # TODO: This doesn't work like expected
     def update_local_svn_dump(self, update_file):
         """Update Local SVN dump."""
-        cmd = ('svnadmin load ' + self.svn_root_dir + ' < '
-                                + os.path.abspath(update_file))
+        cmd = ('svnadmin load ' + self.svn_root_dir + ' < ' +
+               os.path.abspath(update_file))
         subprocess.call(cmd, shell=True)
         log.debug("Finished dump update")
         return

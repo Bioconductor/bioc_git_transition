@@ -84,6 +84,7 @@ def git_checkout(branch, cwd, new=False):
 
 
 def path_leaf(path):
+    """Get leaf node of the path."""
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
 

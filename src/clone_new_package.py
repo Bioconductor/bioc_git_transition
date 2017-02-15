@@ -14,6 +14,7 @@ from git_api import git_remote_rename
 from git_api import git_remote_add
 
 
+# TODO: DEPRECATED
 def clone_new(bioc_git_repo, destination_dir, new_package_url):
     """Clone a new package.
 
