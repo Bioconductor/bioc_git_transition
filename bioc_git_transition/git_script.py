@@ -13,7 +13,6 @@ Ideas taken from Jim Hester's code in Bioconductor/mirror
 import os
 import re
 import subprocess
-from svn_dump import get_pack_list
 from git_api import git_remote_add
 from git_api import git_filter_branch
 from git_api import git_branch_exists
@@ -50,6 +49,12 @@ def get_branch_list(svn_root):
     # branch_list = sorted(branch_list, key=LooseVersion)
     # return branch_list.reverse()
     return branch_list
+
+
+def get_pack_list(path):
+    """Get list of packages on SVN."""
+    result = subprocess.check_output(['svn', 'list', path])
+    return [item.replace('/', '') for item in result.split()]
 
 
 def add_remote(bioc_git_repo, remote_url):
