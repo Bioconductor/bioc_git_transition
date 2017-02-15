@@ -38,14 +38,14 @@ def run_transition():
     """
     # Step 0
     svn_root = 'file:///home/nturaga/bioconductor-svn-mirror/'
-    dump_location = "bioconductor-svn-mirror/"
+    svn_root_dir = "bioconductor-svn-mirror/"
     remote_svn_server = 'https://hedgehog.fhcrc.org/bioconductor'
     bioc_git_repo = "/packages"
     update_file = "updt.svn"
 
     # Log debug statements
     log.debug("svn_root %s: \n" % svn_root)
-    log.debug("dump_location %s: \n" % dump_location)
+    log.debug("svn_root_dir %s: \n" % svn_root_dir)
     log.debug("remote_svn_server %s: \n" % remote_svn_server)
     log.debug("bioc_git_repo %s: \n" % bioc_git_repo)
     log.debug("update_file %s: \n" % update_file)
@@ -63,7 +63,7 @@ def run_transition():
     revision = sd.svn_get_revision(svn_root)
     sd.svn_dump_update(revision, remote_svn_server, svn_root,
                        update_file)
-    sd.update_local_svn_dump(dump_location, update_file)
+    sd.update_local_svn_dump(svn_root_dir, update_file)
 
     # Step 4: Add release branches to all   packages
     gs.add_release_branches(svn_root, bioc_git_repo)

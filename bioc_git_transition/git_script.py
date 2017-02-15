@@ -25,7 +25,7 @@ from git_api import git_clone
 import logging as log
 
 svn_root = 'file:///home/nturaga/bioconductor-svn-mirror/'
-dump_location = "bioconductor-svn-mirror/"
+svn_root_dir = "bioconductor-svn-mirror/"
 remote_svn_server = 'https://hedgehog.fhcrc.org/bioconductor'
 bioc_git_repo = "/home/nturaga/packages"
 update_file = "updt.svn"
@@ -116,7 +116,6 @@ def add_release_branches(svn_root, bioc_git_repo):
         package_list_url = os.path.join(branch_url, branch, 'madman', 'Rpacks')
         # Get list of packages for EACH branch
         package_list = get_pack_list(package_list_url)
-#        import pdb; pdb.set_trace()
         for package in package_list:
 
             git_package_dir = os.path.join(bioc_git_repo, package)
@@ -238,7 +237,8 @@ def create_bare_repos(bioc_git_repo, destination_dir):
     """
     for package in os.listdir(os.path.abspath(bioc_git_repo)):
         try:
-            git_clone(os.path.join(bioc_git_repo, package), destination_dir, bare=True)
+            git_clone(os.path.join(bioc_git_repo, package), destination_dir,
+                      bare=True)
         except subprocess.CalledProcessError as e:
             log.error("Package: %s, Error creating bare repository: %s" % (
                       package, e))

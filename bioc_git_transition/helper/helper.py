@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+
 def is_github_repo(url):
     """Check if it is a valid github repo.
 
@@ -27,8 +28,8 @@ def append_development_url(package):
     for i in xrange(len(doc_list)):
         if doc_list[i].startswith("URL:"):
             url = doc_list[i]
-    url = url.replace("URL: ","")
-    print( url)
+    url = url.replace("URL: ", "")
+    print(url)
     if ("github" in url) and is_github_repo(url):
         # parse to see if valid github URL
         # Add url as Development URL
@@ -54,4 +55,3 @@ def append_development_url_in_all(edit_repo, push=False):
         # if push=True:
         #     git_push(package, branch)
     return
-
