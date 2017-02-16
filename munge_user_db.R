@@ -20,6 +20,9 @@ head(absent)
 View(absent)
 result = c(dat, paste0(absent$V1, " = ", absent$V1, " ", absent$V1, " <", absent$V1, ">"))
 
+# Munge
+result[grep(pattern = "no",x = result)]
+result = result[-1543]
 View(data.frame(result))
 
 write.table(data.frame(result), file="user_db.txt",col.names=FALSE, row.names=FALSE, quote=FALSE)
