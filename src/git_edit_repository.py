@@ -10,6 +10,7 @@ Author: Nitesh Turaga
 """
 import os
 import subprocess
+from src.local_svn_dump import 
 from src.git_api.git_api import *
 import logging as log
 
@@ -20,7 +21,8 @@ class GitEditRepository(object):
     def __init__(self, edit_repo, bioc_git_repo, server):
         """Initialize Git edit repo."""
         self.edit_repo = edit_repo
-        self.bioc_git_repo = bioc_git_repo
+        # TODO:  Make this bare_git_repo 
+        # self.bioc_git_repo = bioc_git_repo
         self.server = server
         return
 
@@ -47,7 +49,10 @@ class GitEditRepository(object):
         """
         log.info("Set up a clone of package: %s, "
                  "to push changes to bioc_git_repo" % package)
+        # TODO: bare_git_repo instead bioc_git_repo
+        # TODO: Also remove packaages (self.bare_git.repo) 
         repository = self.server + self.bioc_git_repo + "/" + package
+        # repository = self.ssh_server + "/" + package
         git_clone(repository, self.edit_repo, bare=False)
         development_url = self.extract_development_url(os.path.join(self.edit_repo, package))
         git_remote_add('upstream', development_url,
@@ -61,6 +66,8 @@ class GitEditRepository(object):
         where contents of the pacakges may be edited. After the modifications
         in the `edit_repo`, the contents can be pushed to the `bioc_git_repo`.
         """
+        # TODO: get list of package from servers
+        # get list of packages from manifest file. 
         for package in os.listdir(self.bioc_git_repo):
             self.set_edit_repo(package)
         return

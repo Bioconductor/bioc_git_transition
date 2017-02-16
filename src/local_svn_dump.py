@@ -71,6 +71,8 @@ class LocalSvnDump(object):
         package_dir = os.path.join(self.svn_root, 'trunk/madman/Rpacks/')
         for pack in packs:
             package_dump = os.path.join(package_dir, pack)
+            # TODO: git svn clone from each release branch. 
+            # This will be tricky.
             cmd = ['git', 'svn', 'clone', '--authors-file=' + self.users_db,
                    package_dump]
             subprocess.check_call(cmd, cwd=self.bioc_git_repo)

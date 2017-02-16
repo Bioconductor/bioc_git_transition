@@ -95,6 +95,7 @@ class GitBioconductorRepository(object):
         git_checkout('master', cwd=package_dir, new=False)
         return
 
+    # TODO: Look at the Issue #3 on github to speed this up
     def add_release_branches(self):
         """Add release branches to each package.
 
@@ -180,7 +181,7 @@ class GitBioconductorRepository(object):
             rel_rev_dict[release] = revision
         return rel_rev_dict
 
-    def graft(self, package, release, d):
+    def graft(self, package, release, release_revision_dict):
         """Write graft file in each pacakage, connecting the branches.
 
         The graft file contains the parent commit_id and the orphan-branch
@@ -188,7 +189,7 @@ class GitBioconductorRepository(object):
         """
         cwd = os.path.join(self.bioc_git_repo, package)
         log.info("Graft package directory: %s" % cwd)
-        branch_point = self.find_branch_points(d, package, release)
+        branch_point = self.find_branch_points(release_revision_dict, package, release)
         if branch_point:
             offspring_sha1, parent_sha1 = branch_point
             with open(os.path.join(cwd, ".git/info/grafts"), 'a') as f:
@@ -206,14 +207,14 @@ class GitBioconductorRepository(object):
         """
         # Get list of branches
         branch_list = self.get_branch_list()
-        d = self.release_revision_dict(branch_list)
+        release_revision_dict = self.release_revision_dict(branch_list)
         branch_url = self.svn_root + "branches"
         for release in branch_list:
             packs = self.get_pack_list(os.path.join(branch_url, release,
                                                     'madman', 'Rpacks'))
             for package in packs:
                 try:
-                    self.graft(package, release, d)
+                    self.graft(package, release, release_revision_dict)
                 except OSError as e:
                     log.error("Package not found: %s" % package)
                     log.error(e)

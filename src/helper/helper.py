@@ -18,7 +18,8 @@ def is_github_repo(url):
     print("Out: %s" % out)
     return True
 
-
+# TODO: Send email during rollout to developers to add 
+# Development URL
 def append_development_url(package):
     """Extract `DevelopmentURL` from DESCRIPTION file."""
     description_file = os.path.join(package, 'DESCRIPTION')
@@ -37,6 +38,8 @@ def append_development_url(package):
         with open(description_file, "a") as f:
             f.write(development_url)
     else:
+        # TODO: Make more robust to catch error and proceed
+        # to next package
         print("This is not a valid URL")
     return
 

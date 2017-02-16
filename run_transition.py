@@ -48,15 +48,18 @@ def run_transition(configfile):
     if not os.path.isdir(bioc_git_repo):
         os.mkdir(bioc_git_repo)
 
-    # # Step 1: Initial set up, get list of packs from trunk
-    # dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
-    # packs = dump.get_pack_list(branch="trunk")
-    # # Create a local dump of SVN packages in a location
-    # dump.svn_dump(packs)
-    # # Step 2: Update
-    # dump.svn_get_revision()
-    # dump.svn_dump_update(update_file)
-    # dump.update_local_svn_dump(update_file)
+    # Step 1: Initial set up, get list of packs from trunk
+    print(svn_root, bioc_git_repo, users_db, remote_svn_server, remote_url)
+    dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
+    packs = dump.get_pack_list(branch="trunk")
+    print(packs)
+    # Create a local dump of SVN packages in a location
+    dump.svn_dump(packs)
+    import pdb; pdb.set_trace()
+    # Step 2: Update
+#    dump.svn_get_revision()
+#    dump.svn_dump_update(update_file)
+#    dump.update_local_svn_dump(update_file)
 
     # # Step 4: Add release branches to all   packages
     # gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo, remote_url)
