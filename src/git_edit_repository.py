@@ -10,9 +10,7 @@ Author: Nitesh Turaga
 """
 import os
 import subprocess
-from git_api import git_remote_add
-from git_api import git_checkout
-from git_api import git_clone
+from src.git_api.git_api import *
 import logging as log
 
 

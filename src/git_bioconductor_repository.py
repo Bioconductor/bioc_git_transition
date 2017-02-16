@@ -13,13 +13,7 @@ Ideas taken from Jim Hester's code in Bioconductor/mirror
 import os
 import re
 import subprocess
-from git_api import git_remote_add
-from git_api import git_filter_branch
-from git_api import git_branch_exists
-from git_api import git_svn_rebase
-from git_api import git_checkout
-from git_api import git_svn_fetch
-from git_api import git_clone
+from src.git_api.git_api import *
 # Logging configuration
 import logging as log
 
@@ -246,14 +240,14 @@ class GitBioconductorRepository(object):
 
 
     def clone_new(self, destination_dir, new_package_url):
-    """Clone a new package into Bioc Git repo.
+        """Clone a new package into Bioc Git repo.
 
-    This function is used to add a new package to the bioconductor
-    repository and reconfigure remotes after cloning the package.
-    """
-    log.info("Cloning NEW Bare repository to bioc_git_repo")
-    package_dir = git_clone(new_package_url, self.bioc_git_repo, bare=True)
-    git_remote_rename(package_dir, 'origin', 'upstream')
-    git_remote_add('origin', package_dir, package_dir)
-    return
+        This function is used to add a new package to the bioconductor
+        repository and reconfigure remotes after cloning the package.
+        """
+        log.info("Cloning NEW Bare repository to bioc_git_repo")
+        package_dir = git_clone(new_package_url, self.bioc_git_repo, bare=True)
+        git_remote_rename(package_dir, 'origin', 'upstream')
+        git_remote_add('origin', package_dir, package_dir)
+        return
 
