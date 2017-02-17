@@ -13,18 +13,28 @@ Ideas taken from Jim Hester's code in Bioconductor/mirror
 import os
 import re
 import subprocess
-from src.git_api.git_api import *
+from src.git_api.git_api import git_clone
+from src.git_api.git_api import git_remote_add
+from src.git_api.git_api import git_svn_fetch
+from src.git_api.git_api import git_svn_rebase
+from src.git_api.git_api import git_remote_rename
+from src.git_api.git_api import git_filter_branch
+from src.git_api.git_api import git_checkout
+from src.git_api.git_api import git_branch_exists
+from local_svn_dump import Singleton
 # Logging configuration
 import logging as log
 
 
 class GitBioconductorRepository(object):
     """Git Bioconductor Repository."""
+    __metaclass__ = Singleton
 
-    def __init__(self, svn_root, bioc_git_repo, remote_url):
+    def __init__(self, svn_root, bioc_git_repo, bare_git_repo, remote_url):
         """Initialize Git Bioconductor repository."""
         self.svn_root = svn_root
         self.bioc_git_repo = bioc_git_repo
+        self.bare_git_repo = bare_git_repo
         self.remote_url = remote_url
         return
 
@@ -221,7 +231,7 @@ class GitBioconductorRepository(object):
                     pass
         return
 
-    def create_bare_repos(self, destination_dir):
+    def create_bare_repos(self):
         """Create bare repos in the repository directory.
 
         This needs to be run from within the bioc_git_repo directory.
@@ -229,7 +239,13 @@ class GitBioconductorRepository(object):
         for package in os.listdir(os.path.abspath(self.bioc_git_repo)):
             try:
                 git_clone(os.path.join(self.bioc_git_repo, package),
-                          destination_dir, bare=True)
+                          self.bare_git_repo, bare=True)
+                # TODO: Check if this is needed if the repo is NOT coped.
+                # Git update server, so that info/refs is populated,
+                # making the server "smart".
+                cmd = ['git', 'update-server-info']
+                subprocess.check_call(cmd, cwd=os.path.join(self.bare_git_repo,
+                                      package + ".git"))
             except subprocess.CalledProcessError as e:
                 log.error("Package: %s, Error creating bare repository: %s" % (
                           package, e))
@@ -239,16 +255,14 @@ class GitBioconductorRepository(object):
                 pass
         return
 
-
-    def clone_new(self, destination_dir, new_package_url):
+    def clone_new(self, new_package_url):
         """Clone a new package into Bioc Git repo.
 
         This function is used to add a new package to the bioconductor
         repository and reconfigure remotes after cloning the package.
         """
         log.info("Cloning NEW Bare repository to bioc_git_repo")
-        package_dir = git_clone(new_package_url, self.bioc_git_repo, bare=True)
+        package_dir = git_clone(new_package_url, self.bare_git_repo, bare=True)
         git_remote_rename(package_dir, 'origin', 'upstream')
         git_remote_add('origin', package_dir, package_dir)
         return
-

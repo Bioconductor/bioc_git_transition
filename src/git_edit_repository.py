@@ -10,18 +10,21 @@ Author: Nitesh Turaga
 """
 import os
 import subprocess
-from src.local_svn_dump import 
-from src.git_api.git_api import *
+from src.git_api.git_api import git_clone
+from src.git_api.git_api import git_remote_add
+from src.git_api.git_api import git_checkout
+from local_svn_dump import Singleton
 import logging as log
 
 
 class GitEditRepository(object):
     """Git Edit repository."""
+    __metaclass__ = Singleton
 
     def __init__(self, edit_repo, bioc_git_repo, server):
         """Initialize Git edit repo."""
         self.edit_repo = edit_repo
-        # TODO:  Make this bare_git_repo 
+        # TODO:  Make this bare_git_repo
         # self.bioc_git_repo = bioc_git_repo
         self.server = server
         return
@@ -50,7 +53,7 @@ class GitEditRepository(object):
         log.info("Set up a clone of package: %s, "
                  "to push changes to bioc_git_repo" % package)
         # TODO: bare_git_repo instead bioc_git_repo
-        # TODO: Also remove packaages (self.bare_git.repo) 
+        # TODO: Also remove packaages (self.bare_git.repo)
         repository = self.server + self.bioc_git_repo + "/" + package
         # repository = self.ssh_server + "/" + package
         git_clone(repository, self.edit_repo, bare=False)
@@ -67,7 +70,7 @@ class GitEditRepository(object):
         in the `edit_repo`, the contents can be pushed to the `bioc_git_repo`.
         """
         # TODO: get list of package from servers
-        # get list of packages from manifest file. 
+        # get list of packages from manifest file.
         for package in os.listdir(self.bioc_git_repo):
             self.set_edit_repo(package)
         return
@@ -181,5 +184,5 @@ class GitEditRepository(object):
             self.release_branch(new_release, package)
             # TODO: Push new release branch
             cmd = ['git', 'push', '-u', 'origin', new_release]
-            subprocess.check_call(cmd, cwd=os.path.join(edit_repo, package))
+            subprocess.check_call(cmd, cwd=os.path.join(self.edit_repo, package))
         return

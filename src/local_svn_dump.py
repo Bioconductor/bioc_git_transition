@@ -15,8 +15,19 @@ import subprocess
 import logging as log
 
 
+class Singleton(type):
+    """Singleton Factory pattern."""
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
 class LocalSvnDump(object):
     """Local SVN dump."""
+    __metaclass__ = Singleton
 
     def __init__(self, svn_root, bioc_git_repo, users_db, remote_svn_server):
         """Initialize Loval SVN dump.
@@ -71,7 +82,7 @@ class LocalSvnDump(object):
         package_dir = os.path.join(self.svn_root, 'trunk/madman/Rpacks/')
         for pack in packs:
             package_dump = os.path.join(package_dir, pack)
-            # TODO: git svn clone from each release branch. 
+            # TODO: git svn clone from each release branch.
             # This will be tricky.
             cmd = ['git', 'svn', 'clone', '--authors-file=' + self.users_db,
                    package_dump]
