@@ -21,12 +21,12 @@ class GitEditRepository(object):
     """Git Edit repository."""
     __metaclass__ = Singleton
 
-    def __init__(self, edit_repo, bioc_git_repo, server):
+    def __init__(self, edit_repo, ssh_server):
         """Initialize Git edit repo."""
         self.edit_repo = edit_repo
         # TODO:  Make this bare_git_repo
         # self.bioc_git_repo = bioc_git_repo
-        self.server = server
+        self.ssh_server = ssh_server
         return
 
     def extract_development_url(self, package):
