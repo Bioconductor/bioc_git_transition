@@ -47,7 +47,7 @@ class GitBioconductorRepository(object):
             List of branches in the reverse order of releases, i.e,
             latest first.
         """
-        branch_url = self.svn_root + "branches"
+        branch_url = os.path.join(self.svn_root, "branches")
         branch_list = [item.replace('/', '')
                        for item in
                        subprocess.check_output(['svn', 'list', branch_url]).split()
@@ -142,7 +142,7 @@ class GitBioconductorRepository(object):
                         pass
                     except subprocess.CalledProcessError as e:
                         log.error("Branch: %s, Package: %s, Error: %s"
-                                  % (branch, package, e.output))
+                                  % (branch, package, e))
                 else:
                     log.warning("Package %s not in directory" % package)
         return "Finished adding release branches"

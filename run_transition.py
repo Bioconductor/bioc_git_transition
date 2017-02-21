@@ -22,6 +22,30 @@ log.basicConfig(filename='transition.log', level=log.DEBUG)
 log.debug("Bioconductor Transition Log File: \n")
 
 
+def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
+    # Step 4: Add release branches to all   packages
+    gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo, 
+ 					bare_git_repo, remote_url)
+    gitrepo.add_release_branches()
+    # Step 5: Add commit history
+    gitrepo.add_commit_history()
+    # Add git remote branch, to make git package act as a server
+    os.chdir(bioc_git_repo)
+    gitrepo.add_remote()
+    os.chdir("..")
+    # Step 6: Make Git repo bare
+    gitrepo.create_bare_repos(bare_git_repo)
+    return
+
+
+def make_edit_repo(edit_repo, server):
+    # Make Edit repo:
+    editrepo = GitEditRepository(edit_repo, bioc_git_repo, server)
+    editrepo.clone_all_edit_repo()
+    return
+
+
+# TODO: Split run_transition into making dump, and adding new packages
 def run_transition(configfile):
     """Update SVN local dump and run gitify-bioconductor.
 
@@ -51,32 +75,15 @@ def run_transition(configfile):
     # Step 1: Initial set up, get list of packs from trunk
     print(svn_root, bioc_git_repo, users_db, remote_svn_server, remote_url)
     dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
-    packs = dump.get_pack_list(branch="trunk")
-    print(packs)
-    # Create a local dump of SVN packages in a location
-    dump.svn_dump(packs)
-    import pdb
-    pdb.set_trace()
-    # Step 2: Update
-    dump.svn_get_revision()
-    dump.svn_dump_update(update_file)
-    dump.update_local_svn_dump(update_file)
-
-    # Step 4: Add release branches to all   packages
-    gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo, remote_url)
-    gitrepo.add_release_branches()
-    # Step 5: Add commit history
-    gitrepo.add_commit_history()
-    # Add git remote branch, to make git package act as a server
-    os.chdir(bioc_git_repo)
-    gitrepo.add_remote()
-    os.chdir("..")
-    # Step 6: Make Git repo bare
-    gitrepo.create_bare_repos(bare_git_repo)
-
-    # Make Edit repo:
-    editrepo = GitEditRepository(edit_repo, bioc_git_repo, server)
-    editrepo.clone_all_edit_repo()
+#    packs = dump.get_pack_list(branch="trunk")
+#    # Create a local dump of SVN packages in a location
+#    dump.svn_dump(packs)
+#    # Step 2: Update
+#    dump.svn_get_revision()
+#    dump.svn_dump_update(update_file)
+#    dump.update_local_svn_dump(update_file)
+    
+    make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
 
     return
 
