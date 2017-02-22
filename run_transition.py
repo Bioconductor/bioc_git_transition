@@ -25,7 +25,7 @@ log.debug("Bioconductor Transition Log File: \n")
 def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
     # Step 4: Add release branches to all   packages
     gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo, 
- 					bare_git_repo, remote_url)
+ 					                    bare_git_repo, remote_url)
     gitrepo.add_release_branches()
     # Step 5: Add commit history
     gitrepo.add_commit_history()
@@ -44,6 +44,15 @@ def make_edit_repo(edit_repo, server):
     editrepo.clone_all_edit_repo()
     return
 
+
+def svn_root_update(svn_root, bioc_git_repo, users_db, remote_svn_server):
+    """Dump update needs to be run by ubuntu-user"""
+    dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
+    dump.svn_get_revision()
+    dump.svn_dump_update(update_file)
+    dump.update_local_svn_dump(update_file)
+    return 
+    
 
 # TODO: Split run_transition into making dump, and adding new packages
 def run_transition(configfile):
@@ -73,20 +82,16 @@ def run_transition(configfile):
         os.mkdir(bioc_git_repo)
 
     # Step 1: Initial set up, get list of packs from trunk
-    print(svn_root, bioc_git_repo, users_db, remote_svn_server, remote_url)
+#    print(svn_root, bioc_git_repo, users_db, remote_svn_server, remote_url)
     dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
-#    packs = dump.get_pack_list(branch="trunk")
-#    # Create a local dump of SVN packages in a location
+    packs = dump.get_pack_list(branch="trunk")
+    # Create a local dump of SVN packages in a location
 #    dump.svn_dump(packs)
-#    # Step 2: Update
-#    dump.svn_get_revision()
-#    dump.svn_dump_update(update_file)
-#    dump.update_local_svn_dump(update_file)
+    # Step 2: Update
     
     make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
-
     return
 
 
-if __name__ == '__main__':
-    run_transition("./settings.ini")
+#if __name__ == '__main__':
+#    run_transition("./settings.ini")

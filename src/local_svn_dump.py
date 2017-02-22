@@ -105,6 +105,7 @@ class LocalSvnDump(object):
                     if "Revision" in line]
         revision = int(revision[0])
         self.revision = revision
+	log.info("SVN dump revision: %s" % revision)
         return
 
     def svn_dump_update(self, update_file):
@@ -119,7 +120,7 @@ class LocalSvnDump(object):
             ret_code = proc.wait()
             # Write dump update to file
             f.flush()
-        log.debug("Finshed dump to local file: %s" % update_file)
+        log.info("Finshed dump to local file: %s" % update_file)
         return ret_code
 
     # TODO: This doesn't work like expected
@@ -128,5 +129,5 @@ class LocalSvnDump(object):
         cmd = ('svnadmin load ' + self.svn_root_dir + ' < ' +
                os.path.abspath(update_file))
         subprocess.call(cmd, shell=True)
-        log.debug("Finished dump update")
+        log.info("Finished dump update")
         return
