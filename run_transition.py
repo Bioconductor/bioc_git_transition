@@ -45,15 +45,6 @@ def make_edit_repo(edit_repo, server):
     return
 
 
-def svn_root_update(svn_root, bioc_git_repo, users_db, remote_svn_server):
-    """Dump update needs to be run by ubuntu-user"""
-    dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
-    dump.svn_get_revision()
-    dump.svn_dump_update(update_file)
-    dump.update_local_svn_dump(update_file)
-    return 
-    
-
 # TODO: Split run_transition into making dump, and adding new packages
 def run_transition(configfile):
     """Update SVN local dump and run gitify-bioconductor.
@@ -78,20 +69,22 @@ def run_transition(configfile):
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
 
+    for s in Config.sections():
+       for k,v in Config.items(s):
+           log.info("%s: %s" % (k,v))	
+    
     if not os.path.isdir(bioc_git_repo):
         os.mkdir(bioc_git_repo)
 
     # Step 1: Initial set up, get list of packs from trunk
-#    print(svn_root, bioc_git_repo, users_db, remote_svn_server, remote_url)
-    dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
-    packs = dump.get_pack_list(branch="trunk")
+    #dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
+    #packs = dump.get_pack_list(branch="trunk")
     # Create a local dump of SVN packages in a location
-#    dump.svn_dump(packs)
-    # Step 2: Update
+    #dump.svn_dump(packs)
     
-    make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
+    #make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
     return
 
 
-#if __name__ == '__main__':
-#    run_transition("./settings.ini")
+if __name__ == '__main__':
+    run_transition("./settings.ini")
