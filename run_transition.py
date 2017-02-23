@@ -18,7 +18,7 @@ from src.git_edit_repository import GitEditRepository
 import os
 import logging as log
 import ConfigParser
-log.basicConfig(filename='transition2.log', 
+log.basicConfig(filename='transition2.log',
                 level=log.DEBUG,
                 format='%(asctime)s %(message)s')
 log.debug("Bioconductor Transition Log File: \n")
@@ -26,8 +26,8 @@ log.debug("Bioconductor Transition Log File: \n")
 
 def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
     # Step 4: Add release branches to all   packages
-    gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo, 
- 					                    bare_git_repo, remote_url)
+    gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo,
+ 					bare_git_repo, remote_url)
     gitrepo.add_release_branches()
     # Step 5: Add commit history
     gitrepo.add_commit_history()
@@ -40,9 +40,9 @@ def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
     return
 
 
-def make_edit_repo(edit_repo, server):
+def make_edit_repo(edit_repo, ssh_server):
     # Make Edit repo:
-    editrepo = GitEditRepository(edit_repo, bioc_git_repo, server)
+    editrepo = GitEditRepository(edit_repo, ssh_server)
     editrepo.clone_all_edit_repo()
     return
 
@@ -65,8 +65,8 @@ def run_transition(configfile):
 
     edit_repo = Config.get('GitEditBioconductor', 'edit_repo')
     server = Config.get('GitEditBioconductor', 'server')
+    ssh_server = Config.get('GitEditBioconductor', 'ssh_server')
 
-    update_file = Config.get('SVN', 'update_file')
     svn_root = Config.get('SVN', 'svn_root')
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
@@ -74,21 +74,27 @@ def run_transition(configfile):
     # Print in the log file.
     for s in Config.sections():
        for k,v in Config.items(s):
-           log.info("%s: %s" % (k,v))	
-    
+           log.info("%s: %s" % (k,v))
+
     if not os.path.isdir(bioc_git_repo):
         os.mkdir(bioc_git_repo)
 
     # Step 1: Initial set up, get list of packs from trunk
     dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
     packs = dump.get_pack_list(branch="trunk")
-    
     ###################################################
     # Create a local dump of SVN packages in a location
-    #dump.svn_dump(packs)
+    # dump.svn_dump(packs)
     ###################################################
-    
-    make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
+
+    # Make temp git repo, with all commit history
+    # make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
+
+    # Make edit repo
+    make_edit_repo(edit_repo, ssh_server)
+
+    # EOF message
+    log.info("Finished setting up bare git repo")
     return
 
 

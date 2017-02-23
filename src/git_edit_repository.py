@@ -54,8 +54,8 @@ class GitEditRepository(object):
                  "to push changes to bioc_git_repo" % package)
         # TODO: bare_git_repo instead bioc_git_repo
         # TODO: Also remove packaages (self.bare_git.repo)
-        repository = self.server + self.bioc_git_repo + "/" + package
-        # repository = self.ssh_server + "/" + package
+        # repository = self.server + self.bioc_git_repo + "/" + package
+        repository = self.ssh_server + "/" + package
         git_clone(repository, self.edit_repo, bare=False)
         development_url = self.extract_development_url(os.path.join(self.edit_repo, package))
         git_remote_add('upstream', development_url,
