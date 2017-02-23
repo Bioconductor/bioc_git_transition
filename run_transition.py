@@ -28,15 +28,15 @@ def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
     # Step 4: Add release branches to all   packages
     gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo,
  					bare_git_repo, remote_url)
-    gitrepo.add_release_branches()
+#    gitrepo.add_release_branches()
     # Step 5: Add commit history
-    gitrepo.add_commit_history()
+#    gitrepo.add_commit_history()
     # Add git remote branch, to make git package act as a server
     os.chdir(bioc_git_repo)
     gitrepo.add_remote()
     os.chdir("..")
     # Step 6: Make Git repo bare
-    gitrepo.create_bare_repos(bare_git_repo)
+    gitrepo.create_bare_repos()
     return
 
 
@@ -88,10 +88,10 @@ def run_transition(configfile):
     ###################################################
 
     # Make temp git repo, with all commit history
-    # make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
+    make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
 
     # Make edit repo
-    make_edit_repo(edit_repo, ssh_server)
+   #  make_edit_repo(edit_repo, ssh_server)
 
     # EOF message
     log.info("Finished setting up bare git repo")

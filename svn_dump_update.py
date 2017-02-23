@@ -17,7 +17,7 @@ log.debug("Bioconductor SVN Dump Log File: \n")
 
 
 def svn_root_update(configfile):
-    """Dump update needs to be run by ubuntu-user"""
+    """Dump update needs to be run as git."""
     Config = ConfigParser.ConfigParser()
     Config.read(configfile)
 
