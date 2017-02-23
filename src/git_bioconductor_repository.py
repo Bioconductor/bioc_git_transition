@@ -20,6 +20,7 @@ from src.git_api.git_api import git_svn_rebase
 from src.git_api.git_api import git_remote_rename
 from src.git_api.git_api import git_filter_branch
 from src.git_api.git_api import git_checkout
+from src.git_api.git_api import git_remote_remove
 from src.git_api.git_api import git_branch_exists
 from local_svn_dump import Singleton
 # Logging configuration
@@ -65,13 +66,14 @@ class GitBioconductorRepository(object):
 
         Usage: cd /home/nturaga/packages and run function.
         """
-        for package in os.listdir(self.bioc_git_repo):
-            if ((os.path.isdir(package)) and
-                    (".git" in os.listdir(os.path.abspath(package)))):
+        log.info("Adding remote url to bare git repo.")
+        for package in os.listdir(self.bare_git_repo):
+            if ".git" in package:
                 remote = self.remote_url + package
                 # Run remote command
-                git_remote_add('origin', remote, os.path.abspath(package))
-                log.info("Added remote to package: %s" % package)
+                git_remote_remove('origin', os.path.join(self.bare_git_repo,package))
+                git_remote_add('origin', remote, os.path.join(self.bare_git_repo,package))
+                log.info("Add remote to package: %s" % os.path.join(self.bare_git_repo,package))
         return
 
     def add_orphan_branch_points(self, release, package):

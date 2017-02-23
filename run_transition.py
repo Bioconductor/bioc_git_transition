@@ -18,7 +18,7 @@ from src.git_edit_repository import GitEditRepository
 import os
 import logging as log
 import ConfigParser
-log.basicConfig(filename='transition2.log',
+log.basicConfig(filename='transition.log',
                 level=log.DEBUG,
                 format='%(asctime)s %(message)s')
 log.debug("Bioconductor Transition Log File: \n")
@@ -28,15 +28,12 @@ def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
     # Step 4: Add release branches to all   packages
     gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo,
  					bare_git_repo, remote_url)
-#    gitrepo.add_release_branches()
+    gitrepo.add_release_branches()
     # Step 5: Add commit history
-#    gitrepo.add_commit_history()
-    # Add git remote branch, to make git package act as a server
-    os.chdir(bioc_git_repo)
-    gitrepo.add_remote()
-    os.chdir("..")
+    gitrepo.add_commit_history()
     # Step 6: Make Git repo bare
     gitrepo.create_bare_repos()
+    gitrepo.add_remote()
     return
 
 
@@ -84,14 +81,14 @@ def run_transition(configfile):
     packs = dump.get_pack_list(branch="trunk")
     ###################################################
     # Create a local dump of SVN packages in a location
-    # dump.svn_dump(packs)
+    dump.svn_dump(packs)
     ###################################################
 
     # Make temp git repo, with all commit history
     make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
 
     # Make edit repo
-   #  make_edit_repo(edit_repo, ssh_server)
+    make_edit_repo(edit_repo, ssh_server)
 
     # EOF message
     log.info("Finished setting up bare git repo")
