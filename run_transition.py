@@ -18,7 +18,9 @@ from src.git_edit_repository import GitEditRepository
 import os
 import logging as log
 import ConfigParser
-log.basicConfig(filename='transition.log', level=log.DEBUG)
+log.basicConfig(filename='transition2.log', 
+                level=log.DEBUG,
+                format='%(asctime)s %(message)s')
 log.debug("Bioconductor Transition Log File: \n")
 
 
@@ -69,6 +71,7 @@ def run_transition(configfile):
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
 
+    # Print in the log file.
     for s in Config.sections():
        for k,v in Config.items(s):
            log.info("%s: %s" % (k,v))	
@@ -77,12 +80,15 @@ def run_transition(configfile):
         os.mkdir(bioc_git_repo)
 
     # Step 1: Initial set up, get list of packs from trunk
-    #dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
-    #packs = dump.get_pack_list(branch="trunk")
+    dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
+    packs = dump.get_pack_list(branch="trunk")
+    
+    ###################################################
     # Create a local dump of SVN packages in a location
     #dump.svn_dump(packs)
+    ###################################################
     
-    #make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
+    make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
     return
 
 

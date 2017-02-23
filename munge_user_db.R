@@ -16,6 +16,8 @@ head(absent)
 head(csv$svn)
 
 dat = csv$svn
+dat = rbind(dat,"(no author) = no_author <no_author@no_author>", "(no author) = no author no_author <noauthor@nowhere.com>")
+
 head(absent)
 View(absent)
 result = c(dat, paste0(absent$V1, " = ", absent$V1, " ", absent$V1, " <", absent$V1, ">"))
@@ -23,6 +25,9 @@ result = c(dat, paste0(absent$V1, " = ", absent$V1, " ", absent$V1, " <", absent
 # Munge
 result[grep(pattern = "no",x = result)]
 result = result[-1543]
-View(data.frame(result))
 
-write.table(data.frame(result), file="user_db.txt",col.names=FALSE, row.names=FALSE, quote=FALSE)
+result = data.frame(result)
+
+result = rbind(result, 
+
+write.table(result, file="user_db.txt",col.names=FALSE, row.names=FALSE, quote=FALSE)
