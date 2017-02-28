@@ -18,16 +18,11 @@ from src.git_edit_repository import GitEditRepository
 import os
 import logging as log
 import ConfigParser
-log.basicConfig(filename='transition.log',
-                level=log.DEBUG,
-                format='%(asctime)s %(message)s')
-log.debug("Bioconductor Transition Log File: \n")
-
 
 def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
     # Step 4: Add release branches to all   packages
     gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo,
- 					bare_git_repo, remote_url)
+                                        bare_git_repo, remote_url)
     gitrepo.add_release_branches()
     # Step 5: Add commit history
     gitrepo.add_commit_history()
@@ -53,6 +48,7 @@ def run_transition(configfile):
     `svnrdump dump https://hedgehog.fhcrc.org/bioconductor |
                 svnadmin load bioconductor-svn-mirror`
     """
+
     # Settings
     Config = ConfigParser.ConfigParser()
     Config.read(configfile)
@@ -67,6 +63,12 @@ def run_transition(configfile):
     svn_root = Config.get('SVN', 'svn_root')
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
+    svn_transition_log = Config.get('SVN', 'svn_transition_log')
+
+    log.basicConfig(filename=svn_transition_log,
+                    level=log.DEBUG,
+                    format='%(asctime)s %(message)s')
+    log.debug("Bioconductor Transition Log File: \n")
 
     # Print in the log file.
     for s in Config.sections():
@@ -83,6 +85,10 @@ def run_transition(configfile):
     # Create a local dump of SVN packages in a location
     dump.svn_dump(packs)
     ###################################################
+
+    # Make bare repo, if it does not exist
+    if not os.path.isdir(bare_git_repo):
+        os.mkdir(bare_git_repo)
 
     # Make temp git repo, with all commit history
     make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
