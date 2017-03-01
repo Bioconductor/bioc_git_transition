@@ -1,14 +1,32 @@
 Hi Bioconductor Developers,
 
-Big news! We are planning to migrate from SVN to git. This is a major change in our version control model. We know this will be disruptive to some of our long-term developers.
+Big news! We are planning to migrate from SVN to git. This is a major change in
+our version control model. We know this will be disruptive to some of our
+long-term developers.
 
-Git has really emerged as a modern replacement to SVN, and is widely used in the bioinformatics community. Many Bioconductor packages are maintained primarily on git and perhaps the majority of commits to our SVN repository are from git. Git encourages broad community participation in development of both Bioconductor infrastructure and contributed software / experiment data packages. Recent developers of new packages have been using git and Github for their package development, and this has worked very well for both developers and core team reviewers. Our current git / svn solutions are very complicated to use.
+Git has really emerged as a modern replacement to SVN, and is widely used in the
+bioinformatics community. Many Bioconductor packages are maintained primarily on
+git and perhaps the majority of commits to our SVN repository are from git. Git
+encourages broad community participation in development of both Bioconductor
+infrastructure and contributed software / experiment data packages. Recent
+developers of new packages have been using git and Github for their package
+development, and this has worked very well for both developers and core team
+reviewers. Our current git / svn solutions are very complicated to use.
 
-We are producing robust scripts to create git repositories of each package in our current SVN repository. The git repositories contain the complete commit history for 'devel', and for all releases as branches. Details for interaction with our git server, including the role of github, are still being finalized.
+We are producing robust scripts to create git repositories of each package in
+our current SVN repository. The git repositories contain the complete commit
+history for 'devel', and for all releases as branches. Details for interaction
+with our git server, including the role of github, are still being finalized.
 
-More information about the specifics of the transition plan will be announced in the middle of March. We anticipate a fully functional 'beta' version available for broad testing immediately after the next Bioconductor release, in mid-April. Once we are confident in the new repositories and work flows, we will switch to an exclusively git-based version control model; SVN will remain available as a 'read only' resource for as long as is feasible.
+More information about the specifics of the transition plan will be announced in
+the middle of March. We anticipate a fully functional 'beta' version available
+for broad testing immediately after the next Bioconductor release, in
+mid-April. Once we are confident in the new repositories and work flows, we will
+switch to an exclusively git-based version control model; SVN will remain
+available as a 'read only' resource for as long as is feasible.
 
-We welcome all feedback during this test period; please respond to this post with comments, or contact nitesh.turaga@roswellpark.org directly.
+We welcome all feedback during this test period; please respond to this post
+with comments, or contact nitesh.turaga@roswellpark.org directly.
 
 Best,
 
