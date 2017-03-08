@@ -19,6 +19,7 @@ import os
 import logging as log
 import ConfigParser
 
+
 def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
     # Step 4: Add release branches to all   packages
     gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo,
@@ -57,7 +58,6 @@ def run_transition(configfile):
     bare_git_repo = Config.get('GitBioconductor', 'bare_git_repo')
 
     edit_repo = Config.get('GitEditBioconductor', 'edit_repo')
-    server = Config.get('GitEditBioconductor', 'server')
     ssh_server = Config.get('GitEditBioconductor', 'ssh_server')
 
     svn_root = Config.get('SVN', 'svn_root')
@@ -72,8 +72,8 @@ def run_transition(configfile):
 
     # Print in the log file.
     for s in Config.sections():
-       for k,v in Config.items(s):
-           log.info("%s: %s" % (k,v))
+        for k, v in Config.items(s):
+            log.info("%s: %s" % (k, v))
 
     if not os.path.isdir(bioc_git_repo):
         os.mkdir(bioc_git_repo)

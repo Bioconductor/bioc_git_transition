@@ -71,9 +71,12 @@ class GitBioconductorRepository(object):
             if ".git" in package:
                 remote = self.remote_url + package
                 # Run remote command
-                git_remote_remove('origin', os.path.join(self.bare_git_repo,package))
-                git_remote_add('origin', remote, os.path.join(self.bare_git_repo,package))
-                log.info("Add remote to package: %s" % os.path.join(self.bare_git_repo,package))
+                git_remote_remove('origin', os.path.join(self.bare_git_repo,
+                                  package))
+                git_remote_add('origin', remote, os.path.join(
+                               self.bare_git_repo, package))
+                log.info("Add remote to package: %s" % os.path.join(
+                         self.bare_git_repo, package))
         return
 
     def add_orphan_branch_points(self, release, package):
@@ -201,7 +204,8 @@ class GitBioconductorRepository(object):
         """
         cwd = os.path.join(self.bioc_git_repo, package)
         log.info("Graft package directory: %s" % cwd)
-        branch_point = self.find_branch_points(release_revision_dict, package, release)
+        branch_point = self.find_branch_points(release_revision_dict, package,
+                                               release)
         if branch_point:
             offspring_sha1, parent_sha1 = branch_point
             with open(os.path.join(cwd, ".git/info/grafts"), 'a') as f:
