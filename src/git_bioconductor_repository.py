@@ -22,6 +22,7 @@ from src.git_api.git_api import git_filter_branch
 from src.git_api.git_api import git_checkout
 from src.git_api.git_api import git_remote_remove
 from src.git_api.git_api import git_branch_exists
+from src.helper.list_to_avoid import avoid
 from local_svn_dump import Singleton
 # Logging configuration
 import logging as log
@@ -59,7 +60,11 @@ class GitBioconductorRepository(object):
     def get_pack_list(self, path):
         """Get list of packages on SVN."""
         result = subprocess.check_output(['svn', 'list', path])
-        return [item.replace('/', '') for item in result.split()]
+        # Get list of files and packages to avoid
+        list_to_avoid = avoid()
+        # Filter packs
+        pack_list = [item.replace('/', '') for item in result.split()]
+        return [pack for pack in pack_list if pack not in list_to_avoid]
 
     def add_remote(self):
         """Add git remote to make the directory.
