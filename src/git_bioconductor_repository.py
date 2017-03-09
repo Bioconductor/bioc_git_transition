@@ -251,7 +251,6 @@ class GitBioconductorRepository(object):
             try:
                 git_clone(os.path.join(self.bioc_git_repo, package),
                           self.bare_git_repo, bare=True)
-                # TODO: Check if this is needed if the repo is NOT coped.
                 # Git update server, so that info/refs is populated,
                 # making the server "smart".
                 cmd = ['git', 'update-server-info']

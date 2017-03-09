@@ -40,7 +40,6 @@ def make_edit_repo(edit_repo, ssh_server):
     return
 
 
-# TODO: Split run_transition into making dump, and adding new packages
 def run_transition(configfile):
     """Update SVN local dump and run gitify-bioconductor.
 

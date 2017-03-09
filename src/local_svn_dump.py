@@ -11,7 +11,6 @@ Usage:
     `python svn_dump.py`
 """
 import os
-import sys
 import subprocess
 import logging as log
 
@@ -123,7 +122,6 @@ class LocalSvnDump(object):
         log.info("Finshed dump to local file: %s" % update_file)
         return ret_code
 
-    # TODO: This doesn't work like expected
     def update_local_svn_dump(self, update_file):
         """Update Local SVN dump."""
         cmd = ('svnadmin load ' + self.svn_root_dir + ' < ' +

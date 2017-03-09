@@ -46,19 +46,13 @@ def git_filter_branch(graft_range, cwd):
     return
 
 
-# TODO: Test, this once
 # --rewrite-root=https://hedgehog.fhcrc.org/bioconductor
 # --authors-file=users_and_user_db.txt
-# TODO: Name the mirror hedgehog.fhcrc.org/bioconductor
 def git_svn_rebase(cwd):
     """Git svn rebase a package."""
     cmd = ['git', 'svn', 'rebase']
     subprocess.check_call(cmd, cwd=cwd)
     return
-
-# TODO:
-# --rewrite-root=https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/BiocInstaller
-# --authors-file=users_and_user_db.txt
 
 
 def git_svn_fetch(branch, cwd):
