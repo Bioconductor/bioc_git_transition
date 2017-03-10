@@ -165,6 +165,17 @@ class GitBioconductorRepository(object):
         revision_id = re.findall('\(from [^:]+:([0-9]+)', output)[-1]
         return revision_id
 
+    def release_revision_dict(self, branch_list):
+        """Make a dictionary with key = svn_release and value = revision_id."""
+        rel_rev_dict = {}  # Dictionary
+        branch_url = self.svn_root + "/branches"
+        for release in branch_list:
+            svn_branch_url = branch_url + "/" + release
+            revision = self._svn_revision_branch_id(svn_branch_url)
+            rel_rev_dict[release] = revision
+            log.debug("release: %s, revision %s" % (release, revision))
+        return rel_rev_dict
+
     def find_branch_points(self, from_revision, package, release):
         """Find branch points in the git revision history."""
         package_dir = os.path.join(self.bioc_git_repo, package)
@@ -188,18 +199,9 @@ class GitBioconductorRepository(object):
                                                cwd=package_dir)
                 # Make tuple and strip sha's for whitespace
                 branch_point = (branch_root.strip(), sha1.strip())
+                log.debug("branch point: %s" % branch_point)
                 return branch_point
         return None
-
-    def release_revision_dict(self, branch_list):
-        """Make a dictionary with key = svn_release and value = revision_id."""
-        rel_rev_dict = {}  # Dictionary
-        branch_url = self.svn_root + "/branches"
-        for release in branch_list:
-            svn_branch_url = branch_url + "/" + release
-            revision = self._svn_revision_branch_id(svn_branch_url)
-            rel_rev_dict[release] = revision
-        return rel_rev_dict
 
     def graft(self, package, release, release_revision_dict):
         """Write graft file in each pacakage, connecting the branches.

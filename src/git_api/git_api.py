@@ -42,7 +42,13 @@ def git_branch_exists(branch, cwd):
 def git_filter_branch(graft_range, cwd):
     """Git filter branch, for a specified graft range."""
     cmd = ['git', 'filter-branch', '--force', '--', graft_range]
-    subprocess.check_call(cmd, cwd=cwd)
+#    subprocess.check_call(cmd, cwd=cwd)
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,cwd=cwd)
+    out, err = proc.communicate()
+    print out
+    print "\n"
+    print err
     return
 
 
