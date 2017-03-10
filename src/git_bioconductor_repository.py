@@ -235,10 +235,10 @@ class GitBioconductorRepository(object):
                                                     'madman', 'Rpacks'))
             for package in packs:
                 try:
+                    log.info("Adding graft to package: %s" % package)
                     self.graft(package, release, release_revision_dict)
                 except OSError as e:
-                    log.error("Package not found: %s" % package)
-                    log.error(e)
+                    log.error("Grafting Error: %s, Package not found: %s" % (e, package))
                     pass
         return
 
@@ -252,16 +252,17 @@ class GitBioconductorRepository(object):
                 git_clone(os.path.join(self.bioc_git_repo, package),
                           self.bare_git_repo, bare=True)
                 # Git update server, so that info/refs is populated,
-                # making the server "smart".
+                # making the server "smart"
+                # TODO: Make sure this is essential for the process.
                 cmd = ['git', 'update-server-info']
                 subprocess.check_call(cmd, cwd=os.path.join(self.bare_git_repo,
                                       package + ".git"))
             except subprocess.CalledProcessError as e:
-                log.error("Package: %s, Error creating bare repository: %s" % (
-                          package, e))
+                log.error("Error creating bare repository: %s in package %s" % (
+                          e, package))
                 pass
             except OSError as e:
-                log.error("Package: %s, Error: %s" % (package, e))
+                log.error("Error: %s, Package: %s" % (e, package))
                 pass
         return
 

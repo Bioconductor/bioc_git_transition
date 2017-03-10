@@ -24,11 +24,15 @@ def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
     # Step 4: Add release branches to all   packages
     gitrepo = GitBioconductorRepository(svn_root, bioc_git_repo,
                                         bare_git_repo, remote_url)
+    log.info("Make git repo: Adding release branches")
     gitrepo.add_release_branches()
     # Step 5: Add commit history
+    log.info("Make git repo: Adding commit history")
     gitrepo.add_commit_history()
     # Step 6: Make Git repo bare
+    log.info("Make git repo: Creating bare repositories")
     gitrepo.create_bare_repos()
+    log.info("Make git repo: Adding remotes to make git server available")
     gitrepo.add_remote()
     return
 
@@ -36,11 +40,12 @@ def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
 def make_edit_repo(edit_repo, ssh_server):
     # Make Edit repo:
     editrepo = GitEditRepository(edit_repo, ssh_server)
+    log.info("Make edit repo: Clone packages for edit repository")
     editrepo.clone_all_edit_repo()
     return
 
 
-def run_transition(configfile):
+def run_transition(configfile, new_svn_dump = False):
     """Update SVN local dump and run gitify-bioconductor.
 
     Step 0: Create dump
@@ -82,7 +87,9 @@ def run_transition(configfile):
     packs = dump.get_pack_list(branch="trunk")
     ###################################################
     # Create a local dump of SVN packages in a location
-    dump.svn_dump(packs)
+    if new_svn_dump:
+        log.info("Create a local SVN dump")
+        dump.svn_dump(packs)
     ###################################################
 
     # Make bare repo, if it does not exist
@@ -90,9 +97,11 @@ def run_transition(configfile):
         os.mkdir(bare_git_repo)
 
     # Make temp git repo, with all commit history
+    log.info("Make git repo")
     make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
 
     # Make edit repo
+    log.info("Make edit repo")
     make_edit_repo(edit_repo, ssh_server)
 
     # EOF message
@@ -101,4 +110,4 @@ def run_transition(configfile):
 
 
 if __name__ == '__main__':
-    run_transition("./settings.ini")
+    run_transition("./settings.ini", new_svn_dump=False)
