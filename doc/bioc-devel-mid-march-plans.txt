@@ -1,0 +1,69 @@
+Hi Bioconductor Developers,
+
+Overall plan
+
+- Bioconductor hosts each package as a distinct repository at
+  git.bioconductor.org. From Bioconductor's perspective, this is the
+  canonical location. Nightly builds will be based on these
+  repositories, release branches will be created in the repositories,
+  etc.
+
+- Developers clone or otherwise sync their code base to these
+  repositories. Each developer will be able to push to and pull from
+  (e.g., branches and version bumps at package release) their
+  git.bioconductor.org repository.
+
+- Developers are encouraged to host and develop their source code on
+  github or other git-based social platforms. This promotes community
+  involvment, and empowers developers to adopt best pratices related
+  to issue tracking, continuous integration, bug fixes, pull requests
+  from their community, etc.
+
+Timing
+
+- Our plan is to make a 'clean' transition from SVN to git,
+  approximately one month after the next Bioconductor release.
+
+Repositories
+
+- The git repositories will be derived from a 'snapshot' of the latest
+  SVN repository at the time of the transition.
+
+- Each repository will capture the full SVN commit history of the
+  package. Releases will be included as branches in the repository.
+
+- We anticipate that software and experiment data packages will be
+  hosted at git.bioconductor.org. Experiment data packages will use
+  git-lfs to manage large data.
+
+- The github Bioconductor-mirror repository will be removed.
+
+Test phases
+
+- We anticipate two test periods.
+
+- A private 'alpha' test phase is starting shortly. Alpha testers will
+  initially have pull access to their repository, and will follow
+  tentative work flows for gaining push access, for maintaining clones
+  of their packages, for commiting to the git.bioconductor.org
+  repositories, and for pulling from (e.g., version bumps and release
+  branches) the repositories.
+  
+- A public 'beta' test phase will start after the next Bioconductor
+  release, and last for approxiately four weeks. Beta testers will
+  have pull access to all Bioconductor package repositories, and push
+  access to packages that they maintain. Commits will be visible, but
+  NOT synced with SVN or incorporated into nightly builds.
+
+- An essential activity during test periods is to verify that the SVN
+  commit history has been captured in the git repositories.
+
+Resourcs
+
+- We will be developing resources to help developers in the
+  transition.
+
+Best,
+
+Nitesh Turaga
+Bioconductor Core Team
