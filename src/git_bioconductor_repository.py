@@ -22,7 +22,6 @@ from src.git_api.git_api import git_filter_branch
 from src.git_api.git_api import git_checkout
 from src.git_api.git_api import git_remote_remove
 from src.git_api.git_api import git_branch_exists
-from src.helper.list_to_avoid import avoid
 from local_svn_dump import Singleton
 # Logging configuration
 import logging as log
@@ -56,15 +55,14 @@ class GitBioconductorRepository(object):
                        if "RELEASE" in item]
         return branch_list
 
-    # TODO: IS THIS EVEN NEEDED?
     def get_pack_list(self, path):
         """Get list of packages on SVN."""
         result = subprocess.check_output(['svn', 'list', path])
         # Get list of files and packages to avoid
-        list_to_avoid = avoid()
         # Filter packs
-        pack_list = [item.replace('/', '') for item in result.split()]
-        return [pack for pack in pack_list if pack not in list_to_avoid]
+        pack_list = result.split()
+        packs = [pack.replace("/","") for pack in pack_list if pack.endswith("/")]
+        return packs
 
     def add_remote(self):
         """Add git remote to make the directory.
@@ -180,7 +178,9 @@ class GitBioconductorRepository(object):
         """Find branch points in the git revision history."""
         package_dir = os.path.join(self.bioc_git_repo, package)
         cmd = ['git', 'log', '--format=%H', release]
+        print("package_dir: ", package_dir)
         branch_root = subprocess.check_output(cmd, cwd=package_dir).split()[-1]
+        print(branch_root)
         # Be careful, as there is an empty string at end of list
         commits = subprocess.check_output(['git', 'svn', 'log',
                                            '--oneline', '--show-commit',
@@ -199,7 +199,7 @@ class GitBioconductorRepository(object):
                                                cwd=package_dir)
                 # Make tuple and strip sha's for whitespace
                 branch_point = (branch_root.strip(), sha1.strip())
-                log.debug("branch point: %s" % branch_point)
+                print("Branch point: ", branch_point)
                 return branch_point
         return None
 
@@ -231,16 +231,23 @@ class GitBioconductorRepository(object):
         # Get list of branches
         branch_list = self.get_branch_list()
         release_revision_dict = self.release_revision_dict(branch_list)
-        branch_url = self.svn_root + "branches"
+        branch_url = os.path.join(self.svn_root, "branches")
         for release in branch_list:
             packs = self.get_pack_list(os.path.join(branch_url, release,
                                                     'madman', 'Rpacks'))
             for package in packs:
                 try:
                     log.info("Adding graft to package: %s" % package)
+                    print("add_commit_history release: ", release)
+                    print("add_commit_history package: ", package)
+#                    for k,v in release_revision_dict.iteritems():
+#                        print("release: %s revision: %s " % (k,v))
                     self.graft(package, release, release_revision_dict)
                 except OSError as e:
                     log.error("Grafting Error: %s, Package not found: %s" % (e, package))
+                    pass
+                except Exception as e:
+                    log.error("Grafting Error: %s in package: %s" %s (e, package))
                     pass
         return
 

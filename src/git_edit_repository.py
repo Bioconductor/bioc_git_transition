@@ -24,8 +24,6 @@ class GitEditRepository(object):
     def __init__(self, edit_repo, ssh_server):
         """Initialize Git edit repo."""
         self.edit_repo = edit_repo
-        # TODO:  Make this bare_git_repo
-        # self.bioc_git_repo = bioc_git_repo
         self.ssh_server = ssh_server
         return
 
@@ -51,10 +49,7 @@ class GitEditRepository(object):
         package, to make changes and push back to the git-server.
         """
         log.info("Set up a clone of package: %s, "
-                 "to push changes to bioc_git_repo" % package)
-        # TODO: bare_git_repo instead bioc_git_repo
-        # TODO: Also remove packaages (self.bare_git.repo)
-        # repository = self.server + self.bioc_git_repo + "/" + package
+                 "to push changes to bare_git_repo" % package)
         repository = self.ssh_server + "/" + package
         git_clone(repository, self.edit_repo, bare=False)
         development_url = self.extract_development_url(os.path.join(self.edit_repo, package))
@@ -71,7 +66,7 @@ class GitEditRepository(object):
         """
         # TODO: get list of package from servers
         # get list of packages from manifest file.
-        for package in os.listdir(self.bioc_git_repo):
+        for package in os.listdir(self.bare_git_repo):
             self.set_edit_repo(package)
         return
 

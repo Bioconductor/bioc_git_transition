@@ -101,8 +101,10 @@ def run_transition(configfile, new_svn_dump = False):
     make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
 
     # Make edit repo
-    log.info("Make edit repo")
-    make_edit_repo(edit_repo, ssh_server)
+#    if not os.path.isdir(edit_repo):
+#        os.mkdir(edit_repo)
+#    log.info("Make edit repo")
+#    make_edit_repo(edit_repo, ssh_server)
 
     # EOF message
     log.info("Finished setting up bare git repo")
@@ -110,4 +112,4 @@ def run_transition(configfile, new_svn_dump = False):
 
 
 if __name__ == '__main__':
-    run_transition("./settings.ini", new_svn_dump=False)
+    run_transition("./settings.ini", new_svn_dump=True)

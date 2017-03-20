@@ -28,5 +28,6 @@ def avoid():
              'grep-package-files',
              'optOut.info',
              'repthemes.xml',
-             'rpacks.test']
+             'rpacks.test',
+             'Makefile']
     return avoid
