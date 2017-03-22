@@ -61,7 +61,7 @@ class GitBioconductorRepository(object):
         # Get list of files and packages to avoid
         # Filter packs
         pack_list = result.split()
-        packs = [pack.replace("/","") for pack in pack_list if pack.endswith("/")]
+        packs = [pack.replace("/", "") for pack in pack_list if pack.endswith("/")]
         return packs
 
     def add_remote(self):
@@ -247,7 +247,7 @@ class GitBioconductorRepository(object):
                     log.error("Grafting Error: %s, Package not found: %s" % (e, package))
                     pass
                 except Exception as e:
-                    log.error("Grafting Error: %s in package: %s" %s (e, package))
+                    log.error("Grafting Error: %s in package: %s" % (e, package))
                     pass
         return
 
