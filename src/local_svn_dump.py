@@ -11,7 +11,6 @@ Usage:
     `python svn_dump.py`
 """
 import os
-import sys
 import subprocess
 import logging as log
 
@@ -85,13 +84,13 @@ class LocalSvnDump(object):
             package_dump = os.path.join(package_dir, pack)
             # TODO: git svn clone from each release branch.
             # This will be tricky.
-	    try:
+            try:
                 cmd = ['git', 'svn', 'clone', '--authors-file=' + self.users_db, package_dump]
                 subprocess.check_call(cmd, cwd=self.bioc_git_repo)
                 log.debug("Finished git-svn clone for package: %s" % pack)
             except subprocess.CalledProcessError as e:
                 log.error("Error : %s in package %s" % (e, pack))
-            except Exception as e: # All other errors
+            except Exception as e:  # All other errors
                 log.error("Unexpected error: %s" % e)
         return
 
@@ -105,7 +104,7 @@ class LocalSvnDump(object):
                     if "Revision" in line]
         revision = int(revision[0])
         self.revision = revision
-	log.info("SVN dump revision: %s" % revision)
+        log.info("SVN dump revision: %s" % revision)
         return
 
     def svn_dump_update(self, update_file):
@@ -123,7 +122,6 @@ class LocalSvnDump(object):
         log.info("Finshed dump to local file: %s" % update_file)
         return ret_code
 
-    # TODO: This doesn't work like expected
     def update_local_svn_dump(self, update_file):
         """Update Local SVN dump."""
         cmd = ('svnadmin load ' + self.svn_root_dir + ' < ' +

@@ -12,6 +12,7 @@ Ideas taken from Jim Hester's code in Bioconductor/mirror
 
 import os
 import re
+import sys
 import subprocess
 from src.git_api.git_api import git_clone
 from src.git_api.git_api import git_remote_add
@@ -55,11 +56,14 @@ class GitBioconductorRepository(object):
                        if "RELEASE" in item]
         return branch_list
 
-    # TODO: IS THIS EVEN NEEDED?
     def get_pack_list(self, path):
         """Get list of packages on SVN."""
         result = subprocess.check_output(['svn', 'list', path])
-        return [item.replace('/', '') for item in result.split()]
+        # Get list of files and packages to avoid
+        # Filter packs
+        pack_list = result.split()
+        packs = [pack.replace("/", "") for pack in pack_list if pack.endswith("/")]
+        return packs
 
     def add_remote(self):
         """Add git remote to make the directory.
@@ -71,9 +75,12 @@ class GitBioconductorRepository(object):
             if ".git" in package:
                 remote = self.remote_url + package
                 # Run remote command
-                git_remote_remove('origin', os.path.join(self.bare_git_repo,package))
-                git_remote_add('origin', remote, os.path.join(self.bare_git_repo,package))
-                log.info("Add remote to package: %s" % os.path.join(self.bare_git_repo,package))
+                git_remote_remove('origin', os.path.join(self.bare_git_repo,
+                                  package))
+                git_remote_add('origin', remote, os.path.join(
+                               self.bare_git_repo, package))
+                log.info("Add remote to package: %s" % os.path.join(
+                         self.bare_git_repo, package))
         return
 
     def add_orphan_branch_points(self, release, package):
@@ -157,6 +164,17 @@ class GitBioconductorRepository(object):
         revision_id = re.findall('\(from [^:]+:([0-9]+)', output)[-1]
         return revision_id
 
+    def release_revision_dict(self, branch_list):
+        """Make a dictionary with key = svn_release and value = revision_id."""
+        rel_rev_dict = {}  # Dictionary
+        branch_url = self.svn_root + "/branches"
+        for release in branch_list:
+            svn_branch_url = branch_url + "/" + release
+            revision = self._svn_revision_branch_id(svn_branch_url)
+            rel_rev_dict[release] = revision
+            log.debug("release: %s, revision %s" % (release, revision))
+        return rel_rev_dict
+
     def find_branch_points(self, from_revision, package, release):
         """Find branch points in the git revision history."""
         package_dir = os.path.join(self.bioc_git_repo, package)
@@ -183,16 +201,6 @@ class GitBioconductorRepository(object):
                 return branch_point
         return None
 
-    def release_revision_dict(self, branch_list):
-        """Make a dictionary with key = svn_release and value = revision_id."""
-        rel_rev_dict = {}  # Dictionary
-        branch_url = self.svn_root + "/branches"
-        for release in branch_list:
-            svn_branch_url = branch_url + "/" + release
-            revision = self._svn_revision_branch_id(svn_branch_url)
-            rel_rev_dict[release] = revision
-        return rel_rev_dict
-
     def graft(self, package, release, release_revision_dict):
         """Write graft file in each pacakage, connecting the branches.
 
@@ -201,7 +209,8 @@ class GitBioconductorRepository(object):
         """
         cwd = os.path.join(self.bioc_git_repo, package)
         log.info("Graft package directory: %s" % cwd)
-        branch_point = self.find_branch_points(release_revision_dict, package, release)
+        branch_point = self.find_branch_points(release_revision_dict, package,
+                                               release)
         if branch_point:
             offspring_sha1, parent_sha1 = branch_point
             with open(os.path.join(cwd, ".git/info/grafts"), 'a') as f:
@@ -220,16 +229,20 @@ class GitBioconductorRepository(object):
         # Get list of branches
         branch_list = self.get_branch_list()
         release_revision_dict = self.release_revision_dict(branch_list)
-        branch_url = self.svn_root + "branches"
+        branch_url = os.path.join(self.svn_root, "branches")
         for release in branch_list:
             packs = self.get_pack_list(os.path.join(branch_url, release,
                                                     'madman', 'Rpacks'))
             for package in packs:
                 try:
+                    log.info("Adding graft to package: %s" % package)
                     self.graft(package, release, release_revision_dict)
                 except OSError as e:
-                    log.error("Package not found: %s" % package)
-                    log.error(e)
+                    log.error("Grafting Error: %s, Package not found: %s" % (e, package))
+                    pass
+                except:
+                    e = sys.exc_info()[0]  # Catch all exceptions
+                    log.error("Unexpected Grafting Error: %s in package: %s" % (e, package))
                     pass
         return
 
@@ -242,18 +255,17 @@ class GitBioconductorRepository(object):
             try:
                 git_clone(os.path.join(self.bioc_git_repo, package),
                           self.bare_git_repo, bare=True)
-                # TODO: Check if this is needed if the repo is NOT coped.
                 # Git update server, so that info/refs is populated,
-                # making the server "smart".
+                # making the server "smart"
                 cmd = ['git', 'update-server-info']
                 subprocess.check_call(cmd, cwd=os.path.join(self.bare_git_repo,
                                       package + ".git"))
             except subprocess.CalledProcessError as e:
-                log.error("Package: %s, Error creating bare repository: %s" % (
-                          package, e))
+                log.error("Error creating bare repository: %s in package %s" % (
+                          e, package))
                 pass
             except OSError as e:
-                log.error("Package: %s, Error: %s" % (package, e))
+                log.error("Error: %s, Package: %s" % (e, package))
                 pass
         return
 

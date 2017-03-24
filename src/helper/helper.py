@@ -18,7 +18,8 @@ def is_github_repo(url):
     print("Out: %s" % out)
     return True
 
-# TODO: Send email during rollout to developers to add 
+
+# TODO: Send email during rollout to developers to add
 # Development URL
 def append_development_url(package):
     """Extract `DevelopmentURL` from DESCRIPTION file."""
