@@ -12,6 +12,7 @@ Ideas taken from Jim Hester's code in Bioconductor/mirror
 
 import os
 import re
+import sys
 import subprocess
 from src.git_api.git_api import git_clone
 from src.git_api.git_api import git_remote_add
@@ -178,9 +179,7 @@ class GitBioconductorRepository(object):
         """Find branch points in the git revision history."""
         package_dir = os.path.join(self.bioc_git_repo, package)
         cmd = ['git', 'log', '--format=%H', release]
-        print("package_dir: ", package_dir)
         branch_root = subprocess.check_output(cmd, cwd=package_dir).split()[-1]
-        print(branch_root)
         # Be careful, as there is an empty string at end of list
         commits = subprocess.check_output(['git', 'svn', 'log',
                                            '--oneline', '--show-commit',
@@ -199,7 +198,6 @@ class GitBioconductorRepository(object):
                                                cwd=package_dir)
                 # Make tuple and strip sha's for whitespace
                 branch_point = (branch_root.strip(), sha1.strip())
-                print("Branch point: ", branch_point)
                 return branch_point
         return None
 
@@ -238,16 +236,13 @@ class GitBioconductorRepository(object):
             for package in packs:
                 try:
                     log.info("Adding graft to package: %s" % package)
-                    print("add_commit_history release: ", release)
-                    print("add_commit_history package: ", package)
-#                    for k,v in release_revision_dict.iteritems():
-#                        print("release: %s revision: %s " % (k,v))
                     self.graft(package, release, release_revision_dict)
                 except OSError as e:
                     log.error("Grafting Error: %s, Package not found: %s" % (e, package))
                     pass
-                except Exception as e:
-                    log.error("Grafting Error: %s in package: %s" % (e, package))
+                except:
+                    e = sys.exc_info()[0]  # Catch all exceptions
+                    log.error("Unexpected Grafting Error: %s in package: %s" % (e, package))
                     pass
         return
 
@@ -262,7 +257,6 @@ class GitBioconductorRepository(object):
                           self.bare_git_repo, bare=True)
                 # Git update server, so that info/refs is populated,
                 # making the server "smart"
-                # TODO: Make sure this is essential for the process.
                 cmd = ['git', 'update-server-info']
                 subprocess.check_call(cmd, cwd=os.path.join(self.bare_git_repo,
                                       package + ".git"))
