@@ -16,6 +16,10 @@ Setup
 
 Usage
 
+* **ALPHA testing** Remember, repositories are *static* snapshots of
+  svn; they are not current, changes commited here are *not*
+  propagated to svn, and will *not* be retained.
+
 * Clone a package
 
         git clone git@git.bioconductor.org:packages/<package_of_choice>
