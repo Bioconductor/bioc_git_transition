@@ -3,18 +3,18 @@
 This package provides functionality to allow for SVN - Git transition for
 the _Bioconductor_ Project.
 
-Goals:
+Goals
 
 * Create a private git server with all Bioconductor packages, including commit
   history from each of the _RELEASE_ branches and the _devel_ branch.
 
-Setup:
+Setup
 
 * Communicate a single ssh public key to martin.morgan at
   roswellpark.org. Alternatively, provide a github id and we'll use
   the first key in `https://github.com/<github_id>.keys`
 
-Usage:
+Usage
 
 * Clone a package:
 
@@ -29,3 +29,19 @@ Usage:
 
         git checkout RELEASE_3_0
         git log
+
+## Troubleshooting
+
+### SSH
+
+`ssh` may have to choose between multiple keys. Resolve this with an
+entry in the plain-text `~/.ssh/config` file, where `identityfile`
+disambiguates the key you'd like to use.
+
+        host git-bioc
+            user git
+            hostname git.bioconductor.org
+            port 22
+            identityfile ~/.ssh/id_rsa
+
+Use as `git clone git-bioc:packages/BiocGenerics`.
