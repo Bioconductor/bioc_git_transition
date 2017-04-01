@@ -10,13 +10,14 @@ Goals
 
 Setup
 
-* Communicate a single ssh public key to martin.morgan at
-  roswellpark.org. Alternatively, provide a github id and we'll use
-  the first key in `https://github.com/<github_id>.keys`
+* To participate in the current testing cycle, communicate a single
+  ssh public key to martin.morgan at roswellpark.org. Alternatively,
+  provide a github id and we'll use the first key in
+  `https://github.com/<github_id>.keys`
 
 Usage
 
-* **ALPHA testing** Remember, repositories are *static* snapshots of
+* **ALPHA testing**. Remember, repositories are *static* snapshots of
   svn; they are not current, changes commited here are *not*
   propagated to svn, and will *not* be retained.
 
