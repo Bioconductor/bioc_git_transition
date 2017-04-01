@@ -4,12 +4,17 @@ This package provides functionality to allow for SVN - Git transition for
 the _Bioconductor_ Project.
 
 Goals:
+
 * Create a private git server with all Bioconductor packages, including commit
-  history from each of the _RELEASE_ branches and also the _devel_ branch.
+  history from each of the _RELEASE_ branches and the _devel_ branch.
+
+Setup:
+
+* Communicate a single ssh public key to martin.morgan at
+  roswellpark.org. Alternatively, provide a github id and we'll use
+  the first key in `https://github.com/<github_id>.keys`
 
 Usage:
-* This is a smaller test set of packages so your choices
-are limited to a `List of available packages` (refer below).
 
 * Clone a package:
 
