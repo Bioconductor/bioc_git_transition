@@ -16,16 +16,16 @@ Setup
 
 Usage
 
-* Clone a package:
+* Clone a package
 
         git clone git@git.bioconductor.org:packages/<package_of_choice>
 
-* See the branches available:
+* See the branches available
 
         cd BiocGenerics
         git branch -a
 
-* Checkout branch and see if the commit history is correct (most important step):
+* Checkout branch and see if the commit history is correct
 
         git checkout RELEASE_3_0
         git log
