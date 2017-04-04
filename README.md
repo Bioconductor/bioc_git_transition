@@ -35,11 +35,29 @@ Usage
         git checkout RELEASE_3_0
         git log
 
+* View R(ead) / W(rite) privileges
+
+        ssh git@git.bioconductor.org info
+
+* Push commits (these will be lost after testing phases are complete)
+
+        ...
+        git commit -m "alpha test" -a
+        git push
+
+* For those with permissions on single repositories: fail to push
+  changes on non-`master` or `RELEASE_3_4` branch.
+
+        git checkout RELEASE_3_3
+        ...
+        git commit -m "alpha test" -a
+        git push    # fail
+
 ## Status
 
 - [x] ssh-based read-only access to all repositories
+- [x] ssh-based read-write access to selected repositories
 - [ ] public read-only access to all repositories
-- [ ] ssh-based read-write access to selected repositories
 - [ ] experiment-data packages
 
 ## Troubleshooting
