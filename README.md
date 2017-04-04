@@ -45,8 +45,8 @@ Usage
         git commit -m "alpha test" -a
         git push
 
-* For those with permissions on single repositories: fail to push
-  changes on non-`master` or `RELEASE_3_4` branch.
+* (Non-core users): Fail to push changes on non-`master` or
+  `RELEASE_3_4` branch.
 
         git checkout RELEASE_3_3
         ...
