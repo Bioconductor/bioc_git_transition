@@ -64,7 +64,8 @@ writeLines(c(
     "",
     "repo @packages",
     "    R  = @all",
-    "    RW = @bioconductor-write0",
+    "    RW master = @bioconductor-write0",
+    "    RW RELEASE_3_4 = @bioconductor-write0",
     ""
 ), fout)
 
