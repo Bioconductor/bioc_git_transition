@@ -5,9 +5,9 @@ fin2 <- "bioc_git_transition/extdata/user_db.csv"
 fout <- "bioc_git_transition/extdata/user_db.txt"
 
 txt = read.csv(
-    fin1,sep=" ",stringsAsFactors = FALSE,strip.white = T,header = FALSE
+    fin1, sep=" ", stringsAsFactors = FALSE, strip.white = TRUE, header = FALSE
 )
-csv = read.csv(fin2,stringsAsFactors = FALSE)
+csv = read.csv(fin2, stringsAsFactors = FALSE)
 
 present = txt$V1 %in% csv$SVN.User.ID
 
@@ -26,7 +26,7 @@ csv[, "Last.Name"] = ifelse(
 
 
 csv$svn = paste0(
-    csv$SVN.User.ID," = ",csv$First.Name, " ", csv$Last.Name, " <",
+    csv$SVN.User.ID," = ", csv$First.Name, " ", csv$Last.Name, " <",
     csv$E.mail.Address,">"
 )
 head(absent)
@@ -34,7 +34,8 @@ head(csv$svn)
 
 dat = csv$svn
 dat = rbind(
-    dat,"(no author) = no_author <no_author@no_author>",
+    dat,
+    "(no author) = no_author <no_author@no_author>",
     "(no author) = no author no_author <noauthor@nowhere.com>"
 )
 
