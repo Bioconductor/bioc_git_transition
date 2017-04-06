@@ -1,3 +1,5 @@
+#svn log -q $svn | awk -F '|' '/^r/ {sub("^ ", "", [); sub(" $", "", [); print [" = "[" <"[">"}' | sort -u > users.txt
+
 txt = read.csv("users.txt",sep=" ",stringsAsFactors = FALSE,strip.white = T,header = FALSE)
 csv = read.csv("user_db.csv",stringsAsFactors = FALSE)
 
