@@ -16,7 +16,7 @@ All git repositories are being shared via http/s as public read-only. There is n
   user: read, write, execute  
   group: read, execute  
   other: none  
-- All files under /hom/e/git/repositories should have the following permissions:  
+- All files under /home/git/repositories should have the following permissions:  
   user: read, write  
   group: read  
   other: none  
