@@ -8,8 +8,9 @@ There are 2 levels of 'sharing' enabled on the the git server: public read-only 
 
 # Public, read-only http/s access
 
-- Configure Apache:
-https://github.com/Bioconductor/AWS_management/blob/master/docs/Configure_Apache.md
+All git repositories are being shared via http/s as public read-only. There is no user-based authentication or repository modulation involved so there is no need for the 'smart http' described in the gitolite documentation. The Apache set-up requires the ssl certificate for https but nothing related to ssh or gitolite.
+
+- Configure Apache as described here https://github.com/Bioconductor/AWS_management/blob/master/docs/Configure_Apache.md.
 - Add the git user, www-data, to the git group.
 - All directories under /home/git/repositories should have the following permissions:  
   user: read, write, execute  
