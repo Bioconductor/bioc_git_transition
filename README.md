@@ -21,9 +21,13 @@ Usage
   svn; they are not current, changes commited here are *not*
   propagated to svn, and will *not* be retained.
 
-* Clone a package
+* Clone a package for read-only access
 
-        git clone git@git.bioconductor.org:packages/<package_of_choice>
+        git clone https://git.bioconductor.org/packages/<package>.git
+
+  or for read / write (appropriate permissions required)
+
+        git clone git@git.bioconductor.org:packages/<package>
 
 * See the branches available
 
@@ -57,7 +61,7 @@ Usage
 
 - [x] ssh-based read-only access to all repositories
 - [x] ssh-based read-write access to selected repositories
-- [ ] public read-only access to all repositories
+- [x] public read-only access to all repositories
 - [ ] experiment-data packages
 
 ## Troubleshooting
