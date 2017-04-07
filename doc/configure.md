@@ -20,8 +20,8 @@ All git repositories are being shared via http/s as public read-only. There is n
   user: read, write  
   group: read  
   other: none  
-- Testing:
-  -- Paste https://git.bioconductor.org/packages/ in a browser and confirm all packages are visable.
+- Testing:  
+  -- Paste https://git.bioconductor.org/packages/ in a browser and confirm all packages are visable.  
   -- Download a package with `git clone https://git.bioconductor.org/packages/BiocGenerics.git`
 
 # svn 'authz' to gitolite 'conf'
