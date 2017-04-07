@@ -1,5 +1,4 @@
 transition.log
 *.pyc
 update.svn
-users_db.txt
-transfer_files.sh
+extdata

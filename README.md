@@ -3,27 +3,31 @@
 This package provides functionality to allow for SVN - Git transition for
 the _Bioconductor_ Project.
 
-Goals
+## Goals
 
 * Create a private git server with all Bioconductor packages, including commit
   history from each of the _RELEASE_ branches and the _devel_ branch.
 
-Setup
+## Setup
 
 * To participate in the current testing cycle, communicate a single
   ssh public key to martin.morgan at roswellpark.org. Alternatively,
   provide a github id and we'll use the first key in
   `https://github.com/<github_id>.keys`
 
-Usage
+## Usage: clone, push, pull, etc.
 
 * **ALPHA testing**. Remember, repositories are *static* snapshots of
   svn; they are not current, changes commited here are *not*
   propagated to svn, and will *not* be retained.
 
-* Clone a package
+* Clone a package for read-only access
 
-        git clone git@git.bioconductor.org:packages/<package_of_choice>
+        git clone https://git.bioconductor.org/packages/<package>.git
+
+  or for read / write (appropriate permissions required)
+
+        git clone git@git.bioconductor.org:packages/<package>
 
 * See the branches available
 
@@ -35,14 +39,14 @@ Usage
         git checkout RELEASE_3_0
         git log
 
-* View R(ead) / W(rite) privileges
-
-        ssh git@git.bioconductor.org info
-
-* Push commits (these will be lost after testing phases are complete)
+* Local commits
 
         ...
         git commit -m "alpha test" -a
+
+* Push commits to writeable repositories (commits will be lost after
+  testing phases are complete)
+
         git push
 
 * (Non-core users): Fail to push changes on non-`master` or
@@ -53,11 +57,22 @@ Usage
         git commit -m "alpha test" -a
         git push    # fail
 
+## Usage: exploration
+
+* Elementary browser interface available at
+
+        https://git.bioconductor.org
+
+* View R(ead) / W(rite) privileges
+
+        ssh git@git.bioconductor.org info        # all packages
+        ssh git@git.bioconductor.org info packages/BiocGenerics
+
 ## Status
 
 - [x] ssh-based read-only access to all repositories
 - [x] ssh-based read-write access to selected repositories
-- [ ] public read-only access to all repositories
+- [x] public read-only access to all repositories
 - [ ] experiment-data packages
 
 ## Troubleshooting

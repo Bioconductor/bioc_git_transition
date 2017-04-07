@@ -1,35 +1,45 @@
-#svn log -q $svn | awk -F '|' '/^r/ {sub("^ ", "", [); sub(" $", "", [); print [" = "[" <"[">"}' | sort -u > users.txt
+## svn log -q $svn | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | sort -u > users.txt
 
-txt = read.csv("users.txt",sep=" ",stringsAsFactors = FALSE,strip.white = T,header = FALSE)
-csv = read.csv("user_db.csv",stringsAsFactors = FALSE)
+fin1 <- "bioc_git_transition/extdata/users.txt"
+fin2 <- "bioc_git_transition/extdata/user_db.csv"
+fout <- "bioc_git_transition/extdata/user_db.txt"
 
-present = txt$V1 %in% csv$SVN.User.ID
+txt <- readLines(fin1)
+txt <- sub(
+    "Jim Hester = Jim Hester <Jim Hester>",
+    "Jim Hester = James Hester <jhester@fredhutch.org>",
+    txt
+)
+txt <- cbind(strcapture(
+    "(\\(?[[:alnum:].@ ]+\\)?) = .*", txt,
+    data.frame(id=character(), stringsAsFactors=FALSE)
+), data.frame(name="unknown", email="unknown", stringsAsFactors=FALSE))
+idx <- grep("@", txt$id)
+txt$email[idx] <- txt$id[idx]
+txt <- txt[txt$id != "(no author)",]
 
-absent = txt[!present,]
+csv <- read.csv(fin2, stringsAsFactors = FALSE)
+csv[] <- lapply(csv, trimws)
+csv$First.Name[csv$First.Name == "Martin Morgan"] <- "Martin"
+csv$Last.Name[csv$Last.Name == "Martin Morgan"] <- "Martin"
 
-head(csv)
-csv[, "SVN.User.ID"] = ifelse(nzchar(csv$SVN.User.ID), csv$SVN.User.ID, csv$E.mail.Address)
-csv[, "First.Name"] = ifelse(nzchar(csv$First.Name), csv$First.Name, csv$E.mail.Address)
-csv[, "Last.Name"] = ifelse(nzchar(csv$Last.Name), csv$Last.Name, csv$E.mail.Address)
+csv$E.mail.Address[!nzchar(csv$E.mail.Address)] <- "unknown"
 
+idx <- !nzchar(csv$SVN.User.ID) | csv$SVN.User.ID == "unknown"
+csv$SVN.User.ID[idx] <- csv$E.mail.Address[idx]
+csv$Name <- trimws(paste(csv$First.Name, csv$Last.Name))
+csv$Name[!nzchar(csv$Name)] <- "unknown"
 
-csv$svn = paste0(csv$SVN.User.ID," = ",csv$First.Name, " ", csv$Last.Name, " <",csv$E.mail.Address,">")
-head(absent)
-head(csv$svn)
+absent <- txt[!txt$id %in% csv$SVN.User.ID,]
 
-dat = csv$svn
-dat = rbind(dat,"(no author) = no_author <no_author@no_author>", "(no author) = no author no_author <noauthor@nowhere.com>")
+fmt <- "%s = %s <%s>"
+dat <- unique(c(
+    sprintf(fmt, csv$SVN.User.ID, csv$Name, csv$E.mail.Address),
+    sprintf(fmt, absent$id, absent$name, absent$email),
+    "(no author) = unknown <unknown@email>"
+))
 
-head(absent)
-View(absent)
-result = c(dat, paste0(absent$V1, " = ", absent$V1, " ", absent$V1, " <", absent$V1, ">"))
-
-# Munge
-result[grep(pattern = "no",x = result)]
-result = result[-1543]
-
-result = data.frame(result)
-
-result = rbind(result, 
-
-write.table(result, file="user_db.txt",col.names=FALSE, row.names=FALSE, quote=FALSE)
+write.table(
+    data.frame(dat), file=fout,
+    col.names=FALSE, row.names=FALSE, quote=FALSE
+)
