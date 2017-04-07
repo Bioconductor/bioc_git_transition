@@ -1,6 +1,27 @@
 # Server
 
-Git is hosted at the AWS-based server git.bioconductor.org
+Git is hosted at the AWS-based server, git.bioconductor.org. This EC2 instance has 2 vCPUs, 8 GB RAM and 500 GB disk space on the root drive.
+
+# Access
+
+There are 2 levels of 'sharing' enabled on the the git server: public read-only via http/s and user-authenticated push/pull via ssh and gitolite. Both methods point to git repositories located at /home/git/repositories.
+
+# Public, read-only http/s access
+
+- Configure Apache:
+https://github.com/Bioconductor/AWS_management/blob/master/docs/Configure_Apache.md
+- Add the git user, www-data, to the git group.
+- All directories under /home/git/repositories should have the following permissions:
+  user: read, write, execute
+  group: read, execute
+  other: none
+- All files under /hom/e/git/repositories should have the following permissions:
+  user: read, write
+  group: read
+  other: none
+- Testing:
+  -- Paste https://git.bioconductor.org/packages/ in a browser and confirm all packages are visable.
+  -- Download a package with `git clone https://git.bioconductor.org/packages/BiocGenerics.git`
 
 # svn 'authz' to gitolite 'conf'
 
