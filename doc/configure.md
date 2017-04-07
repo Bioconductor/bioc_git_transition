@@ -11,14 +11,14 @@ There are 2 levels of 'sharing' enabled on the the git server: public read-only 
 - Configure Apache:
 https://github.com/Bioconductor/AWS_management/blob/master/docs/Configure_Apache.md
 - Add the git user, www-data, to the git group.
-- All directories under /home/git/repositories should have the following permissions:
-  user: read, write, execute
-  group: read, execute
-  other: none
-- All files under /hom/e/git/repositories should have the following permissions:
-  user: read, write
-  group: read
-  other: none
+- All directories under /home/git/repositories should have the following permissions:  
+  user: read, write, execute  
+  group: read, execute  
+  other: none  
+- All files under /hom/e/git/repositories should have the following permissions:  
+  user: read, write  
+  group: read  
+  other: none  
 - Testing:
   -- Paste https://git.bioconductor.org/packages/ in a browser and confirm all packages are visable.
   -- Download a package with `git clone https://git.bioconductor.org/packages/BiocGenerics.git`
