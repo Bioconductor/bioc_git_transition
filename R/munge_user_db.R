@@ -4,54 +4,39 @@ fin1 <- "bioc_git_transition/extdata/users.txt"
 fin2 <- "bioc_git_transition/extdata/user_db.csv"
 fout <- "bioc_git_transition/extdata/user_db.txt"
 
-txt = read.csv(
-    fin1, sep=" ", stringsAsFactors = FALSE, strip.white = TRUE, header = FALSE
+txt <- readLines(fin1)
+txt <- sub(
+    "Jim Hester = Jim Hester <Jim Hester>",
+    "Jim Hester = James Hester <jhester@fredhutch.org>",
+    txt
 )
-csv = read.csv(fin2, stringsAsFactors = FALSE)
+txt <- cbind(strcapture(
+    "(\\(?[[:alnum:].@ ]+\\)?) = .*", txt,
+    data.frame(id=character(), stringsAsFactors=FALSE)
+), data.frame(name="unknown", email="unknown", stringsAsFactors=FALSE))
+idx <- grep("@", txt$id)
+txt$email[idx] <- txt$id[idx]
 
-present = txt$V1 %in% csv$SVN.User.ID
+csv <- read.csv(fin2, stringsAsFactors = FALSE)
+csv[] <- lapply(csv, trimws)
+csv$First.Name[csv$First.Name == "Martin Morgan"] <- "Martin"
 
-absent = txt[!present,]
+csv$E.mail.Address[!nzchar(csv$E.mail.Address)] <- "unknown"
 
-head(csv)
-csv[, "SVN.User.ID"] = ifelse(
-    nzchar(csv$SVN.User.ID), csv$SVN.User.ID, csv$E.mail.Address
-)
-csv[, "First.Name"] = ifelse(
-    nzchar(csv$First.Name), csv$First.Name, csv$E.mail.Address
-)
-csv[, "Last.Name"] = ifelse(
-    nzchar(csv$Last.Name), csv$Last.Name, csv$E.mail.Address
-)
+idx <- !nzchar(csv$SVN.User.ID) | csv$SVN.User.ID == "unknown"
+csv$SVN.User.ID[idx] <- csv$E.mail.Address[idx]
+csv$Name <- trimws(paste(csv$First.Name, csv$Last.Name))
+csv$Name[!nzchar(csv$Name)] <- "unknown"
 
+absent <- txt[!txt$id %in% csv$SVN.User.ID,]
 
-csv$svn = paste0(
-    csv$SVN.User.ID," = ", csv$First.Name, " ", csv$Last.Name, " <",
-    csv$E.mail.Address,">"
-)
-head(absent)
-head(csv$svn)
-
-dat = csv$svn
-dat = rbind(
-    dat,
-    "(no author) = no_author <no_author@no_author>",
-    "(no author) = no author no_author <noauthor@nowhere.com>"
-)
-
-head(absent)
-View(absent)
-result = c(
-    dat,
-    paste0(absent$V1, " = ", absent$V1, " ", absent$V1, " <", absent$V1, ">")
-)
-
-# Munge
-result[grep(pattern = "no",x = result)]
-result = result[-1543]
-
-result = data.frame(result)
+fmt <- "%s = %s <%s>"
+dat <- unique(c(
+    sprintf(fmt, csv$SVN.User.ID, csv$Name, csv$E.mail.Address),
+    sprintf(fmt, absent$id, absent$name, absent$email)
+))
 
 write.table(
-    result, file=fout,col.names=FALSE, row.names=FALSE, quote=FALSE
+    data.frame(dat), file=fout,
+    col.names=FALSE, row.names=FALSE, quote=FALSE
 )
