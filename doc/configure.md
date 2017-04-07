@@ -4,7 +4,7 @@ Git is hosted at the AWS-based server, git.bioconductor.org. This EC2 instance h
 
 # Access
 
-There are 2 levels of 'sharing' enabled on the the git server: public read-only via http/s and user-authenticated push/pull via ssh and gitolite. Both methods point to git repositories located at /home/git/repositories.
+There are 2 levels of access enabled on the the git server: public read-only via http/s and user-authenticated push/pull via ssh and gitolite. Both methods point to git repositories located at /home/git/repositories.
 
 # Public, read-only http/s access
 
