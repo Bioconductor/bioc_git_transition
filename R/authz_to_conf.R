@@ -37,6 +37,13 @@ group_formatter <- function(group_members, name) {
     txt
 }
 
+pkgs <- system2(
+    "svn",
+    "list https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks",
+    stdout=TRUE
+)
+pkgs <- sub("/", "", pkgs[endsWith(pkgs, "/")])
+
 authz <- trimws(readLines(fin))
 
 grps <- grep(group_re, authz)
@@ -55,6 +62,8 @@ group <- sub(
     vapply(strsplit(authz[repos + 1L], " *= *"), `[[`, character(1), 1L)
 )
 stopifnot(all(group %in% names(group_members)))
+name <- name[group %in% pkgs]
+group <- group[group %in% pkgs]
 
 writers <- group_formatter(group_members, "bioconductor-write0")
 
