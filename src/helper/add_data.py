@@ -30,16 +30,9 @@ import os
 import os.path
 import sys
 
-if 'BBS_SVN_CMD' in os.environ and os.environ['BBS_SVN_CMD'] != "":
-    SVN = os.environ['BBS_SVN_CMD']
-else:
-    SVN = 'svn'
-
-SVN_ROOT = 'file:///home/nturaga/bioc-data-mirror/trunk/experiment'
-REF_FILE = 'external_data_store.txt'
 
 def get_data_src_path(pkg, dir):
-    p = [SVN_ROOT, 'data_store', pkg, dir]
+    p = [svn_root + trunk + data_store_path, pkg, dir]
     return '/'.join(p)
 
 def get_data_dest_path(pkg, dir):
@@ -62,14 +55,14 @@ def add_data(pkg):
     print ""
     print "add_data.py: ADDING DATA TO '%s' PACKAGE ..." % pkg
     try:
-        fh = file(os.path.join(pkg, REF_FILE), 'r')
+        fh = file(os.path.join(pkg, ref_file), 'r')
     except IOError, err:
         print "add_data.py: no data to add (no %s file)" % err.filename
         return
     refs = parse_external_refs(pkg, fh)
     for src, dest in refs:
         print "add_data.py: adding", dest
-        cmd = ' '.join([SVN, 'checkout --username readonly --password readonly --non-interactive', src, dest])
+        cmd = ' '.join(['svn', 'export --username readonly --password readonly --non-interactive', src, dest])
         os.system(cmd)
     print "add_data.py: DONE."
     return

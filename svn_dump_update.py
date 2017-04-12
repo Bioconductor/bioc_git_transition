@@ -20,7 +20,7 @@ def svn_root_update(configfile):
     Config = ConfigParser.ConfigParser()
     Config.read(configfile)
 
-    bioc_git_repo = Config.get('GitBioconductor', 'bioc_git_repo')
+    temp_git_repo = Config.get('Software', 'temp_git_repo')
     svn_root = Config.get('SVN', 'svn_root')
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
@@ -30,7 +30,7 @@ def svn_root_update(configfile):
         for k, v in Config.items(s):
             log.info("%s: %s" % (k, v))
 
-    dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
+    dump = LocalSvnDump(svn_root, temp_git_repo, users_db, remote_svn_server)
     dump.svn_get_revision()
     dump.svn_dump_update(update_file)
     dump.update_local_svn_dump(update_file)
@@ -42,9 +42,9 @@ def svn_experiment_root_update(configfile):
     Config = ConfigParser.ConfigParser()
     Config.read(configfile)
 
-    bioc_git_repo = Config.get('ExperimentData', 'temp_data_git_repo')
-    svn_root = Config.get('ExperimentData', 'svn_exp_root')
-    remote_svn_server = Config.get('ExperimentData', 'remote_svn_data_server')
+    temp_git_repo = Config.get('ExperimentData', 'temp_git_repo')
+    svn_root = Config.get('ExperimentData', 'svn_root')
+    remote_svn_server = Config.get('ExperimentData', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
     update_file = Config.get('ExperimentData', 'update_file')
 
@@ -52,7 +52,7 @@ def svn_experiment_root_update(configfile):
         for k, v in Config.items(s):
             log.info("%s: %s" % (k, v))
 
-    dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
+    dump = LocalSvnDump(svn_root, temp_git_repo, users_db, remote_svn_server)
     dump.svn_get_revision()
     dump.svn_dump_update(update_file)
     dump.update_local_svn_dump(update_file)
