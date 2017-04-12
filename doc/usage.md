@@ -2,7 +2,7 @@
 
 - Clone `git clone git@github.com:Bioconductor/bioc_git_transition`
 - **IMPORTANT** Set SVN username / password set, e.g., readonly / readonly
-- Scripts will be created
+- Folders will be created
 
     - `~/temp_packages`: git cloned from SVN; all commit histories added
     - `~/packages`: git bare repos get stored here

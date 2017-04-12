@@ -250,23 +250,29 @@ class GitBioconductorRepository(object):
         """Create bare repos in the repository directory.
 
         This needs to be run from within the bioc_git_repo directory.
+        NOTE: Set `umask` environment variable to 0027 before making
+            bare repositories for git.
         """
-        for package in os.listdir(os.path.abspath(self.bioc_git_repo)):
-            try:
-                git_clone(os.path.join(self.bioc_git_repo, package),
-                          self.bare_git_repo, bare=True)
-                # Git update server, so that info/refs is populated,
-                # making the server "smart"
-                cmd = ['git', 'update-server-info']
-                subprocess.check_call(cmd, cwd=os.path.join(self.bare_git_repo,
-                                      package + ".git"))
-            except subprocess.CalledProcessError as e:
-                log.error("Error creating bare repository: %s in package %s" % (
-                          e, package))
-                pass
-            except OSError as e:
-                log.error("Error: %s, Package: %s" % (e, package))
-                pass
+        old_mask = os.umask(0o0027)
+        try:
+            for package in os.listdir(os.path.abspath(self.bioc_git_repo)):
+                try:
+                    git_clone(os.path.join(self.bioc_git_repo, package),
+                              self.bare_git_repo, bare=True)
+                    # Git update server, so that info/refs is populated,
+                    # making the server "smart"
+                    cmd = ['git', 'update-server-info']
+                    subprocess.check_call(cmd, cwd=os.path.join(self.bare_git_repo,
+                                          package + ".git"))
+                except subprocess.CalledProcessError as e:
+                    log.error("Error creating bare repository: %s in package %s" % (
+                              e, package))
+                    pass
+                except OSError as e:
+                    log.error("Error: %s, Package: %s" % (e, package))
+                    pass
+        finally:
+            os.umask(old_mask)
         return
 
     def clone_new(self, new_package_url):

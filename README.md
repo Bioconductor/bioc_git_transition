@@ -1,211 +1,92 @@
-# Bioconductor SVN to GIT transition
+# _Bioconductor_ SVN to GIT transition
 
 This package provides functionality to allow for SVN - Git transition for
-the Bioconductor Project.
+the _Bioconductor_ Project.
 
-Goals:
+## Goals
+
 * Create a private git server with all Bioconductor packages, including commit
-  history from each of the _RELEASE_ branches and also the _devel_ branch.
+  history from each of the _RELEASE_ branches and the _devel_ branch.
 
-Usage:
-* This is a smaller test set of packages so your choices
-are limited to a `List of available packages` (refer below).
+## Setup
 
-* Clone a package:
+* To participate in the current testing cycle, communicate a single
+  ssh public key to martin.morgan at roswellpark.org. Alternatively,
+  provide a github id and we'll use the first key in
+  `https://github.com/<github_id>.keys`
 
-  `git clone ubuntu@git.bioconductor.org:/packages/<package_of_choice>.git`
+## Usage: clone, push, pull, etc.
 
-* See the branches available:
+* **ALPHA testing**. Remember, repositories are *static* snapshots of
+  svn; they are not current, changes commited here are *not*
+  propagated to svn, and will *not* be retained.
 
-  ` cd ABarray`
+* Clone a package for read-only access
 
-  ` git branch -a`
+        git clone https://git.bioconductor.org/packages/<package>.git
 
-* Checkout branch and see if the commit history is correct (most important step):
+  or for read / write (appropriate permissions required)
 
-  `git checkout RELEASE_2_14`
+        git clone git@git.bioconductor.org:packages/<package>
 
-  `git log`
+* See the branches available
 
-* Make some changes from a copy and see if you can push back up, this should only be available if you have the private key. Not for a standard author.
+        cd BiocGenerics
+        git branch -a
 
+* Checkout branch and see if the commit history is correct
 
-### List of available packages: (A - D)
-```
-ABAEnrichment/
-ABarray/
-ABSSeq/
-ACME/
-ADaCGH2/
-AffyCompatible/
-AffyExpress/
-AffyRNADegradation/
-AGDEX/
-AgiMicroRna/
-AIMS/
-ALDEx2/
-AllelicImbalance/
-AMOUNTAIN/
-AnalysisPageServer/
-Anaquin/
-AneuFinder/
-AnnotationDbi/
-AnnotationForge/
-AnnotationFuncs/
-AnnotationHub/
-AnnotationHubData/
-AnnotationHubServer/
-AnnotationHubServer.version0/
-ArrayExpress/
-ArrayExpressHTS/
-ArrayTools/
-ArrayTV/
-ARRmNormalization/
-ASAFE/
-ASEB/
-ASGSCA/
-ASpli/
-ASSET/
-ASSIGN/
-AtlasRDF/
-BaalChIP/
-BAC/
-BADER/
-BadRegionFinder/
-BAGS/
-BaseSpaceR/
-Basic4Cseq/
-BasicSTARRseq/
-BatchQC/
-BayesKnockdown/
-BayesPeak/
-BBCAnalyzer/
-BCRANK/
-BeadDataPackR/
-BEAT/
-BEclear/
-BgeeDB/
-BGmix/
-BHC/
-BicARE/
-BiGGR/
-Biobase/
-BiocCaseStudies/
-BiocCheck/
-BiocCloud/
-BiocContributions/
-BiocFileCache/
-BiocGenerics/
-BiocInstaller/
-BiocParallel/
-BiocStyle/
-BiocWorkflowTools/
-BioMVCClass/
-BioNet/
-BioQC/
-BioSeqClass/
-Biostrings/
-BiRewire/
-BiSeq/
-BitSeq/
-BPRMeth/
-BRAIN/
-BrainStars/
-BridgeDbR/
-BrowserViz/
-BrowserVizDemo/
-BSgenome/
-BubbleTree/
-BufferedMatrix/
-BufferedMatrixMethods/
-BUMHMM/
-BUS/
-CAFE/
-CAGEr/
-CALIB/
-CAMERA/
-CancerInSilico/
-CancerMutationAnalysis/
-CancerSubtypes/
-CAnD/
-Cardinal/
-Category/
-CausalR/
-CCPROMISE/
-CellMapper/
-CellNOptR/
-CexoR/
-CFAssay/
-CGEN/
-CGHbase/
-CGHcall/
-CGHnormaliter/
-CGHregions/
-ChAMP/
-ChemmineOB/
-ChemmineR/
-Chicago/
-ChIPComp/
-ChIPexoQual/
-ChIPpeakAnno/
-ChIPQC/
-ChIPseeker/
-ChIPseqR/
-ChIPsim/
-ChIPXpress/
-ChromHeatMap/
-CHRONOS/
-CINdex/
-ClassifyR/
-Clomial/
-Clonality/
-ClusterSignificance/
-CMA/
-CNAnorm/
-CNEr/
-CNExperiment/
-CNORdt/
-CNORfeeder/
-CNORfuzzy/
-CNORode/
-CNPBayes/
-CNTools/
-CNVPanelizer/
-CNVrd2/
-CNVtools/
-CoCiteStats/
-CODEX/
-CoGAPS/
-COHCAP/
-COMPASS/
-CompGO/
-ComplexHeatmap/
-CONFESS/
-ConsensusClusterPlus/
-CopyNumber450k/
-CopywriteR/
-CoRegNet/
-Cormotif/
-CorMut/
-CORREP/
-COSNet/
-CountClust/
-CoverageView/
-CRImage/
-CRISPRseek/
-CrispRVariants/
-CSAR/
-CSSP/
-CVE/
-CytoML/
-DAPAR/
-DART/
-DBChIP/
-DChIPRep/
-DECIPHER/
-DEDS/
-DEFormats/
-DEGraph/
-DEGreport/
-DEGseq/
-```
+        git checkout RELEASE_3_0
+        git log
+
+* Local commits
+
+        ...
+        git commit -m "alpha test" -a
+
+* Push commits to writeable repositories (commits will be lost after
+  testing phases are complete)
+
+        git push
+
+* (Non-core users): Fail to push changes on non-`master` or
+  `RELEASE_3_4` branch.
+
+        git checkout RELEASE_3_3
+        ...
+        git commit -m "alpha test" -a
+        git push    # fail
+
+## Usage: exploration
+
+* Elementary browser interface available at
+
+        https://git.bioconductor.org
+
+* View R(ead) / W(rite) privileges
+
+        ssh git@git.bioconductor.org info        # all packages
+        ssh git@git.bioconductor.org info packages/BiocGenerics
+
+## Status
+
+- [x] ssh-based read-only access to all repositories
+- [x] ssh-based read-write access to selected repositories
+- [x] public read-only access to all repositories
+- [ ] experiment-data packages
+
+## Troubleshooting
+
+### SSH
+
+`ssh` may have to choose between multiple keys. Resolve this with an
+entry in the plain-text `~/.ssh/config` file, where `identityfile`
+disambiguates the key you'd like to use.
+
+        host git-bioc
+            user git
+            hostname git.bioconductor.org
+            port 22
+            identityfile ~/.ssh/id_rsa
+
+Use as `git clone git-bioc:packages/BiocGenerics`.
