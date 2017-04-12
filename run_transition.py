@@ -14,7 +14,6 @@ Usage:
 
 from src.local_svn_dump import LocalSvnDump
 from src.git_bioconductor_repository import GitBioconductorRepository
-from src.git_edit_repository import GitEditRepository
 import os
 import logging as log
 import ConfigParser
@@ -37,15 +36,7 @@ def make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url):
     return
 
 
-def make_edit_repo(edit_repo, ssh_server):
-    # Make Edit repo:
-    editrepo = GitEditRepository(edit_repo, ssh_server)
-    log.info("Make edit repo: Clone packages for edit repository")
-    editrepo.clone_all_edit_repo()
-    return
-
-
-def run_transition(configfile, new_svn_dump = False):
+def run_transition(configfile, new_svn_dump=False):
     """Update SVN local dump and run gitify-bioconductor.
 
     Step 0: Create dump
@@ -60,9 +51,6 @@ def run_transition(configfile, new_svn_dump = False):
     bioc_git_repo = Config.get('GitBioconductor', 'bioc_git_repo')
     remote_url = Config.get('GitBioconductor', 'remote_url')
     bare_git_repo = Config.get('GitBioconductor', 'bare_git_repo')
-
-    edit_repo = Config.get('GitEditBioconductor', 'edit_repo')
-    ssh_server = Config.get('GitEditBioconductor', 'ssh_server')
 
     svn_root = Config.get('SVN', 'svn_root')
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
@@ -99,12 +87,6 @@ def run_transition(configfile, new_svn_dump = False):
     # Make temp git repo, with all commit history
     log.info("Make git repo")
     make_git_repo(svn_root, bioc_git_repo, bare_git_repo, remote_url)
-
-    # Make edit repo
-#    if not os.path.isdir(edit_repo):
-#        os.mkdir(edit_repo)
-#    log.info("Make edit repo")
-#    make_edit_repo(edit_repo, ssh_server)
 
     # EOF message
     log.info("Finished setting up bare git repo")

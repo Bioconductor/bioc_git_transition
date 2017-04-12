@@ -44,11 +44,8 @@ def git_filter_branch(graft_range, cwd):
     cmd = ['git', 'filter-branch', '--force', '--', graft_range]
 #    subprocess.check_call(cmd, cwd=cwd)
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,cwd=cwd)
+                            stderr=subprocess.PIPE, cwd=cwd)
     out, err = proc.communicate()
-    print out
-    print "\n"
-    print err
     return
 
 

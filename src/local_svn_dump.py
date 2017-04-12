@@ -33,7 +33,7 @@ class LocalSvnDump(object):
         """Initialize Loval SVN dump.
 
         Usage:
-        svn_root = 'file:///home/nturaga/bioconductor-svn-mirror/'
+        svn_root = 'file:///home/git/hedgehog.fhcrc.org/
         # Initialize dump
         dump = svn_dump(svn_root=svn_root,
                         bioc_git_repo="git_repo",
