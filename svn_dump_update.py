@@ -37,24 +37,27 @@ def svn_root_update(configfile):
     return
 
 
-def svn_bioc_data_update(configfile):
-    """Annotation data dump update."""
+def svn_experiment_root_update(configfile):
+    """Dump update needs to be run as git."""
     Config = ConfigParser.ConfigParser()
     Config.read(configfile)
 
-    bioc_data_git_repo = Config.get('Annotation', 'bioc_data_git_repo')
-    svn_annotation_root = Config.get('Annotation', 'svn_annotation_root')
-    remote_svn_data_server = Config.get('Annotation', 'remote_svn_data_server')
-    data_users_db = Config.get('Annotation', 'data_users_db')
-    update_file_data = Config.get('Annotation', 'updata_file_data')
+    bioc_git_repo = Config.get('ExperimentData', 'temp_data_git_repo')
+    svn_root = Config.get('ExperimentData', 'svn_exp_root')
+    remote_svn_server = Config.get('ExperimentData', 'remote_svn_data_server')
+    users_db = Config.get('SVN', 'users_db')
+    update_file = Config.get('ExperimentData', 'update_file')
 
-    dump = LocalSvnDump(svn_annotation_root, bioc_data_git_repo,
-                        data_users_db, remote_svn_data_server)
+    for s in Config.sections():
+        for k, v in Config.items(s):
+            log.info("%s: %s" % (k, v))
+
+    dump = LocalSvnDump(svn_root, bioc_git_repo, users_db, remote_svn_server)
     dump.svn_get_revision()
-    dump.svn_dump_update(update_file_data)
-    dump.update_local_svn_dump(update_file_data)
+    dump.svn_dump_update(update_file)
+    dump.update_local_svn_dump(update_file)
     return
 
-
 if __name__ == '__main__':
-    svn_root_update("./settings.ini")
+    #svn_root_update("./settings.ini")
+    svn_experiment_root_update("./settings.ini")
