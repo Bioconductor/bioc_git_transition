@@ -95,7 +95,7 @@ class GitBioconductorRepository(object):
         branch_url = os.path.join(self.svn_root, "branches")
 #        package_url = os.path.join(branch_url, release, 'madman',
 #                                   'Rpacks', package)
-        package_url = branch_url + release + self.package_path + package
+        package_url = branch_url + "/" + release + self.package_path + "/" + package
         package_dir = os.path.join(self.temp_git_repo, package)
         # Configure remote svn url
         config_remote_url = ['git', 'config', '--add',
@@ -130,9 +130,7 @@ class GitBioconductorRepository(object):
         branch_list = self.get_branch_list()
         for branch in branch_list:
             # Special case to avoid badly named branches in SVN
-            #package_list_url = os.path.join(branch_url, branch, 'madman',
-            #                                'Rpacks')
-            package_list_url = branch_url + branch + self.package_path
+            package_list_url = branch_url + "/" + branch + self.package_path
             # Get list of packages for EACH branch
             # TODO: This is not CORRECT
             package_list = self.get_pack_list(package_list_url)
@@ -237,7 +235,7 @@ class GitBioconductorRepository(object):
         for release in branch_list:
             #packs = self.get_pack_list(os.path.join(branch_url, release,
             #                                        'madman', 'Rpacks'))
-            packs = self.get_pack_list(branch_url + release + self.package_path)
+            packs = self.get_pack_list(branch_url + "/" +release + self.package_path)
             for package in packs:
                 try:
                     log.info("Adding graft to package: %s" % package)
