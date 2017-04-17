@@ -14,7 +14,7 @@ Usage:
 
 from src.local_svn_dump import LocalSvnDump
 from src.git_bioconductor_repository import GitBioconductorRepository
-from src.graft_data_as_lfs import graft_data_as_lfs
+#from src.graft_data_as_lfs import graft_data_as_lfs
 import os
 import logging as log
 import ConfigParser
@@ -133,7 +133,7 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
 
     # Step 1: Initial set up, get list of packs from trunk
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
-                        remote_svn_server)
+                        remote_svn_server, package_path)
     packs = dump.get_pack_list(branch="trunk")
 
     ###################################################
@@ -142,16 +142,16 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
         log.info("Create a local SVN dump")
         dump.svn_dump(packs)
     ###################################################
-#    # Make bare repo, if it does not exist
-#    if not os.path.isdir(bare_git_repo):
-#        os.mkdir(bare_git_repo)
+    # Make bare repo, if it does not exist
+    if not os.path.isdir(bare_git_repo):
+        os.mkdir(bare_git_repo)
 #
 #    # Make temp git repo, with all commit history
-#    log.info("Make git repo for experiment data packages")
-#    make_git_repo(svn_root, temp_git_repo, bare_git_repo,
-#                  remote_url, package_path)
+    log.info("Make git repo for experiment data packages")
+    make_git_repo(svn_root, temp_git_repo, bare_git_repo,
+                  remote_url, package_path)
 #    # EOF message
-#    log.info("Finished setting up bare git repo for experiment data packages")
+    log.info("Finished setting up bare git repo for experiment data packages")
 #
 #    # Add data to all packages
 #    graft_data_as_lfs(svn_root, trunk, data_store_path, ref_file)
@@ -159,5 +159,5 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
 
 
 if __name__ == '__main__':
-    run_transition("./settings.ini", new_svn_dump=True)
-    run_experiment_data_transition("./settings.ini", new_svn_dump=True)
+#    run_transition("./settings.ini", new_svn_dump=True)
+    run_experiment_data_transition("./settings.ini", new_svn_dump=False)

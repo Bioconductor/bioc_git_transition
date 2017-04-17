@@ -29,7 +29,7 @@ class LocalSvnDump(object):
     """Local SVN dump."""
     __metaclass__ = Singleton
 
-    def __init__(self, svn_root, bioc_git_repo, users_db, remote_svn_server):
+    def __init__(self, svn_root, bioc_git_repo, users_db, remote_svn_server, package_path):
         """Initialize Loval SVN dump.
 
         Usage:
@@ -44,14 +44,14 @@ class LocalSvnDump(object):
         self.users_db = users_db
         self.remote_svn_server = remote_svn_server
         self.bioc_git_repo = bioc_git_repo
+        self.package_path = package_path
 
     def get_pack_list(self, branch="trunk"):
         """Get list of packages on SVN."""
         if branch == "trunk":
-            path = os.path.join(self.svn_root, 'trunk/madman/Rpacks')
+            path = self.svn_root + "/" + 'trunk' +  self.package_path
         else:
-            path = os.path.join(self.svn_root, 'branches', branch,
-                                'madman/Rpacks')
+            path = os.path.join(self.svn_root, 'branches', branch, self.package_path)
         result = subprocess.check_output(['svn', 'list', path])
         package_list = [item.replace('/', '') for item in result.split()]
         return package_list
@@ -79,7 +79,7 @@ class LocalSvnDump(object):
         The SVN dump needs to be updated daily/nightly for the rest to
         work as planned.
         """
-        package_dir = os.path.join(self.svn_root, 'trunk/madman/Rpacks/')
+        package_dir = self.svn_root + '/' + 'trunk' + self.package_path
         for pack in packs:
             package_dump = os.path.join(package_dir, pack)
             # TODO: git svn clone from each release branch.
