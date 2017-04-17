@@ -32,10 +32,10 @@ def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
     log.info("Make git repo: Adding commit history")
     gitrepo.add_commit_history()
     # Step 6: Make Git repo bare
-    log.info("Make git repo: Creating bare repositories")
-    gitrepo.create_bare_repos()
-    log.info("Make git repo: Adding remotes to make git server available")
-    gitrepo.add_remote()
+#    log.info("Make git repo: Creating bare repositories")
+#    gitrepo.create_bare_repos()
+#    log.info("Make git repo: Adding remotes to make git server available")
+#    gitrepo.add_remote()
     return
 
 
@@ -160,4 +160,4 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
 
 if __name__ == '__main__':
 #    run_transition("./settings.ini", new_svn_dump=True)
-    run_experiment_data_transition("./settings.ini", new_svn_dump=False)
+    run_experiment_data_transition("./settings.ini", new_svn_dump=True)
