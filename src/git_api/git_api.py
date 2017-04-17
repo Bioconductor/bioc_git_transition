@@ -102,3 +102,23 @@ def git_clone(repository, directory, bare=True):
         cmd = ['git', 'clone', repository, destination]
     subprocess.check_call(cmd)
     return destination
+
+
+def git_lfs_track(regex, cwd):
+    """Track files in git lfs."""
+    cmd = ['git', 'lfs', 'track', regex]
+    subprocess.check_call(cmd, cwd=cwd)
+    return
+
+
+def git_add(path, cwd):
+    """Add files to git."""
+    cmd = ['git', 'add']
+    if isinstance(path, list):
+        cmd = cmd + path
+    else:
+        cmd = cmd + [path]
+    subprocess.check_call(cmd, cwd=cwd)
+    return
+
+

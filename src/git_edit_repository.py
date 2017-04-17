@@ -7,6 +7,8 @@ This module provides functions for working with the Bioconductor
 to interact with the GIT server, and work with package authors.
 
 Author: Nitesh Turaga
+
+# TODO: This needs to be edited to fit new constraints.
 """
 import os
 import subprocess

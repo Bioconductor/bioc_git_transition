@@ -9,7 +9,6 @@ Author: Nitesh Turaga
 Ideas taken from Jim Hester's code in Bioconductor/mirror
 """
 
-
 import os
 import re
 import sys
@@ -32,7 +31,8 @@ class GitBioconductorRepository(object):
     """Git Bioconductor Repository."""
     __metaclass__ = Singleton
 
-    def __init__(self, svn_root, temp_git_repo, bare_git_repo, remote_url, package_path):
+    def __init__(self, svn_root, temp_git_repo, bare_git_repo, remote_url,
+                 package_path):
         """Initialize Git Bioconductor repository."""
         self.svn_root = svn_root
         self.temp_git_repo = temp_git_repo
@@ -64,7 +64,8 @@ class GitBioconductorRepository(object):
         # Get list of files and packages to avoid
         # Filter packs
         pack_list = result.split()
-        packs = [pack.replace("/", "") for pack in pack_list if pack.endswith("/")]
+        packs = [pack.replace("/", "")
+                 for pack in pack_list if pack.endswith("/")]
         return packs
 
     def add_remote(self):
@@ -130,7 +131,7 @@ class GitBioconductorRepository(object):
         branch_list = self.get_branch_list()
         for branch in branch_list:
             # Special case to avoid badly named branches in SVN
-            #package_list_url = os.path.join(branch_url, branch, 'madman',
+            # package_list_url = os.path.join(branch_url, branch, 'madman',
             #                                'Rpacks')
             package_list_url = branch_url + branch + self.package_path
             # Get list of packages for EACH branch
@@ -235,7 +236,7 @@ class GitBioconductorRepository(object):
         release_revision_dict = self.release_revision_dict(branch_list)
         branch_url = os.path.join(self.svn_root, "branches")
         for release in branch_list:
-            #packs = self.get_pack_list(os.path.join(branch_url, release,
+            # packs = self.get_pack_list(os.path.join(branch_url, release,
             #                                        'madman', 'Rpacks'))
             packs = self.get_pack_list(branch_url + release + self.package_path)
             for package in packs:

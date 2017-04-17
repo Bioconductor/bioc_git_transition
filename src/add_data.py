@@ -1,4 +1,10 @@
 #! /usr/bin/env python
+import os
+import os.path
+import sys
+import subprocess
+from git_api.git_api import git_lfs_track
+from git_api.git_api import git_add
 
 usage = """\
 This is a modified version of add_data.py.
@@ -18,38 +24,37 @@ the data subdir to a given package.
 The appropriate data dir will be added to the specified package.
 """
 
-TODO="""
+TODO = """
 * Add sanity checks:
 
   - Is the right svn working copy
   - PKG is found and is working copy
-
 """
 
-import os
-import os.path
-import sys
 
-
-def get_data_src_path(pkg, dir):
+def get_data_src_path(svn_root, trunk, data_store_path, pkg, dir):
     p = [svn_root + trunk + data_store_path, pkg, dir]
     return '/'.join(p)
+
 
 def get_data_dest_path(pkg, dir):
     p = ['.', pkg, dir]
     return '/'.join(p)
 
-def parse_external_refs(pkg, fh):
+
+def parse_external_refs(svn_root, trunk, data_store_path, pkg, fh):
     refs = []
     for line in fh:
         line = line.strip()
         if line:
-            src = get_data_src_path(pkg, line)
+            src = get_data_src_path(svn_root, trunk, data_store_path,
+                                    pkg, line)
             dest = get_data_dest_path(pkg, line)
             refs.append((src, dest))
     return refs
 
-def add_data(pkg):
+
+def add_data(svn_root, trunk, data_store_path, ref_file, pkg):
     if pkg[-1] == '/':
         pkg = pkg[0:-1]
     print ""
@@ -59,13 +64,26 @@ def add_data(pkg):
     except IOError, err:
         print "add_data.py: no data to add (no %s file)" % err.filename
         return
-    refs = parse_external_refs(pkg, fh)
+    refs = parse_external_refs(svn_root, trunk, data_store_path, pkg, fh)
     for src, dest in refs:
         print "add_data.py: adding", dest
-        cmd = ' '.join(['svn', 'export --username readonly --password readonly --non-interactive', src, dest])
-        os.system(cmd)
+        cmd = ['svn', 'export', '--username', 'readonly', '--password',
+               'readonly', '--non-interactive', src, dest]
+        subprocess.check_call(cmd)
     print "add_data.py: DONE."
     return
+
+
+
+def add_data_as_lfs(ref_file, pkg):
+    """Add data as git LFS."""
+    package_dir = "/".join(pkg, ref_file)
+    files = os.listdir(ref_file)
+    return
+
+
+
+
 
 def show_help():
     print usage
