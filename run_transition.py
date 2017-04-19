@@ -14,14 +14,14 @@ Usage:
 
 from src.local_svn_dump import LocalSvnDump
 from src.git_bioconductor_repository import GitBioconductorRepository
-#from src.graft_data_as_lfs import graft_data_as_lfs
+from src.add_data import Lfs
 import os
 import logging as log
 import ConfigParser
 
 
 def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
-                  package_path):
+                  package_path, lfs=None):
     # Step 4: Add release branches to all   packages
     gitrepo = GitBioconductorRepository(svn_root, temp_git_repo,
                                         bare_git_repo, remote_url,
@@ -31,11 +31,23 @@ def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
     # Step 5: Add commit history
     log.info("Make git repo: Adding commit history")
     gitrepo.add_commit_history()
+
+    if lfs:
+        make_git_lfs_repo(lfs, temp_git_repo)
+
     # Step 6: Make Git repo bare
-#    log.info("Make git repo: Creating bare repositories")
-#    gitrepo.create_bare_repos()
-#    log.info("Make git repo: Adding remotes to make git server available")
-#    gitrepo.add_remote()
+    log.info("Make git repo: Creating bare repositories")
+    gitrepo.create_bare_repos()
+    log.info("Make git repo: Adding remotes to make git server available")
+    gitrepo.add_remote()
+    return
+
+
+def make_git_lfs_repo(lfs, temp_git_repo):
+    for package in os.listdir(temp_git_repo):
+        lfs.add_data(package)
+        lfs.add_data_as_lfs(package)
+        lfs.commit_data_to_lfs(package)
     return
 
 
@@ -145,16 +157,14 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     # Make bare repo, if it does not exist
     if not os.path.isdir(bare_git_repo):
         os.mkdir(bare_git_repo)
-#
-#    # Make temp git repo, with all commit history
+
+    # Make temp git repo, with all commit history
     log.info("Make git repo for experiment data packages")
+    lfs = Lfs(svn_root, trunk, data_store_path, ref_file)
     make_git_repo(svn_root, temp_git_repo, bare_git_repo,
-                  remote_url, package_path)
-#    # EOF message
+                  remote_url, package_path, lfs=lfs)
+    # EOF message
     log.info("Finished setting up bare git repo for experiment data packages")
-#
-#    # Add data to all packages
-#    graft_data_as_lfs(svn_root, trunk, data_store_path, ref_file)
     return
 
 
