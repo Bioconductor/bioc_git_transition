@@ -25,12 +25,13 @@ def svn_root_update(configfile):
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
     update_file = Config.get('SVN', 'update_file')
+    package_path = Config.get('Software', 'package_path') 
 
     for s in Config.sections():
         for k, v in Config.items(s):
             log.info("%s: %s" % (k, v))
 
-    dump = LocalSvnDump(svn_root, temp_git_repo, users_db, remote_svn_server)
+    dump = LocalSvnDump(svn_root, temp_git_repo, users_db, remote_svn_server, package_path)
     dump.svn_get_revision()
     dump.svn_dump_update(update_file)
     dump.update_local_svn_dump(update_file)
@@ -47,17 +48,18 @@ def svn_experiment_root_update(configfile):
     remote_svn_server = Config.get('ExperimentData', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
     update_file = Config.get('ExperimentData', 'update_file')
+    package_path = Config.get('ExperimentData', 'package_path')
 
     for s in Config.sections():
         for k, v in Config.items(s):
             log.info("%s: %s" % (k, v))
 
-    dump = LocalSvnDump(svn_root, temp_git_repo, users_db, remote_svn_server)
+    dump = LocalSvnDump(svn_root, temp_git_repo, users_db, remote_svn_server, package_path)
     dump.svn_get_revision()
     dump.svn_dump_update(update_file)
     dump.update_local_svn_dump(update_file)
     return
 
 if __name__ == '__main__':
-    #svn_root_update("./settings.ini")
+#    svn_root_update("./settings.ini")
     svn_experiment_root_update("./settings.ini")
