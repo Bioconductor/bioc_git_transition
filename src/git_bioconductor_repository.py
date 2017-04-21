@@ -236,17 +236,20 @@ class GitBioconductorRepository(object):
         for release in branch_list:
             # packs = self.get_pack_list(os.path.join(branch_url, release,
             #                                        'madman', 'Rpacks'))
-            packs = self.get_pack_list(branch_url + "/" +release + self.package_path)
+            packs = self.get_pack_list(branch_url + "/" + release +
+                                       self.package_path)
             for package in packs:
                 try:
                     log.info("Adding graft to package: %s" % package)
                     self.graft(package, release, release_revision_dict)
                 except OSError as e:
-                    log.error("Grafting Error: %s, Package not found: %s" % (e, package))
+                    log.error("Grafting Error: %s, Package not found: %s" %
+                              (e, package))
                     pass
                 except:
                     e = sys.exc_info()[0]  # Catch all exceptions
-                    log.error("Unexpected Grafting Error: %s in package: %s" % (e, package))
+                    log.error("Unexpected Grafting Error: %s in package: %s" %
+                              (e, package))
                     pass
         return
 
@@ -266,11 +269,12 @@ class GitBioconductorRepository(object):
                     # Git update server, so that info/refs is populated,
                     # making the server "smart"
                     cmd = ['git', 'update-server-info']
-                    subprocess.check_call(cmd, cwd=os.path.join(self.bare_git_repo,
-                                          package + ".git"))
+                    subprocess.check_call(cmd,
+                                          cwd=os.path.join(self.bare_git_repo,
+                                                           package + ".git"))
                 except subprocess.CalledProcessError as e:
-                    log.error("Error creating bare repository: %s in package %s" % (
-                              e, package))
+                    log.error("Error creating bare repo: %s in package %s"
+                              % (e, package))
                     pass
                 except OSError as e:
                     log.error("Error: %s, Package: %s" % (e, package))

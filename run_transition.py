@@ -14,14 +14,15 @@ Usage:
 
 from src.local_svn_dump import LocalSvnDump
 from src.git_bioconductor_repository import GitBioconductorRepository
-from src.add_data import Lfs
+from src.lfs import Lfs
+from src.lfs.lfs import run_lfs_transition
 import os
 import logging as log
 import ConfigParser
 
 
 def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
-                  package_path, lfs=None):
+                  package_path, lfs_object=None):
     # Step 4: Add release branches to all   packages
     gitrepo = GitBioconductorRepository(svn_root, temp_git_repo,
                                         bare_git_repo, remote_url,
@@ -32,22 +33,16 @@ def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
     log.info("Make git repo: Adding commit history")
     gitrepo.add_commit_history()
 
-    if lfs:
-        make_git_lfs_repo(lfs, temp_git_repo)
+    if lfs_object is not None:
+        log.info("Running LFS transtion")
+        run_lfs_transition(lfs_object)
+        log.info("Completed setting up LFS transition on experiment data")
 
     # Step 6: Make Git repo bare
     log.info("Make git repo: Creating bare repositories")
     gitrepo.create_bare_repos()
     log.info("Make git repo: Adding remotes to make git server available")
     gitrepo.add_remote()
-    return
-
-
-def make_git_lfs_repo(lfs, temp_git_repo):
-    for package in os.listdir(temp_git_repo):
-        lfs.add_data(package)
-        lfs.add_data_as_lfs(package)
-        lfs.commit_data_to_lfs(package)
     return
 
 
@@ -160,7 +155,9 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
 
     # Make temp git repo, with all commit history
     log.info("Make git repo for experiment data packages")
+    # Create a new git LFS object
     lfs = Lfs(svn_root, trunk, data_store_path, ref_file)
+    # Run make_git_repo, with new LFS object
     make_git_repo(svn_root, temp_git_repo, bare_git_repo,
                   remote_url, package_path, lfs=lfs)
     # EOF message
@@ -169,5 +166,5 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
 
 
 if __name__ == '__main__':
-#    run_transition("./settings.ini", new_svn_dump=True)
+    # run_transition("./settings.ini", new_svn_dump=True)
     run_experiment_data_transition("./settings.ini", new_svn_dump=True)
