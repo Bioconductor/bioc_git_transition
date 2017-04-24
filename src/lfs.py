@@ -44,39 +44,43 @@ class Lfs:
         return [item[len(path)+1:] for item in ans]
 
     def add_data(self, package):
-        # package_dir = os.path.join(self.temp_git_repo, self.trunk, package)
-        before_files = self.list_files(package)
-        try:
-            refs = self.parse_external_refs(package)
+        package_dir = os.path.join(self.temp_git_repo, package)
+        before_files = self.list_files(package_dir)
+        try:            
+            refs = self.parse_external_refs(package_dir)
         except IOError, err:
+            log.debug("Error in package %s " % package)
             log.debug("No data to add (no %s file)" % err.filename)
             return
         for ref in refs:
             src = "/".join([self.svn_root, self.trunk,
                             self.data_store_path, package, ref])
-            dest = "/".join([package, ref])
-            cmd = ['svn', 'export', '--username', 'readonly', '--password',
-                   'readonly', '--non-interactive', src, dest]
-            subprocess.check_call(cmd)
-            # subprocess.check_call(cmd, cwd=package_dir)
-        after_files = self.list_files(package)
+            dest = "/".join([package_dir, ref])
+            try:
+                cmd = ['svn', 'export', '--username', 'readonly', '--password',
+                       'readonly', '--non-interactive', src, dest]
+                print "CMD to add data: ", cmd
+                subprocess.check_call(cmd)
+            except Exception as e:
+                log.debug("Error in adding ref: %s , package : %s " % (ref, package))
+                log.debug(e)
+                pass
+        after_files = self.list_files(package_dir)
         self.lfs_files = list(set(after_files) - set(before_files))
-        return self.lfs_files
+        return
 
     def add_data_as_lfs(self, package):
         """Add data as git LFS."""
         package_dir = os.path.join(self.temp_git_repo, package)
-        print("package directory: ", package_dir)
         for item in self.lfs_files:
             # Add files
             git_add(item, cwd=package_dir)
             git_lfs_track(item, cwd=package_dir)
-            print("Adding file: ", item)
             # Track all files using lfs
         git_add(".gitattributes", cwd=package_dir)
         for item in self.lfs_files:
             git_add(item, cwd=package_dir)
-        return self.lfs_files
+        return
 
     def commit_data_to_lfs(self, package):
         """Commit data as LFS to server."""
@@ -88,9 +92,14 @@ class Lfs:
         """Run LFS transition on all package."""
         try:
             for package in os.listdir(os.path.abspath(temp_git_repo)):
-                self.add_data(package)
-                self.add_data_as_lfs(package)
-                self.commit_data_to_lfs(package)
+                if "bioc-data-experiment" not in package:
+                    log.info("LFS: Add data to package %s" % package)
+                    self.add_data(package)
+                    log.info("LFS: Add data as LFS to package %s" % package)
+                    self.add_data_as_lfs(package)
+                    log.info("LFS: Commit data as LFS to package %s" % package)
+                    self.commit_data_to_lfs(package)
         except Exception as e:
+            log.debug("Error in run_lfs_transition:  package : %s : " % package)
             log.debug(e)
         return

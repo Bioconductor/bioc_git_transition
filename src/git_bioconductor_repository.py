@@ -234,8 +234,6 @@ class GitBioconductorRepository(object):
         release_revision_dict = self.release_revision_dict(branch_list)
         branch_url = os.path.join(self.svn_root, "branches")
         for release in branch_list:
-            # packs = self.get_pack_list(os.path.join(branch_url, release,
-            #                                        'madman', 'Rpacks'))
             packs = self.get_pack_list(branch_url + "/" + release +
                                        self.package_path)
             for package in packs:

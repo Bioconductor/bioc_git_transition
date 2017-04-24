@@ -53,8 +53,10 @@ class LocalSvnDump(object):
         else:
             path = os.path.join(self.svn_root, 'branches', branch, self.package_path)
         result = subprocess.check_output(['svn', 'list', path])
-        package_list = [item.replace('/', '') for item in result.split()]
-        return package_list
+        pack_list = result.split()
+        packs = [pack.replace("/", "")        
+                 for pack in pack_list if pack.endswith("/")]
+        return packs
 
     def manifest_package_list(self, manifest_file):
         """Get the package list from Bioconductor manifest file.
