@@ -17,7 +17,7 @@ repos_re <- "^\\[/trunk/madman/Rpacks/([[:alnum:]]+)]"
 package_template <- paste(
     "repo packages/%s",
     "    RW master = %s",
-    "    RW RELEASE_3_4 = %s",
+    "    RW RELEASE_3_5 = %s",
     "",
     sep="\n"
 )
@@ -74,7 +74,7 @@ writeLines(c(
     "repo @packages",
     "    R  = @all",
     "    RW master = @bioconductor-write0",
-    "    RW RELEASE_3_4 = @bioconductor-write0",
+    "    RW RELEASE_3_5 = @bioconductor-write0",
     ""
 ), fout)
 
