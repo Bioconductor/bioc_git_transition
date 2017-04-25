@@ -29,6 +29,7 @@ class GitEditRepository(object):
         self.ssh_server = ssh_server
         return
 
+    # TODO: deprecate
     def extract_development_url(self, package):
         """Extract `DevelopmentURL` from DESCRIPTION file."""
         description = os.path.join(package, 'DESCRIPTION')
@@ -42,7 +43,7 @@ class GitEditRepository(object):
         url = url.strip()
         return url
 
-    # TODO: Edit the package url as the remote repo changes
+    # TODO: deprecate
     def set_edit_repo(self, package):
         """
         Clone a package from bioc_git_repo to make changes.
@@ -59,6 +60,7 @@ class GitEditRepository(object):
                        cwd=os.path.join(self.edit_repo, package))
         return
 
+    # TODO: deprecate
     def clone_all_edit_repo(self):
         """Clone all packages in git server.
 
@@ -72,6 +74,7 @@ class GitEditRepository(object):
             self.set_edit_repo(package)
         return
 
+    # TODO: deprecate
     def daily_fetch_branch(self, package, branch):
         """Daily fetch from github repo.
 
@@ -95,6 +98,7 @@ class GitEditRepository(object):
             subprocess.check_call(cmd, cwd=path)
         return
 
+    # TODO: deprecate
     def daily_fetch(self, branch):
         """Daily fetch of every package in the edit_repo.
 
@@ -137,6 +141,7 @@ class GitEditRepository(object):
         log.info("Package: %s updated version to: %s" % (package, version))
         return
 
+    # TODO: REMOVE commit_message and use the one in git_api
     def commit_message(self, msg, package):
         """Add a commit message to package during, bioc release."""
         cmd = ['git', 'commit', '-m', msg]

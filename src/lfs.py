@@ -1,28 +1,31 @@
 #! /usr/bin/env python
-# Author: Nitesh Turaga
-# nitesh.turaga@roswellpark.org
+"""Module to create LFS based experiment data packages.
+
+Add data content to data package.
+
+In this svn repository, the data subdir of a package is
+stored separately in svn.  add_data.py can be used to add
+the data subdir to a given package.
+
+The appropriate data dir will be added to the specified package.
+"""
+
 import os
 import subprocess
 from git_api.git_api import git_lfs_track
 from git_api.git_api import git_add
 from git_api.git_api import git_commit
 import logging as log
+from local_svn_dump import Singleton
 
 
 class Lfs:
-    """This is a modified version of add_data.py.
-
-    Add data content to data package.
-
-    In this svn repository, the data subdir of a package is
-    stored separately in svn.  add_data.py can be used to add
-    the data subdir to a given package.
-
-    The appropriate data dir will be added to the specified package.
-    """
+    """Create git LFS based experiment data packages."""
+    __metaclass__ = Singleton
 
     def __init__(self, svn_root, trunk, data_store_path, ref_file,
                  temp_git_repo):
+        """Initialize LFS class."""
         self.svn_root = svn_root
         self.trunk = trunk
         self.data_store_path = data_store_path
@@ -31,6 +34,7 @@ class Lfs:
         return
 
     def parse_external_refs(self, package):
+        """Parse external refs file, and return a list of data references."""
         path = package + "/" + self.ref_file
         with open(path) as f:
             refs = f.readlines()
@@ -38,19 +42,22 @@ class Lfs:
         return refs
 
     def list_files(self, path):
+        """List files in a path."""
         ans = [os.path.join(root, f)
                for root, subdir, files in os.walk(path)
                for f in files]
         return [item[len(path)+1:] for item in ans]
 
     def add_data(self, package):
+        """Add data from SVN data source to each package."""
         package_dir = os.path.join(self.temp_git_repo, package)
         before_files = self.list_files(package_dir)
-        try:            
+        try:
+            # Get references from external_data_source.txt
             refs = self.parse_external_refs(package_dir)
         except IOError, err:
-            log.debug("Error in package %s " % package)
-            log.debug("No data to add (no %s file)" % err.filename)
+            log.debug("Error: No data : missing file %s, in package %s "
+                      % (err.filename, package))
             return
         for ref in refs:
             src = "/".join([self.svn_root, self.trunk,
@@ -62,10 +69,11 @@ class Lfs:
                 print "CMD to add data: ", cmd
                 subprocess.check_call(cmd)
             except Exception as e:
-                log.debug("Error in adding ref: %s , package : %s " % (ref, package))
+                log.debug("Error adding ref: %s, package: %s" % (ref, package))
                 log.debug(e)
                 pass
         after_files = self.list_files(package_dir)
+        # Add list of files newly added to object.
         self.lfs_files = list(set(after_files) - set(before_files))
         return
 
@@ -100,6 +108,6 @@ class Lfs:
                     log.info("LFS: Commit data as LFS to package %s" % package)
                     self.commit_data_to_lfs(package)
         except Exception as e:
-            log.debug("Error in run_lfs_transition:  package : %s : " % package)
+            log.debug("LFS: Error in package : %s : " % package)
             log.debug(e)
         return

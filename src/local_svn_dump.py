@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 
-"""Bioconductor make SVN dump and update.
+"""Module to create Bioconductor SVN dump and update.
 
 This module provides functions to create an SVN dump and
 update the SVN dump before making the git transition.
 
 Author: Nitesh Turaga
-
-Usage:
-    `python svn_dump.py`
 """
 import os
 import subprocess
@@ -29,7 +26,8 @@ class LocalSvnDump(object):
     """Local SVN dump."""
     __metaclass__ = Singleton
 
-    def __init__(self, svn_root, bioc_git_repo, users_db, remote_svn_server, package_path):
+    def __init__(self, svn_root, bioc_git_repo, users_db, remote_svn_server,
+                 package_path):
         """Initialize Loval SVN dump.
 
         Usage:
@@ -49,12 +47,13 @@ class LocalSvnDump(object):
     def get_pack_list(self, branch="trunk"):
         """Get list of packages on SVN."""
         if branch == "trunk":
-            path = self.svn_root + "/" + 'trunk' +  self.package_path
+            path = self.svn_root + "/" + 'trunk' + self.package_path
         else:
-            path = os.path.join(self.svn_root, 'branches', branch, self.package_path)
+            path = os.path.join(self.svn_root, 'branches', branch,
+                                self.package_path)
         result = subprocess.check_output(['svn', 'list', path])
         pack_list = result.split()
-        packs = [pack.replace("/", "")        
+        packs = [pack.replace("/", "")
                  for pack in pack_list if pack.endswith("/")]
         return packs
 
@@ -91,7 +90,8 @@ class LocalSvnDump(object):
             # TODO: git svn clone from each release branch.
             # This will be tricky.
             try:
-                cmd = ['git', 'svn', 'clone', '--authors-file=' + self.users_db, package_dump]
+                cmd = ['git', 'svn', 'clone',
+                       '--authors-file=' + self.users_db, package_dump]
                 subprocess.check_call(cmd, cwd=self.bioc_git_repo)
                 log.debug("Finished git-svn clone for package: %s" % pack)
             except subprocess.CalledProcessError as e:
