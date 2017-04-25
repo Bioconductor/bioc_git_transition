@@ -93,7 +93,8 @@ class Lfs:
     def commit_data_to_lfs(self, package):
         """Commit data as LFS to server."""
         package_dir = os.path.join(self.temp_git_repo, package)
-        git_commit(cwd=package_dir)
+        git_commit(message="Adding external data files as LFS",
+                   cwd=package_dir)
         return
 
     def run_lfs_transition(self, temp_git_repo):

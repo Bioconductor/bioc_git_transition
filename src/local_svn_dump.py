@@ -18,7 +18,8 @@ class Singleton(type):
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(Singleton, cls).__call__(*args,
+                                                                 **kwargs)
         return cls._instances[cls]
 
 
@@ -63,9 +64,6 @@ class LocalSvnDump(object):
         Usage:
             dump.manifest_package_list("bioc_3.4.manifest")
         """
-        # TODO: change to package_path
-#        manifest = os.path.join(self.svn_root, "trunk", "madman", "Rpacks",
-#                                manifest_file)
         manifest = (self.svn_root + "/" + "trunk" + self.package_path +
                     "/" + manifest_file)
         print manifest
@@ -87,8 +85,6 @@ class LocalSvnDump(object):
         package_dir = self.svn_root + '/' + 'trunk' + self.package_path
         for pack in packs:
             package_dump = os.path.join(package_dir, pack)
-            # TODO: git svn clone from each release branch.
-            # This will be tricky.
             try:
                 cmd = ['git', 'svn', 'clone',
                        '--authors-file=' + self.users_db, package_dump]

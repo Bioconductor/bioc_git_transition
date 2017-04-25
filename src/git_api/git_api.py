@@ -118,8 +118,8 @@ def git_add(path, cwd):
     return
 
 
-def git_commit(cwd):
+def git_commit(message, cwd):
     """Commit files to git server."""
-    cmd = ['git', 'commit', '-m', 'Adding external data files as LFS']
+    cmd = ['git', 'commit', '-m', message]
     subprocess.check_call(cmd, cwd=cwd)
     return
