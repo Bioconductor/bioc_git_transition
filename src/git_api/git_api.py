@@ -42,18 +42,12 @@ def git_branch_exists(branch, cwd):
 def git_filter_branch(graft_range, cwd):
     """Git filter branch, for a specified graft range."""
     cmd = ['git', 'filter-branch', '--force', '--', graft_range]
-#    subprocess.check_call(cmd, cwd=cwd)
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,cwd=cwd)
+                            stderr=subprocess.PIPE, cwd=cwd)
     out, err = proc.communicate()
-    print out
-    print "\n"
-    print err
     return
 
 
-# --rewrite-root=https://hedgehog.fhcrc.org/bioconductor
-# --authors-file=users_and_user_db.txt
 def git_svn_rebase(cwd):
     """Git svn rebase a package."""
     cmd = ['git', 'svn', 'rebase']
@@ -105,3 +99,24 @@ def git_clone(repository, directory, bare=True):
         cmd = ['git', 'clone', repository, destination]
     subprocess.check_call(cmd)
     return destination
+
+
+def git_lfs_track(path, cwd):
+    """Track files in git lfs."""
+    cmd = ['git', 'lfs', 'track', path]
+    subprocess.check_call(cmd, cwd=cwd)
+    return
+
+
+def git_add(path, cwd):
+    """Add files to git."""
+    cmd = ['git', 'add', path]
+    subprocess.check_call(cmd, cwd=cwd)
+    return
+
+
+def git_commit(cwd):
+    """Commit files to git server."""
+    cmd = ['git', 'commit', '-m', 'Adding external data files as LFS']
+    subprocess.check_call(cmd, cwd=cwd)
+    return

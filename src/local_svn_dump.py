@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 
-"""Bioconductor make SVN dump and update.
+"""Module to create Bioconductor SVN dump and update.
 
 This module provides functions to create an SVN dump and
 update the SVN dump before making the git transition.
 
 Author: Nitesh Turaga
-
-Usage:
-    `python svn_dump.py`
 """
 import os
 import subprocess
@@ -29,11 +26,12 @@ class LocalSvnDump(object):
     """Local SVN dump."""
     __metaclass__ = Singleton
 
-    def __init__(self, svn_root, bioc_git_repo, users_db, remote_svn_server):
+    def __init__(self, svn_root, bioc_git_repo, users_db, remote_svn_server,
+                 package_path):
         """Initialize Loval SVN dump.
 
         Usage:
-        svn_root = 'file:///home/nturaga/bioconductor-svn-mirror/'
+        svn_root = 'file:///home/git/hedgehog.fhcrc.org/
         # Initialize dump
         dump = svn_dump(svn_root=svn_root,
                         bioc_git_repo="git_repo",
@@ -44,17 +42,20 @@ class LocalSvnDump(object):
         self.users_db = users_db
         self.remote_svn_server = remote_svn_server
         self.bioc_git_repo = bioc_git_repo
+        self.package_path = package_path
 
     def get_pack_list(self, branch="trunk"):
         """Get list of packages on SVN."""
         if branch == "trunk":
-            path = os.path.join(self.svn_root, 'trunk/madman/Rpacks')
+            path = self.svn_root + "/" + 'trunk' + self.package_path
         else:
             path = os.path.join(self.svn_root, 'branches', branch,
-                                'madman/Rpacks')
+                                self.package_path)
         result = subprocess.check_output(['svn', 'list', path])
-        package_list = [item.replace('/', '') for item in result.split()]
-        return package_list
+        pack_list = result.split()
+        packs = [pack.replace("/", "")
+                 for pack in pack_list if pack.endswith("/")]
+        return packs
 
     def manifest_package_list(self, manifest_file):
         """Get the package list from Bioconductor manifest file.
@@ -62,8 +63,12 @@ class LocalSvnDump(object):
         Usage:
             dump.manifest_package_list("bioc_3.4.manifest")
         """
-        manifest = os.path.join(self.svn_root, "trunk", "madman", "Rpacks",
-                                manifest_file)
+        # TODO: change to package_path
+#        manifest = os.path.join(self.svn_root, "trunk", "madman", "Rpacks",
+#                                manifest_file)
+        manifest = (self.svn_root + "/" + "trunk" + self.package_path +
+                    "/" + manifest_file)
+        print manifest
         cmd = ['svn', 'cat', manifest]
         out = subprocess.check_output(cmd)
         # with open(manifest, 'r') as f:
@@ -79,13 +84,14 @@ class LocalSvnDump(object):
         The SVN dump needs to be updated daily/nightly for the rest to
         work as planned.
         """
-        package_dir = os.path.join(self.svn_root, 'trunk/madman/Rpacks/')
+        package_dir = self.svn_root + '/' + 'trunk' + self.package_path
         for pack in packs:
             package_dump = os.path.join(package_dir, pack)
             # TODO: git svn clone from each release branch.
             # This will be tricky.
             try:
-                cmd = ['git', 'svn', 'clone', '--authors-file=' + self.users_db, package_dump]
+                cmd = ['git', 'svn', 'clone',
+                       '--authors-file=' + self.users_db, package_dump]
                 subprocess.check_call(cmd, cwd=self.bioc_git_repo)
                 log.debug("Finished git-svn clone for package: %s" % pack)
             except subprocess.CalledProcessError as e:
