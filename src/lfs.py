@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 """Module to create LFS based experiment data packages.
 
 Add data content to data package.
@@ -80,12 +79,12 @@ class Lfs:
         """Add data as git LFS."""
         package_dir = os.path.join(self.temp_git_repo, package)
         try:
-	  	    for item in self.lfs_files:
-				# Add files
+            for item in self.lfs_files:
+                # Add files
                 git_add(item, cwd=package_dir)
-                git_lfs_track(item, cwd=package_dir)
                 # Track all files using lfs
-            git_add(".gitattributes", cwd=package_dir) 
+                git_lfs_track(item, cwd=package_dir)
+            git_add(".gitattributes", cwd=package_dir)
             for item in self.lfs_files:
                 git_add(item, cwd=package_dir)
         except Exception as e:
@@ -95,27 +94,27 @@ class Lfs:
 
     def commit_data_to_lfs(self, package):
         """Commit data as LFS to server."""
-		try:
-        	package_dir = os.path.join(self.temp_git_repo, package)
-        	git_commit(cwd=package_dir)
-		except Exception as e:
-			log.error("Error commit data to LFS in package %s" % package)
-			log.error(e)
+        try:
+            package_dir = os.path.join(self.temp_git_repo, package)
+            git_commit(cwd=package_dir)
+        except Exception as e:
+            log.error("Error commit data to LFS in package %s" % package)
+            log.error(e)
         return
 
     def run_lfs_transition(self, temp_git_repo):
         """Run LFS transition on all package."""
-		for package in os.listdir(os.path.abspath(temp_git_repo)):
-			try:
-				if "bioc-data-experiment" not in package:
-					log.info("LFS: Add data to package %s" % package)
-					self.add_data(package)
-					log.info("LFS: Add data as LFS to package %s" % package)
-					self.add_data_as_lfs(package)
-					log.info("LFS: Commit data as LFS to package %s" % package)
-					self.commit_data_to_lfs(package)
-			except Exception as e:
-				log.error("LFS: Error in package %s: " % package)
-				log.error(e)
-				pass
+        for package in os.listdir(os.path.abspath(temp_git_repo)):
+            try:
+                if "bioc-data-experiment" not in package:
+                    log.info("LFS: Add data to package %s" % package)
+                    self.add_data(package)
+                    log.info("LFS: Add data as LFS to package %s" % package)
+                    self.add_data_as_lfs(package)
+                    log.info("LFS: Commit data as LFS to package %s" % package)
+                    self.commit_data_to_lfs(package)
+            except Exception as e:
+                log.error("LFS: Error in package %s: " % package)
+                log.error(e)
+                pass
         return
