@@ -27,10 +27,10 @@ def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
                                         bare_git_repo, remote_url,
                                         package_path)
     log.info("Make git repo: Adding release branches")
-    gitrepo.add_release_branches()
+#    gitrepo.add_release_branches()
     # Step 5: Add commit history
     log.info("Make git repo: Adding commit history")
-    gitrepo.add_commit_history()
+#    gitrepo.add_commit_history()
 
     if lfs_object is not None:
         log.info("Running LFS transtion")
@@ -127,6 +127,7 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
                     format='%(asctime)s %(message)s')
     log.debug("Bioconductor Experiment data transition log File: \n")
 
+    # Create temp_git_repo directory
     if not os.path.isdir(temp_git_repo):
         os.mkdir(temp_git_repo)
 
@@ -159,4 +160,4 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
 
 if __name__ == '__main__':
     # run_transition("./settings.ini", new_svn_dump=True)
-    run_experiment_data_transition("./settings.ini", new_svn_dump=True)
+    run_experiment_data_transition("./settings.ini", new_svn_dump=False)

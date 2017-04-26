@@ -71,7 +71,7 @@ class GitBioconductorRepository(object):
     def add_remote(self):
         """Add git remote to make the directory.
 
-        Usage: cd /home/nturaga/packages and run function.
+        Usage: cd /home/git/packages and run function.
         """
         log.info("Adding remote url to bare git repo.")
         for package in os.listdir(self.bare_git_repo):
@@ -94,8 +94,6 @@ class GitBioconductorRepository(object):
         to the fetched commits. Checkout master at the end.
         """
         branch_url = os.path.join(self.svn_root, "branches")
-#        package_url = os.path.join(branch_url, release, 'madman',
-#                                   'Rpacks', package)
         package_url = branch_url + "/" + release + self.package_path + "/" + package
         package_dir = os.path.join(self.temp_git_repo, package)
         # Configure remote svn url
@@ -123,8 +121,8 @@ class GitBioconductorRepository(object):
         """Add release branches to each package.
 
         TODO: Extended description of how this works.
-        svn_root = file:///home/nturaga/bioconductor-svn-mirror/
-        temp_git_repo: '/home/nturaga/packages_local'
+        svn_root = file:///home/git/hedgehog.fhcrc.org/
+        temp_git_repo: '/home/git/temp_packages'
         """
         # Get list of branches
         branch_url = os.path.join(self.svn_root, "branches")
