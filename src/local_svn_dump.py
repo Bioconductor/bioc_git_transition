@@ -63,9 +63,6 @@ class LocalSvnDump(object):
         Usage:
             dump.manifest_package_list("bioc_3.4.manifest")
         """
-        # TODO: change to package_path
-#        manifest = os.path.join(self.svn_root, "trunk", "madman", "Rpacks",
-#                                manifest_file)
         manifest = (self.svn_root + "/" + "trunk" + self.package_path +
                     "/" + manifest_file)
         print manifest

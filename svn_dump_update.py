@@ -25,7 +25,7 @@ def svn_root_update(configfile):
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
     update_file = Config.get('SVN', 'update_file')
-    package_path = Config.get('Software', 'package_path') 
+    package_path = Config.get('Software', 'package_path')
 
     for s in Config.sections():
         for k, v in Config.items(s):
@@ -61,5 +61,5 @@ def svn_experiment_root_update(configfile):
     return
 
 if __name__ == '__main__':
-#    svn_root_update("./settings.ini")
+    svn_root_update("./settings.ini")
     svn_experiment_root_update("./settings.ini")
