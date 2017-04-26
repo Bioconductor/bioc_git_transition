@@ -36,9 +36,8 @@ class Lfs:
     def parse_external_refs(self, package):
         """Parse external refs file, and return a list of data references."""
         path = package + "/" + self.ref_file
-        with open(path) as f:
-            refs = f.readlines()
-            refs = map(str.strip, refs)
+        with open(path, 'r') as f:
+            refs = list(line for line in (l.strip() for l in f) if line)
         return refs
 
     def list_files(self, path):
@@ -60,6 +59,7 @@ class Lfs:
                       % (err.filename, package))
             return
         for ref in refs:
+            # TODO: PATH ISSUE here.
             src = "/".join([self.svn_root, self.trunk,
                             self.data_store_path, package, ref])
             dest = "/".join([package_dir, ref])
