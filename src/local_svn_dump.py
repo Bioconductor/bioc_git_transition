@@ -75,6 +75,18 @@ class LocalSvnDump(object):
                         for line in doc if line.startswith("Package")]
         return package_list
 
+    def search_git_files(self, path):
+        """Check if path has pre exisiting .git files."""
+        cmd = 'svn list --depth=infinity ' + path + " | grep \\.git"
+        try:
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
+            output, error = proc.communicate()
+        except Exception as e:
+            log.error("Error in search git files: %s" % path)
+            log.error(e)
+        return output
+
     def svn_dump(self, packs):
         """
         Create git svn clone from SVN dump for each package.
@@ -85,15 +97,18 @@ class LocalSvnDump(object):
         package_dir = self.svn_root + '/' + 'trunk' + self.package_path
         for pack in packs:
             package_dump = os.path.join(package_dir, pack)
-            try:
-                cmd = ['git', 'svn', 'clone',
-                       '--authors-file=' + self.users_db, package_dump]
-                subprocess.check_call(cmd, cwd=self.bioc_git_repo)
-                log.debug("Finished git-svn clone for package: %s" % pack)
-            except subprocess.CalledProcessError as e:
-                log.error("Error : %s in package %s" % (e, pack))
-            except Exception as e:  # All other errors
-                log.error("Unexpected error: %s" % e)
+            # If .git files exsit in package, throw error.
+            pre_exisiting_git = self.search_git_files(package_dump)
+            if not pre_exisiting_git:
+                try:
+                    cmd = ['git', 'svn', 'clone',
+                           '--authors-file=' + self.users_db, package_dump]
+                    subprocess.check_call(cmd, cwd=self.bioc_git_repo)
+                    log.debug("Finished git-svn clone for package: %s" % pack)
+                except subprocess.CalledProcessError as e:
+                    log.error("Error : %s in package %s" % (e, pack))
+                except Exception as e:  # All other errors
+                    log.error("Unexpected error: %s" % e)
         return
 
     def svn_get_revision(self):
