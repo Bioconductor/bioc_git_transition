@@ -4,18 +4,27 @@ It is always a good idea to fetch updates from Bioconductor (remote `upstream`),
 
 ## Steps
 
-1. Make sure you are on the appropriate branch, if the change was made on `upstream/master` or `upstream/RELEASE_X_Y`. Checkout the correct branch with,
+1. Make sure you are on the appropriate branch, if the change was made on `upstream/master` or `upstream/RELEASE_X_Y`.
 
-    `git checkout master` or `git checkout RELEASE_X_Y`    
+    ```
+    git checkout master
+    ## alternatively 'git checkout RELEASE_X_Y' for the release branch
+    ```
 
-2. Fetch content from Bioconductor,
+2. Fetch content from Bioconductor
 
-    `git fetch upstream`
+    ```
+    git fetch upstream
+    ```
 
 3. Merge upstream with your local branch, (it is this step, where you need to be sure you have the correct branch checked out)
 
-    `git merge upstream/master`
+    ```
+    git merge upstream/master
+    ```
 
-4. Push changes to Github's (`origin`) `master` branch,
+4. Push changes to Github's (`origin`) `master` branch
 
-     `git push origin`
+     ```
+     git push origin
+     ```

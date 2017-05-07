@@ -12,40 +12,52 @@ The SVN to git transition is all done and dusted. What should a developer do now
 
 3.  On your local machine clone the empty repository from Github
 
-    `git clone git@github.com:developer/BiocGenerics.git`
+    ```
+    git clone git@github.com:developer/BiocGenerics.git
+    ```
 
 4.  Add remote to your cloned repository,
 
     For Bioconductor repositories that you have read / write (ssh) access, use:
 
-    `git remote add upstream git@git.bioconductor.org:packages/BiocGenerics.git`
+    ```
+    git remote add upstream git@git.bioconductor.org:packages/BiocGenerics.git
+    ```
 
     For read-only Bioconductor repositories, use:
 
-    `git remote add upstream https://git.bioconductor.org/packages/BiocGenerics.git`
+    ```
+    git remote add upstream https://git.bioconductor.org/packages/BiocGenerics.git
+    ```
 
 5.  Fetch content from remote upstream,
 
-    `git fetch upstream`
+    ```
+    git fetch upstream
+    ```
 
 6.  Merge upstream with origin's master branch,
 
-    `git merge upstream/master`
+    ```
+    git merge upstream/master
+    ```
 
 7. Push changes to your origin master,
 
-    `git push origin`
+    ```
+    git push origin
+    ```
 
 8.  (Optional) Add a branch to Github,
 
     ```
-    # Fetch all updates
+    ## Fetch all updates
     git fetch upstream
 
-    # Checkout new branch RELEASE_3_5, from upstream/RELEASE_3_5
+    ## Checkout new branch RELEASE_3_5, from upstream/RELEASE_3_5
     git checkout -b RELEASE_3_5 upstream/RELEASE_3_5
 
-    # Push updates to remote origin's new branch RELEASE_3_5
+    ## Push updates to remote origin's new branch RELEASE_3_5
     git push -u origin RELEASE_3_5
     ```
 

@@ -8,7 +8,9 @@
 
 2.  To check that remotes are set up properly, run the command inside your local machine's clone.
 
-    `git remote -v`
+    ```
+    git remote -v
+    ```
 
     which should produce the result
 
@@ -19,21 +21,28 @@
     upstream    git@git.bioconductor.org:packages/BiocGenerics.git (push)
     ```
 
-3. Once you have made changes to `master` branch or the latest release branch (`RELEASE_X_Y`),
+3. Make and commit changes to `master` branch or the latest release branch (`RELEASE_X_Y`),
 
-    `git add <name of file changed>`
-
-    `git commit -m "My informative commit message describing the change" `
+    ```
+    git checkout master
+    ## edit files, etc.
+    git add <name of file changed>
+    git commit -m "My informative commit message describing the change"
+    ```
 
 4. Push updates to Github's (`origin`) `master` branch
 
-    `git push origin master`
+    ```
+    git push origin master
+    ```
 
     (use `RELEASE_X_Y` instead of `master` if you are committing to and updating the release branch, `git push origin RELEASE_X_Y`).
 
 5.  Next, push updates to Bioconductor's (`upstream`) `master` branch
 
-    `git push upstream master`
+    ```
+    git push upstream master
+    ```
 
     (use `git push upstream RELEASE_X_Y` to push to Bioconductor's release branch).
 
