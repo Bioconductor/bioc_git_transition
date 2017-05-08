@@ -15,6 +15,12 @@
 
 Once you have accepted pull requests from your package community on Github, you can push these changes to Bioconductor.
 
+1. Make sure that you are on the branch to which the changes were applied, for example `master`.
+
+   ```
+   git checkout master
+   ```
+
 1. Pull the Github changes to your local repository.
 
     ```
@@ -26,6 +32,8 @@ Once you have accepted pull requests from your package community on Github, you 
     ```
     git push upstream master
     ```
+    
+If you want to update a release branch, simply replace `master` with name of the release branch, e.g.: `RELEASE_3_5`.
 
 [Adding a new collaborator]: https://help.github.com/articles/inviting-collaborators-to-a-personal-repository/
 
