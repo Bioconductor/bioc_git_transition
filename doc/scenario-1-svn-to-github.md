@@ -22,7 +22,13 @@ The SVN to git transition is all done and dusted. What should a developer do now
     git clone git@github.com:developer/BiocGenerics.git
     ```
 
-4.  Add remote to your cloned repository,
+4.  Add remote to your cloned repository.
+
+    Change the current working directory to your local repository cloned in previous step.
+    
+    ```
+    cd BiocGenerics
+    ```
 
     For Bioconductor repositories that you have read / write (ssh) access, use:
 
