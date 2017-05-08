@@ -10,8 +10,14 @@ The SVN to git transition is all done and dusted. What should a developer do now
 
     We use "BiocGenerics" as an example for this scenario.
 
-3.  On your local machine clone the empty repository from Github
+3.  On your local machine clone the empty repository from Github. Use HTTPS URL
 
+    ```
+    git clone https://github.com/developer/BiocGenerics.git
+    ```
+    
+    or SSH URL (provided that you have [added your public key to your GitHub account](https://help.github.com/articles/connecting-to-github-with-ssh/).)
+    
     ```
     git clone git@github.com:developer/BiocGenerics.git
     ```
