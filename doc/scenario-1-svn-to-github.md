@@ -69,8 +69,10 @@ This scenario does NOT involve setting up a _fork_ or using an existing Github r
 7. Push changes to your origin master,
 
     ```
-    git push origin
+    git push origin master
     ```
+
+    **NOTE:** Run the command `git config --global push.default matching` to always push local branches to the remote branch of the same name, allowing use of `git push origin` rather than `git push origin master`.
 
 8.  (Optional) Add a branch to Github,
 
