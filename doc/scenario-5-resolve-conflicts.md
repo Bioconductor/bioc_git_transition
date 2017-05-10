@@ -16,7 +16,7 @@
 
     This merge conflict occurs when the package developer makes a change, and also a collaborator or a Bioconductor core team member makes a change to the same file (in this case the DESCRIPTION file).
 
-    How can you avoid this? **Sync your repository** to all the updates before you push a new change. [Scenario-3][].
+    How can you avoid this? **Sync your repository** to all the updates before commiting any changes, see [Scenario-3][].
 
 3. If in spite of this you have conflicts, you need to fix them. See which file has the conflict,
 

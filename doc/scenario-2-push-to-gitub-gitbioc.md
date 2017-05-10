@@ -50,7 +50,7 @@
 
 (Optional)
 
-It is always a good idea to fetch updates from remote origin and remote upstream, to see if there were any changes made by your collaborators or the Bioconductor core team. Before pushing changes please do, [Scenario-3][]
+It is always a good idea to fetch updates from remote origin and remote upstream, to see if there were any changes made by your collaborators or the Bioconductor core team. Before pushing changes please do [Scenario-3][].
 
 
 [Scenario-1]: scenario-1-svn-to-github.md
