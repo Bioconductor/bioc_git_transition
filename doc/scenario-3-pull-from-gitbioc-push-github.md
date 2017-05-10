@@ -1,6 +1,8 @@
 # Scenario 3: Get updates from Bioconductor and update Github
 
-It is always a good idea to fetch updates from Bioconductor (remote `upstream`), to see if there were any changes made by your collaborators or the Bioconductor core team.
+**Goal:** Your Bioconductor repository has been updated by the core team. You want to fetch these commits from Bioconductor (remote `upstream`), merge them into your local repository, and push them to Github.
+
+**NOTE:** It is always a good idea to fetch updates from Bioconductor as a precautionary measure before making more changes. This will help prevent conflicts.
 
 ## Steps
 

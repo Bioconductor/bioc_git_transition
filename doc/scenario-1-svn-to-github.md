@@ -10,7 +10,7 @@ This scenario does NOT involve setting up a _fork_ or using an existing Github r
 
 1.  Set up remote access to Github via SSH or Https.  Please check [which-remote-url-should-i-use][] and [add your public key to your GitHub account][].
 
-2.  [Create a new Github repository][] on your account, with the name of the existing Bioconductor package that you have been previously developing in SVN.
+2.  [Create a new Github repository][] on your accoungt, with the name of the existing Bioconductor package that you have been previously developing in SVN.
 
     We use "BiocGenerics" as an example for this scenario.
 

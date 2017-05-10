@@ -1,6 +1,6 @@
 # Scenario 2: Push to both Github and Bioconductor repositories
 
-**Goal:** Push updates to both Github repository and Bioconductor repositories.
+**Goal:** During everyday development, you commit changes to your local repository and wish to push these commits to both Github and Bioconductor repositories.
 
 ## Steps:
 
