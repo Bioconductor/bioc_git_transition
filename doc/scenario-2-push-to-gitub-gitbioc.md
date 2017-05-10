@@ -2,9 +2,11 @@
 
 **Goal:** During everyday development, you commit changes to your local repository and wish to push these commits to both Github and Bioconductor repositories.
 
+**NOTE:** See [Scenario-3][] for best practices for getting updates from Bioconductor and Github before committing local changes.
+
 ## Steps:
 
-1. We assume you already have a Github repository with the right setup to push to Bioconductor's git server (git@git.bioconductor.org). If not please see FAQ's on how to get access and follow [Scenario-1][]. We use a clone of the BiocGenerics package in the following example.
+1. We assume you already have a Github repository with the right setup to push to Bioconductor's git server (git@git.bioconductor.org). If not please see FAQ's on how to get access and follow [Scenario-1][]. We use a clone of the `BiocGenerics` package in the following example.
 
 2.  To check that remotes are set up properly, run the command inside your local machine's clone.
 
@@ -48,9 +50,7 @@
 
 6. Confirm changes, e.g., by visiting the Github web page for the repository.
 
-(Optional)
 
-It is always a good idea to fetch updates from remote origin and remote upstream, to see if there were any changes made by your collaborators or the Bioconductor core team. Before pushing changes please do [Scenario-3][].
 
 
 [Scenario-1]: scenario-1-svn-to-github.md
