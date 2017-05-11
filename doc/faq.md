@@ -64,6 +64,12 @@
 
     `ExamplePackage`: This is being used a place holder for a package name.
 
+12. SVN `devel` and git `master` branch, similarities and
+
+13. I'm a Bioconductor developer only on the Bioconductor server. I do not have/want a Github account. What should I do?
+    **TODO:** This becomes a scenario.
+    Good idea to get one.
+
 ## More questions?
 
 If you have additional questions which are not answered here already, please send an email to bioc-devel@bioconductor.org.
@@ -86,7 +92,7 @@ If you have additional questions which are not answered here already, please sen
 
 [Scenario 8: New package workflow](scenario-8-new-package-workflow.md)
 
-[Scenario 9: Sync existing Github and Bioconductor repositories](scenario-9-sync-exisiting-github-gitbioc.md)
+[Scenario 9: Sync existing Github and Bioconductor repositories](scenario-9-sync-existing-github-gitbioc.md)
 
 [Adding a new SSH key to your GitHub account](https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/)
 
@@ -118,7 +124,7 @@ If you have additional questions which are not answered here already, please sen
 
 [Scenario 8: New package workflow]: scenario-8-new-package-workflow.md
 
-[Scenario 9: Sync existing Github and Bioconductor repositories]: scenario-9-sync-exisiting-github-gitbioc.md
+[Scenario 9: Sync existing Github and Bioconductor repositories]: scenario-9-sync-existing-github-gitbioc.md
 
 [Adding a new SSH key to your GitHub account]: https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 
