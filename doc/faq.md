@@ -52,6 +52,10 @@
 
     Follow [Scenario 9: Sync existing Github and Bioconductor repositories][] for details on how to achieve this.
 
+    Image explaining Github and Bioconductor relationship for a developer
+
+    ![](images/github-bioc-relationship.png)
+
 10. Can I have more than one upstream remote, if yes, is this recommended?
 
     You can have as many remotes as you please. But you can have only one remote with the name **upstream**. We recommend having the remote `origin` set to Github, and `upstream` set to the Bioconductor git server to avoid confusion.
