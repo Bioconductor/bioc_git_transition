@@ -4,13 +4,13 @@
 
 # Going sub-nuclear:  Make a new branch
 
-One way you can ignore your work, and make a new branch is by replacing your local and Github repository `master` branch with the Bioconductor `master` branch.
+One way you can ignore your work, and make a new branch is by replacing your local and GitHub repository `master` branch with the Bioconductor `master` branch.
 
 NOTE: This works only if you haven't pushed the change causing the issue to the Bioconductor repository.
 
 ## Steps:
 
-1. Checkout a new branch called `master_backup` with tracking set to `upstream/master`.
+1. Checkout a new branch, e.g., `master_backup`, with tracking set to `upstream/master`.
 
     ```
     git checkout -b master_backup upstream/master
@@ -25,7 +25,7 @@ NOTE: This works only if you haven't pushed the change causing the issue to the 
     git branch -m master_backup master
     ```
 
-3. You will now have to `force push` the changes to your Github (`origin`) `master` branch.
+3. You will now have to `force push` the changes to your GitHub (`origin`) `master` branch.
 
     ```
     git push -f origin master
@@ -39,12 +39,12 @@ NOTE: This works only if you haven't pushed the change causing the issue to the 
     git cherry-pick <commit id>
     ```
 
-# Revert to a previous commit
+# Reset to a previous commit
 
-If you find yourself in a place where you want to abandon the changes and go back to a previous commit id, you can always `revert`. Remember that, if you use `HEAD` as the commit id, that is the most recent **parent** commit of the current state of your local repository.
+If you find yourself in a place where you want to abandon the changes and go back to a previous commit id, you can always `reset`. Remember that, if you use `HEAD` as the commit id, that is the most recent **parent** commit of the current state of your local repository.
 
     ```
-    git revert --hard <commit id>
+    git reset --hard <commit id>
     ```
 
     Example:
@@ -53,31 +53,29 @@ If you find yourself in a place where you want to abandon the changes and go bac
     HEAD is now at e02e4d8 version bump by bioc core
     ```
 
-    You will then need to push the changes to both, Github and Bioconductor repositories, if you intend to make them permanent, using:
+    You will then need to push the changes to both, GitHub and Bioconductor repositories, if you intend to make them permanent, using:
 
     ```
     git push -f origin
     git push -f upstream
     ```
 
-# Go Nuclear - Delete your local copy and Github repo, because nothing is working.
+# Go Nuclear - Delete your local copy and GitHub repo, because nothing is working.
 
-**CAUTION: These instructions comes with many disadvantages. You have been warned.**
+**CAUTION: These instructions come with many disadvantages. You have been warned.**
 
 ## Steps:
 
 1. Delete your machines local repository, e.g., `rm -rf BiocGenerics`
 
-2. Delete (or rename) your Github repository.
+2. Delete (or rename) your GitHub repository.
 
-3. Start from [Scenario 1](scenario-1-svn-to-github.md). Make a new copy, and then [Scenario-3](scenario-3-pull-from-gitbioc-push-github.md)
+3. Start from [Scenario 1](scenario-1-svn-to-github.md). Make a new copy, and then [Scenario 3](scenario-3-pull-from-gitbioc-push-github.md)
 
-## Costs of going nuclear:
+## Disadvantages of going "nuclear":
 
-(There will be a holocaust)
+1. You will lose all your GitHub issues
 
-1. You will lose all your Github issues
-
-2. You will lose your custom collaborator settings in Github.
+2. You will lose your custom collaborator settings in GitHub.
 
 3. You have to start from scratch and redo everything related to this transition.

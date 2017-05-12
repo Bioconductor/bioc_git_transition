@@ -1,12 +1,12 @@
-# Scenario 2: Push to both Github and Bioconductor repositories
+# Scenario 2: Push to both GitHub and Bioconductor repositories
 
-**Goal:** During everyday development, you commit changes to your local repository and wish to push these commits to both Github and Bioconductor repositories.
+**Goal:** During everyday development, you commit changes to your local repository and wish to push these commits to both GitHub and Bioconductor repositories.
 
-**NOTE:** See [Scenario-3][] for best practices for getting updates from Bioconductor and Github before committing local changes.
+**NOTE:** See [Scenario 3][] for best practices for getting updates from Bioconductor and GitHub before committing local changes.
 
 ## Steps:
 
-1. We assume you already have a Github repository with the right setup to push to Bioconductor's git server (git@git.bioconductor.org). If not please see FAQ's on how to get access and follow [Scenario-1][]. We use a clone of the `BiocGenerics` package in the following example.
+1. We assume you already have a GitHub repository with the right setup to push to Bioconductor's git server (git@git.bioconductor.org). If not please see FAQ's on how to get access and follow [Scenario 1][]. We use a clone of the `BiocGenerics` package in the following example.
 
 2.  To check that remotes are set up properly, run the command inside your local machine's clone.
 
@@ -14,16 +14,16 @@
     git remote -v
     ```
 
-    which should produce the result
+    which should produce the result (where <developer> is your GitHub username):
 
     ```
-    origin  git@github.com:developer/BiocGenerics.git (fetch)
-    origin  git@github.com:developer/BiocGenerics.git (push)
+    origin  git@github.com:<developer>/BiocGenerics.git (fetch)
+    origin  git@github.com:<developer>/BiocGenerics.git (push)
     upstream    git@git.bioconductor.org:packages/BiocGenerics.git (fetch)
     upstream    git@git.bioconductor.org:packages/BiocGenerics.git (push)
     ```
 
-3. Make and commit changes to `master` branch or the latest release branch (`RELEASE_X_Y`),
+3. Make and commit changes to the `master` branch or the latest release branch (`RELEASE_X_Y`),
 
     ```
     git checkout master
@@ -32,13 +32,13 @@
     git commit -m "My informative commit message describing the change"
     ```
 
-4. Push updates to Github's (`origin`) `master` branch
+4. Push updates to GitHub's (`origin`) `master` branch
 
     ```
     git push origin master
     ```
 
-    (use `RELEASE_X_Y` instead of `master` if you are committing to and updating the release branch, `git push origin RELEASE_X_Y`).
+    **Note**. Use `RELEASE_X_Y` instead of `master` if you are committing to and updating the release branch, `git push origin RELEASE_X_Y`.
 
 5.  Next, push updates to Bioconductor's (`upstream`) `master` branch
 
@@ -48,10 +48,10 @@
 
     (use `git push upstream RELEASE_X_Y` to push to Bioconductor's release branch).
 
-6. Confirm changes, e.g., by visiting the Github web page for the repository.
+6. Confirm changes, e.g., by visiting the GitHub web page for the repository.
 
 
 
 
-[Scenario-1]: scenario-1-svn-to-github.md
-[Scenario-3]: scenario-3-pull-from-gitbioc-push-github.md
+[Scenario 1]: scenario-1-svn-to-github.md
+[Scenario 3]: scenario-3-pull-from-gitbioc-push-github.md

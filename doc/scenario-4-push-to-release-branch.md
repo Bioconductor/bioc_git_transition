@@ -1,13 +1,14 @@
 # Scenario 4: Push updates to release branch (RELEASE_X_Y)
 
-Developers will have write access to only the most recent release, example, `RELEASE_3_5` if `RELEASE_3_6` is the current development cycle. Whatever updates developers make to their `master` branch will be captured in the latest development cycle.
+Developers will have write access to only the most recent release branch (currently, the `RELEASE_3_5` branch).
+Any updates made to the `master` branch will be captured as the latest development cycle (eventually becoming the `RELEASE_3_6` branch).
 
 NOTE: For developers who are used to the SVN way of development in Bioconductor, `devel` (svn) --> `master` (git).
 
 
 ## Steps:
 
-1. Pull any changes from Github or other `origin` repository
+1. Pull any changes from GitHub or other `origin` repository
 
     ```
     git pull
@@ -37,11 +38,11 @@ NOTE: For developers who are used to the SVN way of development in Bioconductor,
 1. Add and commit the files you made the changes to,  
 
     ```
-    git add <file which changed>
+    git add <file(s) that changed>
     git commit -m "My informative commit message"
     ```
 
-1.  Push to both the Bioconductor repository, and your own Github repository.
+1.  Push to both the Bioconductor repository, and your own GitHub repository.
 
     ```
     git push origin RELEASE_3_5
