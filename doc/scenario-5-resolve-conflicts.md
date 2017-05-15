@@ -5,7 +5,7 @@
 
 ## Steps:
 
-1. You will know you have a merge conflict, when you see something like this:
+1. You will know you have a merge conflict when you see something like this:
 
     ```
     git merge upstream/master
@@ -16,7 +16,7 @@
 
     This merge conflict occurs when the package developer makes a change, and also a collaborator or a _Bioconductor_ core team member makes a change to the same file (in this case the `DESCRIPTION` file).
 
-    How can you avoid this? **Sync your repository** to all the updates before commiting any changes, see [Scenario 3][]. In other words, `fetch` and `merge` remote branches before a `push`.
+    How can you avoid this? **Sync your repository** to any remote repositories before commiting any changes, see [Scenario 3][]. In other words, `fetch` and `merge` remote branches before a `push`.
 
 3. If in spite of this you have conflicts, you need to fix them. See which file has the conflict,
 
@@ -42,7 +42,7 @@
 	no changes added to commit (use "git add" and/or "git commit -a")
     ```
 
-4. Open the file in your favorite editor and you will see that change in question is reflected in this manner:
+4. Open the file in your favorite editor. Conflicts look like:
 
 	```
 	 <<<<<<< HEAD
@@ -54,7 +54,7 @@
 
 	Everything between `<<<<` and `=====` refers to HEAD, i.e your current change. And everything between `=====` and `>>>>>` refers to the `remote/branch` shown there, i.e `upstream/master`.
 
-	You want to keep the most accurate and latest change, by deleting what is necessary. In this case, keep the latest version:
+	You want to keep the most accurate change, by deleting what is necessary. In this case, keep the latest version:
 
 	```
  	Version: 0.23.3
