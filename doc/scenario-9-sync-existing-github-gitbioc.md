@@ -1,42 +1,42 @@
 # Scenario 9: Sync existing GitHub and _Bioconductor_ repositories
 
-**Goal:** Sync your GitHub repository and _Bioconductor_ repository to the same commit. All the branches should be in sync.
+**Goal:** Ensure that your local, _Bioconductor_, and Github repositories are all in sync.
 
 ## Steps:
 
-*   Fetch all the updates from both remotes, GitHub and _Bioconductor_
+1. Fetch updates from all (_Bioconductor_ and Github) remotes.
 
     ```
     git fetch --all
     ```
 
-*   Make sure you are on the master branch, if not, checkout master.
+1. Make sure you are on the master branch.
 
     ```
     git checkout master
     ```
 
-*   Pull updates from your origin into your local machine.
-
-    ```
-    git pull
-    ```
-
-*   Merge updates into your `master` from _Bioconductor_ (`upstream`) remote
+1. Merge updates from the _Bioconductor_ (`upstream`) remote
 
     ```
     git merge upstream/master
     ```
 
-*   Push to both GitHub and _Bioconductor_ repositories, to have them in sync:
+    If you have conflicts after the `merge` step, see [Scenario 5][].
+
+1. Merge updates from the Github (`origin`) remote
 
     ```
-    git push origin master
+    git merge origin/master
+    ```
+
+1. Push to both _Bioconductor_  and GitHub repositories.
+
+    ```
     git push upstream master
+    git push origin master
     ```
 
-If you want to update a release branch, simply replace `master` with name of the release branch, eg: `RELEASE_3_5`
+1. Repeat for the release branch, replacing `master` with the name of the release branch, eg: `RELEASE_3_5`. Remember that only `master` and teh current release branh of _Bioconductor_ repositories can be updated.
 
-*   (Optional) If you have conflicts after `pull` or `merge` step. Please take a look at the our manual on how to [Resolve Conflicts][].
-
-[Resolve Conflicts]: scenario-5-resolve-conflicts.md
+[Scenario 5]: scenario-5-resolve-conflicts.md
