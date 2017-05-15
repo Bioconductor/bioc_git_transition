@@ -1,4 +1,4 @@
-# Scenario 3: Get updates from _Bioconductor_ and update GitHub
+# Scenario 3: Pull updates from _Bioconductor_ and push to GitHub
 
 **Goal:** Your _Bioconductor_ repository has been updated by the core team. You want to fetch these commits from _Bioconductor_, merge them into your local repository, and push them to GitHub.
 
@@ -6,31 +6,37 @@
 
 ## Steps
 
-1. Make sure you are on the appropriate branch, depending on the location of the changes, either `upstream/master` or `upstream/RELEASE_X_Y`.
+These steps update the `master` branch.
+
+1. Make sure you are on the appropriate branch.
 
     ```
     git checkout master
-    ## alternative for branch RELEASE_X_Y: git checkout RELEASE_X_Y
     ```
 
-2. Fetch content from _Bioconductor_
+1. Fetch content from _Bioconductor_
 
     ```
     git fetch upstream
     ```
 
-3. Merge upstream with the appropriate local branch
+1. Merge upstream with the appropriate local branch
 
     ```
-    ## on branch `master`
     git merge upstream/master
-
-    ## alternative: git merge upstream/RELEASE_X_Y
     ```
 
-4. Push changes to GitHub's (`origin`) `master` branch
+    If you have conflicts after the `merge` step, see [Scenario 5][].
+
+1. Push changes to GitHub's (`origin`) `master` branch
 
      ```
      git push origin master
-     ## atlerantive: git push origin RELEASE_X_Y
      ```
+
+To pull updates to the current `RELEASE_X_Y` branch, replace `master` with `RELEASE_X_Y` in the lines above.
+
+See [Scenario 9][] to sync your local repository with changes to both the _Bioconductor_ and Github repositories.
+
+[Scenario 5]: scenario-5-resolve-conflicts.md
+[Scenario 9]: scenario-9-sync-existing-github-gitbioc.md
