@@ -12,7 +12,20 @@
 
 1. Make changes which you need in the Bioconductor package. This is up to the developer/user to make whatever changes he wishes.
 
-1. Rebuild and reinstall the package in your local machine,
+     ```
+     git checkout -b user-feature
+     ## modify
+     git commit -a -m "feature: a new feature
+     ```
+
+   and then merge the feature onto the branch corresponding to the release in use, e.g.,
+
+    ```
+    git checkout <RELEASE_X_Y>
+    git merge user-feature
+    ```
+
+1. Rebuild (to create the vignette and help pages) and reinstall the package in your local machine,
 
     ```
     R CMD build ExamplePackage
