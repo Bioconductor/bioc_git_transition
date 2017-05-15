@@ -1,8 +1,8 @@
-# Scenario 4: Push updates to release branch (RELEASE_X_Y)
+# Scenario 4: Push updates to the release branch (RELEASE_X_Y)
 
 **Goal:** A bug has been identified. A bug fix needs to be commited to the `RELEASE_X_Y` branch.
 
-Developers can push commits to the `master` branch. These commits will be usied in the latest development builds, and will eventually become the  _next_ release branch. Developers also have write access to the most recent release branch (currently, the `RELEASE_3_5` branch). Bug fixes (but not new features) should be commited to the current release, so that they are made available to users.
+Developers have write access to the most recent release branch (currently, the `RELEASE_3_5` branch). Bug fixes (but not new features) should be commited to the current release, so that the bug fixes are made available to users.
 
 **NOTE:** Best practice is to develop and test (including a full nightly build) the bug fix on the `master` branch, and to merge the bug fix from master to release. See [Scenario-10][].
 
@@ -10,32 +10,16 @@ Developers can push commits to the `master` branch. These commits will be usied 
 
 ## Steps:
 
-1. Pull any changes from GitHub or other `origin` repository
+1. Fetch and merge changes from the _Bioconductor_ and Github repositories following [Scenario 9][].
 
     ```
-    git pull
-    ```
-
-1. Fetch any updates from the _Bioconductor_ `upstream` repository
-
-   ```
-   git fetch upstream
-   ```
-
-1. Checkout the release branch. If the branch was not previously available on your local machine, use:
-
-    ```
-    git checkout -b RELEASE_3_5 upstream/RELEASE_3_5
-    ```
-
-    If the branch was already available, use:
-
-    ```
+    git fetch --all
     git checkout RELEASE_3_5
     git merge upstream/RELEASE_3_5
+    git merge origin/RELEASE_3_5
     ```
 
-1. Make appropriate changes as needed, and bump the version number in the DESCRIPTION file.
+1. Make changes to source code as needed, and bump the version number in the DESCRIPTION file. Remember that release branch versions go from `x.y.z` to `x.y.z+1` (e.g., from `1.10.1` to `1.10.2`) where `y` is even in release.
 
 1. Add and commit the files you made the changes to
 
