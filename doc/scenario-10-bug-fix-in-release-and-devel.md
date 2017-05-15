@@ -27,6 +27,7 @@
     ```
     git checkout <RELEASE_X_Y>
     git merge master
+    ## FIXME: version bump in master not same as in release
     ```
 5. Then, make sure you push your changes to both the Github and Bioconductor, `master` and `<RELEASE_X_Y>` branches. Make sure you are on the correct branch on your local machine,
 
