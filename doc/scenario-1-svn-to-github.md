@@ -16,7 +16,7 @@ This scenario does NOT involve setting up a _fork_ or using an existing GitHub r
 
     ![](images/create_repo.png)
 
-    After pressing the 'Create repository' button, ignore the instructions that GitHub provides, and follow the rest of this document.
+    After pressing the 'Create repository' button, **ignore** the instructions that GitHub provides, and follow the rest of this document.
 
 1.  On your local machine, clone the empty repository from GitHub.
 
