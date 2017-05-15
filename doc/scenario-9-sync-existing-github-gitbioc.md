@@ -1,4 +1,4 @@
-# Scenario 9: Sync existing GitHub and _Bioconductor_ repositories
+# Scenario 9: Sync existing _Bioconductor_ and Github repositories
 
 **Goal:** Ensure that your local, _Bioconductor_, and Github repositories are all in sync.
 
