@@ -4,14 +4,16 @@
 
 ## Steps:
 
-1. Make sure to follow [Scenario-3][] to pull any potential changes in the code from the _Bioconductor_ core team. Do this for both the master and release branches.
+1. Follow [Scenario-9][] to sync your local repository with _Bioconductor_ and Github. Do this for both the master and release branches.
 
     ```
-    git fetch upstream
+    git fetch --all
     git checkout <RELEASE_X_Y>
     git merge upstream/<RELEASE_X_Y>
+    git merge origin/<RELEASE_X_Y>
     git checkout master
     git merge upstream/master
+    git merge origin/master
     ```
 
 1. On your local machine, be sure that you are on the `master` branch.
@@ -70,4 +72,4 @@
     git push origin <RELEASE_X_Y>
     ```
 
-[Scenario-3]: scenario-3-pull-from-gitbioc-push-github.md
+[Scenario-9]: scenario-9-sync-existing-github-gitbioc.md
