@@ -1,14 +1,26 @@
-# Scenario 10: Bug fix in `release` and  `master` branch
+# Scenario 10: Bug fix in `master` and  `release` branches
 
-**Goal:** Maintainers will have to fix bugs from time to time, and make sure the patch is available both in the `master` branch (svn `devel`) and the current `release` branch.
+**Goal:** Maintainers will have to fix bugs from time to time, and make sure the patch is available both in the `master` branch (svn devel) and the current `release` branch.
 
 ## Steps:
 
-1. Make sure to follow [Scenario-3][] to pull any potential changes in the code from the _Bioconductor_ core team.
+1. Make sure to follow [Scenario-3][] to pull any potential changes in the code from the _Bioconductor_ core team. Do this for both the master and release branches.
 
-2. Once you have done that, on your local machine, make the changes you need to fix your bug. It is helpful to tag the commit as bug fix, and then update the version number.
+    ```
+    git fetch upstream
+    git checkout <RELEASE_X_Y>
+    git merge upstream/<RELEASE_X_Y>
+    git checkout master
+    git merge upstream/master
+    ```
 
-3. On your local machine,
+1. On your local machine, be sure that you are on the `master` branch.
+
+    ```
+    git checkout master
+    ```
+
+   Make the changes you need to fix your bug. Add the modified files to the commit. Remember to edit the DESCRIPTION file to update the version number.
 
     ```
     git add <files changed>
@@ -16,22 +28,33 @@
     git add DESCRIPTION
     ```
 
-    After adding the files which changed,
+   Commit the modified files. It is helpful to tag the commit as bug fix.
 
     ```
-    git commit -m "bug fix and version bump"
+    git commit -m "bug fix: my bug fix"
     ```
 
-4. The assumption is that you are making these changes on your `master` branch. Once the changes have been committed, you need to make sure these changes are available in your `release` branch as well,
+
+1. (Alternative) If the changes are non-trivial, create a new branch where you can easily abandon any false starts. Merge the final version onto `master`
+
+    ```
+    git checkout master
+    git checkout -b bugfix-my-bug
+    ## add and commit to this branch. When the bug fix is complete...
+    git checkout master
+    git merge bugfix-my-bug
+    ```
+
+1. These changes are on your `master` branch. The changes need to be available in your `release` branch as well,
 
     ```
     git checkout <RELEASE_X_Y>
     git merge master
     ## FIXME: version bump in master not same as in release
     ```
-5. Then, make sure you push your changes to both the Github and _Bioconductor_, `master` and `<RELEASE_X_Y>` branches. Make sure you are on the correct branch on your local machine,
+1. Push your changes to both the Github and _Bioconductor_ `master` and `<RELEASE_X_Y>` branches. Make sure you are on the correct branch on your local machine.
 
-    For the `master` branch,
+   For the `master` branch,
 
     ```
     git checkout master
@@ -39,7 +62,7 @@
     git push origin master
     ```
 
-    then, for the `release` branch,
+   For the `release` branch,
 
     ```
     git checkout <RELEASE_X_Y>
