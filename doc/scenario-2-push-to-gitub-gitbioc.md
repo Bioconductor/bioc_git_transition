@@ -32,6 +32,21 @@
     git commit -m "My informative commit message describing the change"
     ```
 
+1. (Alternatve) When changes are more elaborate, best practice is to use a local branch for development.
+
+    ```
+    git checkout master
+    git checkout -b feature-my-feature
+    ## multiple rounds of edit, add, commit
+    ```
+
+    Merge the local branch to master when the feature is 'complete'.
+
+    ```
+    git checkout master
+    git merge feature-my-feature
+    ```
+
 1. Push updates to GitHub's (`origin`) `master` branch
 
     ```
