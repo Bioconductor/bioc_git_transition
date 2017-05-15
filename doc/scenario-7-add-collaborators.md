@@ -12,7 +12,7 @@
 
 1. [Merging a pull request][]
 
-## Push to _Bioconductor_ repository
+## Push Github changes to the _Bioconductor_ repository
 
 Once you have accepted pull requests from your package community on GitHub, you can push these changes to _Bioconductor_.
 
@@ -22,15 +22,15 @@ Once you have accepted pull requests from your package community on GitHub, you 
    git checkout master
    ```
 
-1. Pull the GitHub changes to your local repository.
+1. Fetch and merge the GitHub changes to your local repository.
 
     ```
-    git pull
-
-    ## alternative:
-    ## git fetch
-    ## git merge
+    git fetch origin
+    git merge
+    ## alternative: git pull
     ```
+
+    If you have conflicts after the `merge` step, see [Scenario 5][].
 
 1. Push your local repository to the upstream _Bioconductor_ repository.
 
@@ -38,8 +38,9 @@ Once you have accepted pull requests from your package community on GitHub, you 
     git push upstream master
     ```
     
-If you want to push Github release branch updates to the _Bioconductor_ release branch, simply replace `master` with name of the release branch, e.g.: `RELEASE_3_5`.
+To push Github release branch updates to the _Bioconductor_ release branch, replace `master` with name of the release branch, e.g.: `RELEASE_3_5`.
 
 [Adding a new collaborator]: https://help.github.com/articles/inviting-collaborators-to-a-personal-repository/
 [Removing collaborator]: https://help.github.com/articles/removing-a-collaborator-from-a-personal-repository/
 [Merging a pull request]: https://help.github.com/articles/merging-a-pull-request/
+[Scenario 5]: scenario-5-resolve-conflicts.md
