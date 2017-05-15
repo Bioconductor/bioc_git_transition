@@ -1,8 +1,8 @@
 # Scenario 3: Get updates from _Bioconductor_ and update GitHub
 
-**Goal:** Your _Bioconductor_ repository has been updated by the core team. You want to fetch these commits from _Bioconductor_ (remote `upstream`), merge them into your local repository, and push them to GitHub.
+**Goal:** Your _Bioconductor_ repository has been updated by the core team. You want to fetch these commits from _Bioconductor_, merge them into your local repository, and push them to GitHub.
 
-**NOTE:** It is always a good idea to fetch updates from _Bioconductor_ as a precautionary measure before making more changes. This will help prevent merge conflicts.
+**NOTE:** It is always a good idea to fetch updates from _Bioconductor_  before making more changes. This will help prevent merge conflicts.
 
 ## Steps
 
@@ -10,7 +10,7 @@
 
     ```
     git checkout master
-    ## alternatively 'git checkout RELEASE_X_Y' for the release branch
+    ## alternative for branch RELEASE_X_Y: git checkout RELEASE_X_Y
     ```
 
 2. Fetch content from _Bioconductor_
@@ -25,12 +25,12 @@
     ## on branch `master`
     git merge upstream/master
 
-    ## alternatively, on branch `RELEASE_X_Y`
-    git merge upstream/RELEASE_X_Y
+    ## alternative: git merge upstream/RELEASE_X_Y
     ```
 
 4. Push changes to GitHub's (`origin`) `master` branch
 
      ```
-     git push origin
+     git push origin master
+     ## atlerantive: git push origin RELEASE_X_Y
      ```
