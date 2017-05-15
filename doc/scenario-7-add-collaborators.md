@@ -11,9 +11,9 @@
 
 1. [Merging a pull request][]
 
-## Push to Bioconductor repository
+## Push to _Bioconductor_ repository
 
-Once you have accepted pull requests from your package community on GitHub, you can push these changes to Bioconductor.
+Once you have accepted pull requests from your package community on GitHub, you can push these changes to _Bioconductor_.
 
 1. Make sure that you are on the branch to which the changes were applied, for example `master`.
 
@@ -31,7 +31,7 @@ Once you have accepted pull requests from your package community on GitHub, you 
     git merge
     ```
 
-1. Push your local repository to the upstream Bioconductor repository.
+1. Push your local repository to the upstream _Bioconductor_ repository.
 
     ```
     git push upstream master

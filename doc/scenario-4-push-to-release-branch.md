@@ -3,7 +3,7 @@
 Developers will have write access to only the most recent release branch (currently, the `RELEASE_3_5` branch).
 Any updates made to the `master` branch will be captured as the latest development cycle (eventually becoming the `RELEASE_3_6` branch).
 
-NOTE: For developers who are used to the SVN way of development in Bioconductor, `devel` (svn) --> `master` (git).
+NOTE: For developers who are used to the SVN way of development in _Bioconductor_, `devel` (svn) --> `master` (git).
 
 
 ## Steps:
@@ -14,7 +14,7 @@ NOTE: For developers who are used to the SVN way of development in Bioconductor,
     git pull
     ```
 
-1. Fetch any updates from the Bioconductor `upstream` repository
+1. Fetch any updates from the _Bioconductor_ `upstream` repository
 
    ```
    git fetch upstream
@@ -42,7 +42,7 @@ NOTE: For developers who are used to the SVN way of development in Bioconductor,
     git commit -m "My informative commit message"
     ```
 
-1.  Push to both the Bioconductor repository, and your own GitHub repository.
+1.  Push to both the _Bioconductor_ repository, and your own GitHub repository.
 
     ```
     git push origin RELEASE_3_5

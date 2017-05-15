@@ -1,6 +1,6 @@
 # Scenario 5: Resolve merge conflicts
 
-**Goal:** Resolve merge conflicts in branch and push to GitHub and Bioconductor repositories.
+**Goal:** Resolve merge conflicts in branch and push to GitHub and _Bioconductor_ repositories.
 
 
 ## Steps:
@@ -14,7 +14,7 @@
     Automatic merge failed; fix conflicts and then commit the result
     ```
 
-    This merge conflict occurs when the package developer makes a change, and also a collaborator or a Bioconductor core team member makes a change to the same file (in this case the `DESCRIPTION` file).
+    This merge conflict occurs when the package developer makes a change, and also a collaborator or a _Bioconductor_ core team member makes a change to the same file (in this case the `DESCRIPTION` file).
 
     How can you avoid this? **Sync your repository** to all the updates before commiting any changes, see [Scenario 3][]. In other words, `fetch` and `merge` remote branches before a `push`.
 
@@ -67,7 +67,7 @@
 	git commit -m "Fixed conflicts in version change"
 	```
 
-6. 	Push to both your GitHub, and Bioconductor repositories,
+6. 	Push to both your GitHub and _Bioconductor_ repositories,
 
 	```
 	git push origin master

@@ -1,10 +1,10 @@
-# Scenario 9: Sync existing GitHub and Bioconductor repositories
+# Scenario 9: Sync existing GitHub and _Bioconductor_ repositories
 
-**Goal:** Sync your GitHub repository and Bioconductor repository to the same commit. All the branches should be in sync.
+**Goal:** Sync your GitHub repository and _Bioconductor_ repository to the same commit. All the branches should be in sync.
 
 ## Steps:
 
-*   Fetch all the updates from both remotes, GitHub and Bioconductor
+*   Fetch all the updates from both remotes, GitHub and _Bioconductor_
 
     ```
     git fetch --all
@@ -22,13 +22,13 @@
     git pull
     ```
 
-*   Merge updates into your `master` from Bioconductor (`upstream`) remote
+*   Merge updates into your `master` from _Bioconductor_ (`upstream`) remote
 
     ```
     git merge upstream/master
     ```
 
-*   Push to both GitHub and Bioconductor repositories, to have them in sync:
+*   Push to both GitHub and _Bioconductor_ repositories, to have them in sync:
 
     ```
     git push origin master

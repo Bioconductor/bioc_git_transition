@@ -1,14 +1,14 @@
-# Scenario 11: Maintaining your package on Bioconductor without a Github repo
+# Scenario 11: Maintaining your package on _Bioconductor_ without a Github repo
 
-**Goal:** Developer *without* or *does not want* a Github account or repository wants to maintain their package on Bioconductor.
+**Goal:** Developer wishes to maintain their _Bioconductor_ repository without using Github.
 
 ## Steps:
 
 ### Clone and setup the package on your local machine.
 
-1. Developer or maintainer of the Bioconductor package needs to make sure that they have correct `SSH` access rights to the Bioconductor repository hosted on our private git server. If this is not the case, please contact packages@bioconductor.org.
+1. The _Bioconductor_ developer needs to make sure that they have `SSH` access to the _Bioconductor_ repository hosted on our git server. Please forward your ssh 'public key' to packages@bioconductor.org.
 
-1. Clone package with `SSH` on your local machine,
+1. Clone your package to your local machine,
 
     ```
     git clone git@git.bioconductor.org:packages/<ExamplePackage>
@@ -16,7 +16,7 @@
 
     **NOTE:** If you clone with `https` you will NOT get read+write access.
 
-1. Once the package is cloned, there will only be a single remote. To see remote, use:
+1. Once the package is cloned, there will only be a single remote. To see the remote, use:
 
     ```
     git remote -v
@@ -29,11 +29,11 @@
     origin    git@git.bioconductor.org:packages/<ExamplePackage>.git (push)
     ```
 
-    This indicates that your git repository has only one remote `origin`, which is the Bioconductor repository.
+    This indicates that your git repository has only one remote `origin`, which is the _Bioconductor_ repository.
 
-### How to make changes and maintain.
+### Make and commit changes to your local repository
 
-1. Before making changes to your package, make sure to `pull` changes or updates from the Bioconductor repository. This is needed to avoid conflicts.
+1. Before making changes to your package, make sure to `pull` changes or updates from the _Bioconductor_ repository. This is needed to avoid conflicts.
 
     ```
     git pull
@@ -61,7 +61,9 @@
     ```
     A new commit message will show up after this step, with the message `Merge branch 'master' into <RELEASE_X_Y>`. It will be committed to `<RELEASE_X_Y>` branch when you save.
 
-1. You have to push your commits to the Bioconductor repository to make them available to the user community.
+### Push your local commits to the _Bioconductor_ repository
+
+1. Push your commits to the _Bioconductor_ repository to make them available to the user community.
 
     Push changes to the `master` branch using:
 

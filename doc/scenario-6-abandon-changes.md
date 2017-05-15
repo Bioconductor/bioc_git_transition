@@ -4,9 +4,9 @@
 
 # Going sub-nuclear:  Make a new branch
 
-One way you can ignore your work, and make a new branch is by replacing your local and GitHub repository `master` branch with the Bioconductor `master` branch.
+One way you can ignore your work, and make a new branch is by replacing your local and GitHub repository `master` branch with the _Bioconductor_ `master` branch.
 
-NOTE: This works only if you haven't pushed the change causing the issue to the Bioconductor repository.
+NOTE: This works only if you haven't pushed the change causing the issue to the _Bioconductor_ repository.
 
 ## Steps:
 
@@ -53,7 +53,7 @@ If you find yourself in a place where you want to abandon the changes and go bac
     HEAD is now at e02e4d8 version bump by bioc core
     ```
 
-    You will then need to push the changes to both, GitHub and Bioconductor repositories, if you intend to make them permanent, using:
+    You will then need to push the changes to both, GitHub and _Bioconductor_ repositories, if you intend to make them permanent, using:
 
     ```
     git push -f origin

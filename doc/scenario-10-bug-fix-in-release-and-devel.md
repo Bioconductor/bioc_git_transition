@@ -1,10 +1,10 @@
 # Scenario 10: Bug fix in `release` and  `master` branch
 
-**Goal:** Maintainers will have to fix bugs from time to time, and make sure the patch is available both in the `master` branch( svn `devel`) and the current `release` branch.
+**Goal:** Maintainers will have to fix bugs from time to time, and make sure the patch is available both in the `master` branch (svn `devel`) and the current `release` branch.
 
 ## Steps:
 
-1. Make sure to follow [Scenario-3][] to pull any potential changes in the code from the Bioconductor core team.
+1. Make sure to follow [Scenario-3][] to pull any potential changes in the code from the _Bioconductor_ core team.
 
 2. Once you have done that, on your local machine, make the changes you need to fix your bug. It is helpful to tag the commit as bug fix, and then update the version number.
 
@@ -29,7 +29,7 @@
     git merge master
     ## FIXME: version bump in master not same as in release
     ```
-5. Then, make sure you push your changes to both the Github and Bioconductor, `master` and `<RELEASE_X_Y>` branches. Make sure you are on the correct branch on your local machine,
+5. Then, make sure you push your changes to both the Github and _Bioconductor_, `master` and `<RELEASE_X_Y>` branches. Make sure you are on the correct branch on your local machine,
 
     For the `master` branch,
 

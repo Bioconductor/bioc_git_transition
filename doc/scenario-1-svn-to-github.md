@@ -1,4 +1,4 @@
-# Scenario 1: Create GitHub repository for existing Bioconductor repository
+# Scenario 1: Create GitHub repository for existing _Bioconductor_ repository
 
 **Goal:** The SVN to git transition is all done and dusted. As a longterm SVN developer you don't have a GitHub repository of your package. You'd like to create a new GitHub repository, so that your user community can engage in the development of your package.
 
@@ -10,7 +10,7 @@ This scenario does NOT involve setting up a _fork_ or using an existing GitHub r
 
 1.  Set up remote access to GitHub via SSH or Https.  Please check [which-remote-url-should-i-use][] and [add your public key to your GitHub account][].
 
-2.  [Create a new GitHub repository][] on your account, with the name of the existing Bioconductor package that you have been previously developing in SVN.
+2.  [Create a new GitHub repository][] on your account, with the name of the existing _Bioconductor_ package that you have been previously developing in SVN.
 
     We use "BiocGenerics" as an example for this scenario.
 
@@ -40,13 +40,13 @@ This scenario does NOT involve setting up a _fork_ or using an existing GitHub r
     cd BiocGenerics
     ```
 
-    For Bioconductor repositories that you have read / write (SSH) access, use:
+    For _Bioconductor_ repositories that you have read / write (SSH) access, use:
 
     ```
     git remote add upstream git@git.bioconductor.org:packages/BiocGenerics.git
     ```
 
-    For read-only Bioconductor repositories, use:
+    For read-only _Bioconductor_ repositories, use:
 
     ```
     git remote add upstream https://git.bioconductor.org/packages/BiocGenerics.git

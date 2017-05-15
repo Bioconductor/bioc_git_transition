@@ -1,16 +1,16 @@
-# Scenario 12: Clone and modify on local repository
+# Scenario 12: Clone and modify a _Bioconductor_ repository for personal use
 
-**Goal:** There are developers/users who do not contribute to Bioconductor, but would like to modify functions in the package to meet their needs.
+**Goal:** A user would like to modify functions in a package to meet their needs. There is no Github repository for the package.
 
 ## Steps:
 
-1. Clone the package from the Bioconductor repository, use the **https** protocol
+1. Clone the package from the _Bioconductor_ repository, use the **https** protocol
 
     ```
     git clone https://git@git.bioconductor.org/packages/<ExamplePackage>
     ```
 
-1. Make changes which you need in the Bioconductor package. This is up to the developer/user to make whatever changes he wishes.
+1. Make changes which you need in the _Bioconductor_ package. This is up to the user to make whatever changes he wishes. Commit the changes to your local repository. A best practice might modify the changes in a new branch
 
      ```
      git checkout -b user-feature
@@ -29,7 +29,7 @@
 
     ```
     R CMD build ExamplePackage
-    R CMD INSTALL ExamplePackage_version_number.tar.gz
+    R CMD INSTALL ExamplePackage_<version.number.tar.gz>
     ```
 
-1. The package with the changes should be available in your local R installation.
+1. The package with the changes should be available in your local _R_ installation.
