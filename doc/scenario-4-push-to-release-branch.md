@@ -1,10 +1,12 @@
 # Scenario 4: Push updates to release branch (RELEASE_X_Y)
 
-Developers will have write access to only the most recent release branch (currently, the `RELEASE_3_5` branch).
-Any updates made to the `master` branch will be captured as the latest development cycle (eventually becoming the `RELEASE_3_6` branch).
+**Goal:** A bug has been identified. A bug fix needs to be commited to the `RELEASE_X_Y` branch.
 
-NOTE: For developers who are used to the SVN way of development in _Bioconductor_, `devel` (svn) --> `master` (git).
+Developers can push commits to the `master` branch. These commits will be usied in the latest development builds, and will eventually become the  _next_ release branch. Developers also have write access to the most recent release branch (currently, the `RELEASE_3_5` branch). Bug fixes (but not new features) should be commited to the current release, so that they are made available to users.
 
+**NOTE:** Best practice is to develop and test (including a full nightly build) the bug fix on the `master` branch, and to merge the bug fix from master to release. See [Scenario-10][].
+
+**NOTE:** For developers who are used to the SVN way of development in _Bioconductor_, `devel` (svn) --> `master` (git).
 
 ## Steps:
 
@@ -20,7 +22,7 @@ NOTE: For developers who are used to the SVN way of development in _Bioconductor
    git fetch upstream
    ```
 
-1. Checkout the branch. If the branch was not previously available on your local machine, use:
+1. Checkout the release branch. If the branch was not previously available on your local machine, use:
 
     ```
     git checkout -b RELEASE_3_5 upstream/RELEASE_3_5
@@ -35,16 +37,18 @@ NOTE: For developers who are used to the SVN way of development in _Bioconductor
 
 1. Make appropriate changes as needed, and bump the version number in the DESCRIPTION file.
 
-1. Add and commit the files you made the changes to,  
+1. Add and commit the files you made the changes to
 
     ```
     git add <file(s) that changed>
     git commit -m "My informative commit message"
     ```
 
-1.  Push to both the _Bioconductor_ repository, and your own GitHub repository.
+1.  Push to both the _Bioconductor_ and GitHub repositories.
 
     ```
     git push origin RELEASE_3_5
     git push upstream RELEASE_3_5
     ```
+
+[Scenario-10]: scenario-10-bug-fix-in-release-and-devel.md
