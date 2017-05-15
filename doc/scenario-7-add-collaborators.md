@@ -1,5 +1,6 @@
 # Scenario 7: Add collaborators and leverage GitHub features
 
+**Goal:** You would like to take advantage of the social coding features provided by Github, while continuing to update your _Bioconductor_ repository.
 
 ## Maintaining Collaborators on GitHub
 
@@ -26,9 +27,9 @@ Once you have accepted pull requests from your package community on GitHub, you 
     ```
     git pull
 
-    # alternatively
-    git fetch
-    git merge
+    ## alternative:
+    ## git fetch
+    ## git merge
     ```
 
 1. Push your local repository to the upstream _Bioconductor_ repository.
@@ -37,7 +38,7 @@ Once you have accepted pull requests from your package community on GitHub, you 
     git push upstream master
     ```
     
-If you want to update a release branch, simply replace `master` with name of the release branch, e.g.: `RELEASE_3_5`.
+If you want to push Github release branch updates to the _Bioconductor_ release branch, simply replace `master` with name of the release branch, e.g.: `RELEASE_3_5`.
 
 [Adding a new collaborator]: https://help.github.com/articles/inviting-collaborators-to-a-personal-repository/
 [Removing collaborator]: https://help.github.com/articles/removing-a-collaborator-from-a-personal-repository/
