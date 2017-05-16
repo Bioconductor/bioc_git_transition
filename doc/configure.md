@@ -8,18 +8,15 @@ the EC2 instance has 2 vCPUs, 8 GB RAM and 500 GB disk space on the root drive.
 The git repositories are located at /home/git/repositories and can be accessed
 via http/s or ssh.
 
-Authentication: Verification of user identify with a password or key;
-                handled by http/s or ssh.
-Authoriziation: Determines which repositories can a use access; handled
-                by gitolite. 
-
+    Authentication: Verification of user identify with a password or key; handled by http/s or ssh.
+                
+    Authoriziation: Determines which repositories can a use access; handled by gitolite. 
 
 ## Public read-only access via http/s
 
-We are allowing unauthenticated access via http. All 
-incoming http/s requests are treated as a single user ('nobody'). 
-There are 2 options for public git access, 'git protocol' handled by
-git-daemon and 'smart http'. The current implementation is 'smart http'.
+We are allowing unauthenticated access via http so all incoming http/s requests 
+are treated as a single user. There are 2 options for public git access, 'git protocol' 
+handled by git-daemon and 'smart http'. The current implementation is 'smart http'.
 
 ### Smart http
 
@@ -36,18 +33,17 @@ apache -> gitolite -> git-http-backend
 
 apache
 - redirects incoming traffic to CGI-enabled location
-- suEXEC runs CGI-script
+- hands off to suEXEC
+- suEXEC (as user git) runs CGI script that wraps gitolite executible
 
 gitolite
-- checks if user has permissions to requested
+- reads gitolite.rc
+- checks user permissions in gitolite.conf and packages.conf
 - hands off to git-http-backend
 
 git-http-backend
 - GET request (does repo exist)
-  -- verifies that directory has magic file "git-daemon-export-ok" unless
-     GIT_HTTP_EXPORT_ALL environmental variable has been set.
 - POST request (serve up the repo)
-
 
 1) Configure Apache2 for https as described here 
 
@@ -55,13 +51,12 @@ https://github.com/Bioconductor/AWS_management/blob/master/docs/Configure_Apache
 
 2) Enable support for Common Gateway Interface (CGI)
 
+    ````
     sudo a2enmod cgi
     sudo service apache2 restart
-
-The directives contained in this module allow for manipulation and control of
-URLs as requests arrive at the server.
-
-The Alias and ScriptAlias directives are used to map between URLs and
+    ````
+    
+    The Alias and ScriptAlias directives are used to map between URLs and
 filesystem paths. This allows for content which is not directly under the
 DocumentRoot to be served as part of the web document tree.  The ScriptAlias
 directive has the additional effect of marking the target directory as
@@ -69,24 +64,24 @@ containing only CGI scripts.
 
 - Apache2 config modifications:
 
+    ````
     ScriptAlias /packages/ /home/git/bin/gitolite-suexec-wrapper.sh/
-
     <Directory "/home/git/bin">
         Options +ExecCGI
         SetHandler cgi-script
         AllowOverride None
         Require       all granted
     </Directory>
-
-
+    ````
+    
 3) Enable support for suEXEC 
 
-Instructions collated from multiple sources: 
+  Instructions collated from multiple sources: 
     https://httpd.apache.org/docs/2.4/suexec.html
     http://gitolite.com/gitolite/contrib/ssh-and-http/
     https://www.digitalocean.com/community/tutorials/how-to-use-suexec-in-apache-to-run-cgi-scripts-on-an-ubuntu-vps 
 
-  The suEXEC feature provides users the ability to run Common Gateway Interface
+    The suEXEC feature provides users the ability to run Common Gateway Interface
   (CGI) and Server Side Interface (SSI) programs under user IDs different from
   the user ID of the calling web server. Normally, when a CGI or SSI program
   executes, it runs as the same user who is running the web server. This
@@ -95,57 +90,75 @@ Instructions collated from multiple sources:
 - Install a modified suEXEC module that allows us to configure the directories
   in which it operates. Normally, this would not be configurable without
   recompiling from source. 
-
+    ```
     sudo apt-get install apache2-suexec-custom
     sudo a2enmod suexec
-
+    ```
+    
 - Add a line to the Apache2 config specifying which user should
   run the CGI scripts:
-
+    ```
     SuexecUserGroup git git
-
+    ```
+    
 - Modify /etc/apache2/suexec/www-data to point the suEXEC root to the 
   CGI-enabled directory specified in the Apache2 config file.
-
+    ```
     /home/git/bin/
-
+    ```
+    
 - Modify the gitolite-suexec-wrapper.sh:
-
+    ```
     export GIT_PROJECT_ROOT="/home/git/repositories/packages"
     export GITOLITE_HTTP_HOME="/home/git"
     exec ${GITOLITE_HTTP_HOME}/gitolite/src/gitolite-shell
-
+    ```
+    
 - Set permissions to 755 on both the CGI-enabled /home/git/bin/ directory
   and the suEXEC wrapper for the gitolite shell,
   /home/git/bin/gitolite-suexec-wrapper.sh. Both should be owned by git:git. 
 
 - Restart Apache2:
-
+    ```
     sudo service apache2 restart
-
+    ```
+    
 - Add a whoami test script (test.cgi) to the CGI-enabled path in 
   ScriptAlias above. Confirm the git user is the one running 
   the script by pasting
-
+    ```
     https://git.bioconductor.org/packages/test.cgi
-
+    ```
+    
   in a browser.
-
 
 4) Anonymous ('nobody') user
 
 - Apache passes an anonomous user to gitolite who assigns the user name
   'nobody' in the gitolite.rc file. Confirm this line is uncommented:
-
+    ```
     # rc variables used by various features
     HTTP_ANON_USER      =>  'nobody',
-
+    ```
+    
 - Give user 'nobody' read access to repositories in gitolite.conf or 
   packages.conf by specifying
-
+    ```
     R = nobody
+    ```
+    
+5) git-http-backend
 
+  This is the server-side implementation of git over http. It's a CGI program 
+that serves the contents of a git repository to git clients. The script verifies 
+the repos being accessed have magic file "git-daemon-export-ok" unless 
+GIT_HTTP_EXPORT_ALL is set.
 
+- Add this line to the Apache2 config:
+    ```
+    SetEnv GIT_HTTP_EXPORT_ALL
+    ```
+    
 ### Non-gitolite (dumb) http configuration
 
 (Keep for historical reference)
