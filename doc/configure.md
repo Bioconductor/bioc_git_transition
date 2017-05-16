@@ -1,23 +1,38 @@
-# Server
+# Configuration
+
+## Table of Contents
+- [Server Specs](#server)
+- [Authentication and Authorization](#auth)
+- [Public read-only access via http/s](#http)
+    - [Smart http](#smarthttp)
+    - [Dumb http](#dumbhttp)
+- [Push / Pull access via SSH](#ssh)
+
+<a name="server"></a>
+## Server
 
 Git is hosted at the AWS-based server, git.bioconductor.org. As of May 2017,
 the EC2 instance has 2 vCPUs, 8 GB RAM and 500 GB disk space on the root drive.
 
+<a name="auth"></a>
 # Authentication and Authorization
 
 The git repositories are located at /home/git/repositories and can be accessed
-via http/s or ssh.
+via http/s or ssh. Public read-only access is via http and push/pull access
+is via ssh.
 
     Authentication: Verification of user identify with a password or key; handled by http/s or ssh.
  
     Authoriziation: Determines which repositories can a use access; handled by gitolite. 
 
+<a name="http"></a>
 ## Public read-only access via http/s
 
 We are allowing unauthenticated access via http so all incoming http/s requests 
 are treated as a single user. There are 2 options for public git access, 'git protocol' 
 handled by git-daemon and 'smart http'. The current implementation is 'smart http'.
 
+<a name="smarthttp"></a>
 ### Smart http
 
 References:
@@ -166,7 +181,8 @@ Add this line to the Apache2 config:
     SetEnv GIT_HTTP_EXPORT_ALL
     ```
  
-### Non-gitolite (dumb) http configuration
+<a name="dumbhttp"></a>
+### Dumb http
 
 (Keep for historical reference)
 
@@ -187,9 +203,10 @@ out-of-the-box Apache2 configuration to limit what users can see.
   -- Paste https://git.bioconductor.org/packages/ in a browser and confirm all packages are visible. 
   -- Download a package with `git clone https://git.bioconductor.org/packages/BiocGenerics.git`
 
+<a name="ssh"></a>
 ## Push / pull access via ssh
 
-# svn 'authz' to gitolite 'conf'
+### svn 'authz' to gitolite 'conf'
 
 The gitolite configuration involves
 
