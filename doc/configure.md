@@ -9,13 +9,13 @@
 - [Push / Pull access via SSH](#ssh)
 
 <a name="server"></a>
-## Server
+## Server Specs
 
 Git is hosted at the AWS-based server, git.bioconductor.org. As of May 2017,
 the EC2 instance has 2 vCPUs, 8 GB RAM and 500 GB disk space on the root drive.
 
 <a name="auth"></a>
-# Authentication and Authorization
+## Authentication and Authorization
 
 The git repositories are located at /home/git/repositories and can be accessed
 via http/s or ssh. Public read-only access is via http and push/pull access
