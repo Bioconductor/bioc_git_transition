@@ -77,10 +77,12 @@ DocumentRoot to be served as part of the web document tree.  The ScriptAlias
 directive has the additional effect of marking the target directory as
 containing only CGI scripts.
 
-Apache2 config modifications:
+In the Apache config file, alias the root of git.bioconductor.org ('/') to 
+the directory with the wrapper script and CGI-enable the directory with
+the wrapper.
 
     ```
-    ScriptAlias /packages/ /home/git/bin/gitolite-suexec-wrapper.sh/
+    ScriptAlias / /home/git/bin/gitolite-suexec-wrapper.sh/
     <Directory "/home/git/bin">
         Options +ExecCGI
         SetHandler cgi-script
@@ -88,14 +90,23 @@ Apache2 config modifications:
         Require       all granted
     </Directory>
     ```
- 
+The alias in ScriptAlias must be a directory above /packages/
+so the "packages/" prefix is included in the PATH_INFO variable.
+PATH_INFO is passed from Apache to gitolite and is used to locate
+the rules in the gitolite config files and by the git-http-backend
+script to locate the physical git directory on the machine.
+PATH_INFO will only include directories below the level of the
+alias in ScriptAlias; we need PATH_INFO to include the "packages/"
+prefix because that is how the directories are specified in 
+packages.conf.
+
 #### Enable support for suEXEC 
 
 The suEXEC feature provides users the ability to run Common Gateway Interface
-  (CGI) and Server Side Interface (SSI) programs under user IDs different from
-  the user ID of the calling web server. Normally, when a CGI or SSI program
-  executes, it runs as the same user who is running the web server. This
-  feature is not enabled by default.
+(CGI) and Server Side Interface (SSI) programs under user IDs different from
+the user ID of the calling web server. Normally, when a CGI or SSI program
+executes, it runs as the same user who is running the web server. This
+feature is not enabled by default.
 
 Instructions collated from multiple sources: 
  
@@ -112,7 +123,7 @@ Install a modified suEXEC module that allows us to configure the directories
     sudo a2enmod suexec
     ``` 
  
-Add a line to the Apache2 config specifying which user should
+Add a line to the Apache config specifying which user should
   run the CGI scripts:
  
     ```
@@ -129,14 +140,21 @@ Modify /etc/apache2/suexec/www-data to point the suEXEC root to the
 Modify the gitolite-suexec-wrapper.sh:
  
     ```
-    export GIT_PROJECT_ROOT="/home/git/repositories/packages"
+    export GIT_PROJECT_ROOT="/home/git/repositories"
     export GITOLITE_HTTP_HOME="/home/git"
     exec ${GITOLITE_HTTP_HOME}/gitolite/src/gitolite-shell
     ```
+The git-http-backend script concatenates GIT_PROJECT_ROOT and PATH_INFO
+when trying to locate the git repositories on the machine. We constructed
+ScriptAlias such that PATH_INFO would include the "packages/" prefix. This
+means GIT_PROJECT_ROOT cannot include "packages/". Using IRanges as an
+example, the concatenated GIT_PROJECT_ROOT/PATH_INFO should look like this:
+
+    /home/git/repositories/packages/IRanges.git/info/refs
  
 Set permissions to 755 on both the CGI-enabled /home/git/bin/ directory
-  and the suEXEC wrapper for the gitolite shell,
-  /home/git/bin/gitolite-suexec-wrapper.sh. Both should be owned by git:git. 
+and the suEXEC wrapper for the gitolite shell,
+/home/git/bin/gitolite-suexec-wrapper.sh. Both should be owned by git:git. 
 
 Restart Apache2:
  
