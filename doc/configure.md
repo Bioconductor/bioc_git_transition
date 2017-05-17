@@ -21,9 +21,9 @@ The git repositories are located at /home/git/repositories and can be accessed
 via http/s or ssh. Public read-only access is via http and push/pull access
 is via ssh.
 
-    Authentication: Verification of user identify with a password or key; handled by http/s or ssh.
+    Authentication: Verification of user identity with password or key; handled by http/s or ssh.
  
-    Authoriziation: Determines which repositories can a use access; handled by gitolite. 
+    Authoriziation: Determines which repositories a user can access; handled by gitolite. 
 
 <a name="http"></a>
 ## Public read-only access via http/s
