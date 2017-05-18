@@ -126,7 +126,7 @@ Using IRanges as an example, we want the concatenated
 
     /home/git/repositories/packages/IRanges.git/info/refs
 
-Create a shell script named gitolite-suexec-wrapper.sh in side the
+Create a shell script named gitolite-suexec-wrapper.sh inside the
 CGI-enabled directory. Point *GIT_PROJECT_ROOT* to the directory above
 'packages/':
 
@@ -141,7 +141,7 @@ CGI-enabled directory. Point *GIT_PROJECT_ROOT* to the directory above
  
 Set permissions to 500 on the CGI-enabled /home/git/bin/ directory and 755 on
 the /home/git/bin/gitolite-suexec-wrapper.sh wrapper. Both should be owned by
-git:git. 
+git. 
 
 In the Apache config file, alias the root of git.bioconductor.org (i.e., '/')
 to the CGI-enabled directory which now contains the suEXEC wrapper script.
@@ -153,18 +153,14 @@ CGI scripts:
  
     SuexecUserGroup git git
 
-When suEXEC was enabled a /etc/apache2/suexec/www-dta files was created. 
-Modify www-data to point the suEXEC root to the CGI-enabled directory:
+When suEXEC was enabled, a /etc/apache2/suexec/www-dta file was created. 
+Modify the www-data file to point suEXEC root to the CGI-enabled directory:
  
     /home/git/bin/
 
-Restart Apache:
- 
-    sudo service apache2 restart
-
 #### Anonymous ('nobody') user
 
-Apache passes an anonomous user to gitolite who assigns the user name 'nobody'
+Apache passes an anonyomous user to gitolite who assigns the user name 'nobody'
 in the gitolite.rc file. Confirm this line is uncommented:
  
     # rc variables used by various features
@@ -186,6 +182,10 @@ Add this line to the Apache config:
  
     SetEnv GIT_HTTP_EXPORT_ALL
  
+Restart Apache:
+ 
+    sudo service apache2 restart
+
 <a name="dumbhttp"></a>
 ### Dumb http
 
