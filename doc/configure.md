@@ -66,30 +66,22 @@ https://github.com/Bioconductor/AWS_management/blob/master/docs/Configure_Apache
 
 #### Enable support for Common Gateway Interface (CGI)
 
-Enable the module and restart Apache:
+Enable the CGI module:
 
-    ```
     sudo a2enmod cgi
-    sudo service apache2 restart
-    ```
 
-    ```
+Modify the Apache config to enable CGI in the /home/git/bin directory:
+
     <Directory "/home/git/bin">
         Options +ExecCGI
         SetHandler cgi-script
         AllowOverride None
         Require       all granted
     </Directory>
-    ```
-The alias in ScriptAlias must be a directory above /packages/
-so the "packages/" prefix is included in the PATH_INFO variable.
-PATH_INFO is passed from Apache to gitolite and is used to locate
-the rules in the gitolite config files and by the git-http-backend
-script to locate the physical git directory on the machine.
-PATH_INFO will only include directories below the level of the
-alias in ScriptAlias; we need PATH_INFO to include the "packages/"
-prefix because that is how the directories are specified in 
-packages.conf.
+
+Restart Apache:
+
+    sudo service apache2 restart
 
 #### Enable support for suEXEC 
 
@@ -108,19 +100,35 @@ References:
 Install a modified suEXEC module that allows us to configure the directories
 in which it operates.
  
-    ```
     sudo apt-get install apache2-suexec-custom
     sudo a2enmod suexec
-    ``` 
- 
-The ScriptAlias and ALIAS directives are used to map between URLs and
-filesystem paths. This allows for content which is not directly under the
-DocumentRoot to be served as part of the web document tree.  The ScriptAlias
-directive has the additional effect of marking the target directory as
-containing only CGI scripts.
+
+The ScriptAlias directive in the Apache config has (at least) two important
+roles.  The first is to map between URLs and filesystem paths. This allows for
+content which is not directly under the DocumentRoot to be served as part of
+the web document tree. When a user enters the alias location in a browser the
+script at the corresponding location will be executed.
+
+The second role is in the git-http-backend script when *GIT_PROJECT_ROOT* 
+and *PATH_INFO* variables are concatenated to specify the physical location
+of the git repositories on the machine.
+
+*PATH_INFO* is also used by gitolite to look up rules in the gitolite config
+files. In packages.conf we specify repositories with a preceding 'packages/'
+directory. This means *PATH_INFO* must include the 'packages/' prefix.
+For this to happen we must set the alias in ScriptAlias to a location
+above packages/; *PATH_INFO* can only 'see' directories below the alias in
+ScriptAlias. Because *PATH_INFO* needs to have the 'packages/' prefix,
+*GIT_PROJECT_ROOT* cannot.
+
+Using IRanges as an example, we want the concatenated 
+*GIT_PROJECT_ROOT/PATH_INFO* to look like this:
+
+    /home/git/repositories/packages/IRanges.git/info/refs
 
 Create a shell script named gitolite-suexec-wrapper.sh in side the
-CGI-enabled directory. 
+CGI-enabled directory. Point *GIT_PROJECT_ROOT* to the directory above
+'packages/':
 
     #!/bin/bash
     #
@@ -130,60 +138,42 @@ CGI-enabled directory.
     export GIT_PROJECT_ROOT="/home/git/repositories"
     export GITOLITE_HTTP_HOME="/home/git"
     exec ${GITOLITE_HTTP_HOME}/gitolite/src/gitolite-shell
-
-The git-http-backend script concatenates *GIT_PROJECT_ROOT* and *PATH_INFO*
-when trying to locate the git repositories on the machine. We constructed
-ScriptAlias such that *PATH_INFO* would include the "packages/" prefix. This
-means *GIT_PROJECT_ROOT* cannot include "packages/". Using IRanges as an
-example, the concatenated *GIT_PROJECT_ROOT/PATH_INFO* should look like this:
-
-    /home/git/repositories/packages/IRanges.git/info/refs
  
-Set permissions to 500 on the CGI-enabled /home/git/bin/ directory
-and 755 on the suEXEC wrapper for the gitolite shell,
-/home/git/bin/gitolite-suexec-wrapper.sh. Both should be owned by git:git. 
+Set permissions to 500 on the CGI-enabled /home/git/bin/ directory and 755 on
+the /home/git/bin/gitolite-suexec-wrapper.sh wrapper. Both should be owned by
+git:git. 
 
-In the Apache config file, alias the root of git.bioconductor.org ('/') to 
-the CGI-enabled directory with the suEXEC wrapper script.
+In the Apache config file, alias the root of git.bioconductor.org (i.e., '/')
+to the CGI-enabled directory which now contains the suEXEC wrapper script.
 
-    ```
     ScriptAlias / /home/git/bin/gitolite-suexec-wrapper.sh/
-    ```
+
 Add a line to the Apache config specifying which user should run the 
 CGI scripts:
  
-    ```
     SuexecUserGroup git git
-    ```
 
-Modify /etc/apache2/suexec/www-data to point the suEXEC root to the CGI-enabled
-directory:
+When suEXEC was enabled a /etc/apache2/suexec/www-dta files was created. 
+Modify www-data to point the suEXEC root to the CGI-enabled directory:
  
-    ```
     /home/git/bin/
-    ```
 
 Restart Apache:
  
-    ```
     sudo service apache2 restart
-    ```
 
 #### Anonymous ('nobody') user
 
 Apache passes an anonomous user to gitolite who assigns the user name 'nobody'
 in the gitolite.rc file. Confirm this line is uncommented:
  
-    ```
     # rc variables used by various features
     HTTP_ANON_USER      =>  'nobody',
-    ```
+
 Give user 'nobody' read access to repositories in gitolite.conf or
 packages.conf by specifying
  
-    ```
     R = nobody
-    ```
  
 #### git-http-backend
 
@@ -194,9 +184,7 @@ the repos being accessed have magic file "git-daemon-export-ok" unless
 
 Add this line to the Apache config:
  
-    ```
     SetEnv GIT_HTTP_EXPORT_ALL
-    ```
  
 <a name="dumbhttp"></a>
 ### Dumb http
