@@ -9,7 +9,7 @@ This image will be used to describe how this process works.
 
 ## Image Description
 
-There are three boxes in this image, each represent one `git` database. The database in all three of these locations is for a single Bioconductor package (example: <BiocGenerics>).
+There are three boxes in this image, each represent one `git` database. The database in all three of these locations is for a single Bioconductor package (example: BiocGenerics).
 
 The three locations of these git databases are.
 
@@ -23,7 +23,7 @@ The arrows in the image represent direction of the `fetch` and `push` process wh
 
 ## Some git lingo
 
-A `remote` refers to a location for the database, and the user/developer interacts with the `remote` from his local mahcine. So in our case since we have two remote locations, the user would have two remotes set up.
+A `remote` refers to a location for the database, and the user/developer interacts with the `remote` from his local mahcine. So in our case since we have two remote locations, the user would have two remotes set up. We call it by convention, but they can be called anything eg. "foo", "bar".
 
 1. `origin`: This is the GitHub remote location, and we call it `origin`.
 
@@ -57,9 +57,9 @@ upstream    git@git.bioconductor.org:packages/BiocGenerics.git (fetch)
 upstream    git@git.bioconductor.org:packages/BiocGenerics.git (push)
 ```
 
-The reason, you have `fetch` and `push` for each remote is because you want to be able to `sync` your local machine's repository to both locations. By `sync`, it means getting commits from the remote locations using the `fetch` process, and then `push` commits from your local machine to the remote locations.
+The reason, you have `fetch` and `push` for each remote is because you want to be able to sync your local machine's repository to both locations. By sync, it means getting commits from the remote locations using the `fetch` process, and then `push` commits from your local machine to the remote locations.
 
-You can only `fetch` and `push` through your local machine to either GitHub or Bioconductor. You cannot directly `fetch` or `push` from Github to Bioconductor directly. You local machine acts as the intermediate git repository to sync your package between GitHub and Bioconductor.
+You can only `fetch` and `push` through your local machine to either GitHub or Bioconductor. You cannot `fetch` or `push` from Github to Bioconductor directly. You local machine acts as the intermediate git repository to sync your package between GitHub and Bioconductor.
 
 ## Developers/Maintainers vs Users
 
