@@ -74,13 +74,13 @@
     git checkout -b <RELEASE_X_Y>
     ```
 
-    Pull any changes from the _Bioconductor_ repository to this branch
+1. Pull any changes from the _Bioconductor_ repository to this branch
 
     ```
     git pull
     ```
 
-    Then, merge `master` into the `<RELEASE_X_Y>` branch
+1.  Then, merge `master` into the `<RELEASE_X_Y>` branch
 
     ```
     git merge master
@@ -90,10 +90,10 @@
 
     ```
     git add DESCRIPTION
-    git commit -m "update version bump"
+    git commit -m "Update version bump"
     ```
 
-    Push changes to the `<RELEASE_X_Y>` branch using:
+1. Push changes to the `<RELEASE_X_Y>` branch using:
 
     ```
     git push origin <RELEASE_X_Y>
