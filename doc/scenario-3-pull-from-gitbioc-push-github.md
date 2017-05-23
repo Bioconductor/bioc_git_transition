@@ -36,7 +36,7 @@ These steps update the `master` branch.
 
 To pull updates to the current `RELEASE_X_Y` branch, replace `master` with `RELEASE_X_Y` in the lines above.
 
-See [Scenario 9][] to sync your local repository with changes to both the _Bioconductor_ and Github repositories.
+See [Scenario 9][] to sync your local repository with changes to both the _Bioconductor_ and GitHub repositories.
 
 [Scenario 5]: scenario-5-resolve-conflicts.md
 [Scenario 9]: scenario-9-sync-existing-github-gitbioc.md

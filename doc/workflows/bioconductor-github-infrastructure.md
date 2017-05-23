@@ -59,7 +59,7 @@ upstream    git@git.bioconductor.org:packages/BiocGenerics.git (push)
 
 The reason, you have `fetch` and `push` for each remote is because you want to be able to `sync` your local machine's repository to both locations. By `sync`, it means getting commits from the remote locations using the `fetch` process, and then `push` commits from your local machine to the remote locations.
 
-You can only `fetch` and `push` through your local machine to either GitHub or Bioconductor. You cannot directly `fetch` or `push` from Github to Bioconductor directly. You local machine acts as the intermediate git repository to sync your package between GitHub and Bioconductor.
+You can only `fetch` and `push` through your local machine to either GitHub or Bioconductor. You cannot directly `fetch` or `push` from GitHub to Bioconductor directly. You local machine acts as the intermediate git repository to sync your package between GitHub and Bioconductor.
 
 ## Developers/Maintainers vs Users
 

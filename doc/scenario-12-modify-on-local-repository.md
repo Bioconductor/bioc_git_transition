@@ -1,6 +1,6 @@
 # Scenario 12: Clone and modify a _Bioconductor_ repository for personal use
 
-**Goal:** A user would like to modify functions in a package to meet their needs. There is no Github repository for the package.
+**Goal:** A user would like to modify functions in a package to meet their needs. There is no GitHub repository for the package.
 
 ## Steps:
 

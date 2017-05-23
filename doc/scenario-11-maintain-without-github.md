@@ -1,6 +1,6 @@
-# Scenario 11: Maintaining your package on _Bioconductor_ without a Github repo
+# Scenario 11: Maintaining your package on _Bioconductor_ without a GitHub repo
 
-**Goal:** Developer wishes to maintain their _Bioconductor_ repository without using Github.
+**Goal:** Developer wishes to maintain their _Bioconductor_ repository without using GitHub.
 
 ## Steps:
 

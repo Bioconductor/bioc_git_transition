@@ -20,10 +20,10 @@
     git remote add upstream git@git.bioconductor.org:packages/<YOUR-REPOSITORY-NAME>.git`
     ```
 
-1. See other scenarios for working with _Bioconductor_ and Github repositories, in particular:
+1. See other scenarios for working with _Bioconductor_ and GitHub repositories, in particular:
 
     - [Scenario 3][]: Fetch updates from the _Bioconductor_ core team.
-    - [Scenario 2][]: Push local commits to _Bioconductor_ and Github.
+    - [Scenario 2][]: Push local commits to _Bioconductor_ and GitHub.
     - [Scenario 10][]: Fix bugs in devel and release branches.
 
 [Scenario 2]: scenario-2-push-to-gitub-gitbioc.md

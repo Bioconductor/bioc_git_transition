@@ -1,10 +1,10 @@
-# Scenario 9: Sync existing _Bioconductor_ and Github repositories
+# Scenario 9: Sync existing _Bioconductor_ and GitHub repositories
 
-**Goal:** Ensure that your local, _Bioconductor_, and Github repositories are all in sync.
+**Goal:** Ensure that your local, _Bioconductor_, and GitHub repositories are all in sync.
 
 ## Steps:
 
-1. Fetch updates from all (_Bioconductor_ and Github) remotes.
+1. Fetch updates from all (_Bioconductor_ and GitHub) remotes.
 
     ```
     git fetch --all
@@ -24,7 +24,7 @@
 
     If you have conflicts after the `merge` step, see [Scenario 5][].
 
-1. Merge updates from the Github (`origin`) remote
+1. Merge updates from the GitHub (`origin`) remote
 
     ```
     git merge origin/master

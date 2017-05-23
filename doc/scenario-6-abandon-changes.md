@@ -2,7 +2,7 @@
 
 **Goal:** You want to start fresh after failing to resolve conflicts or some other issue. If you intend to go nuclear, please contact the bioc-devel@bioconductor.org mailing list.
 
-# Going sub-nuclear: force _Bioconductor_ `master` to github `master`
+# Going sub-nuclear: force _Bioconductor_ `master` to GitHub `master`
 
 One way you can ignore your work and make a new branch is by replacing your local and GitHub repository `master` branch with the _Bioconductor_ `master` branch.
 
@@ -37,11 +37,11 @@ NOTE: This works only if you haven't pushed the change causing the issue to the 
     git cherry-pick <commit id>
     ```
 
-    Push these cherry-picked changes to Github and _Bioconductor_ repositories.
+    Push these cherry-picked changes to GitHub and _Bioconductor_ repositories.
 
 # Reset to a previous commit
 
-If you find yourself in a place where you want to abandon changes **already committed** to _Bioconductor_ or Github, use `reset` to undo the commits on your local repository and `push -f` to force the changes to the remotes. Remember that the `HEAD` commit id is the most recent **parent** commit of the current state of your local repository.
+If you find yourself in a place where you want to abandon changes **already committed** to _Bioconductor_ or GitHub, use `reset` to undo the commits on your local repository and `push -f` to force the changes to the remotes. Remember that the `HEAD` commit id is the most recent **parent** commit of the current state of your local repository.
 
     ```
     git reset --hard <commit id>
@@ -79,7 +79,7 @@ If you find yourself in a place where you want to abandon changes **already comm
 
 2. You will lose your custom collaborator settings in GitHub.
 
-3. You will lose any Github-specific changes.
+3. You will lose any GitHub-specific changes.
 
 [Scenario-1]: scenario-1-svn-to-github.md
 [Scenario-3]: scenario-3-pull-from-gitbioc-push-github.md
