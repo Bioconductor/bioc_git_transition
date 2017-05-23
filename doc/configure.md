@@ -139,7 +139,7 @@ CGI-enabled directory. Point *GIT_PROJECT_ROOT* to the directory above
     export GITOLITE_HTTP_HOME="/home/git"
     exec ${GITOLITE_HTTP_HOME}/gitolite/src/gitolite-shell
  
-Set permissions to 500 on the CGI-enabled /home/git/bin/ directory and 755 on
+Set permissions to 755 on the CGI-enabled /home/git/bin/ directory and 755 on
 the /home/git/bin/gitolite-suexec-wrapper.sh wrapper. Both should be owned by
 git. 
 
