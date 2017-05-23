@@ -153,7 +153,7 @@ CGI scripts:
  
     SuexecUserGroup git git
 
-When suEXEC was enabled, a /etc/apache2/suexec/www-dta file was created. 
+When suEXEC was enabled, a /etc/apache2/suexec/www-data file was created. 
 Modify the www-data file to point suEXEC root to the CGI-enabled directory:
  
     /home/git/bin/
