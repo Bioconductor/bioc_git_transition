@@ -1,6 +1,6 @@
 # Scenario 12: Clone and modify a _Bioconductor_ repository for personal use
 
-**Goal:** A user would like to modify functions in a package to meet their needs. There is no Github repository for the package.
+**Goal:** A user would like to modify functions in a package to meet their needs. There is no GitHub repository for the package.
 
 ## Steps:
 
@@ -15,7 +15,7 @@
      ```
      git checkout -b feature-my-feature
      ## modify
-     git commit -a -m "feature: a new feature
+     git commit -a -m "feature: a new feature"
      ```
 
    and then merge the feature onto the branch corresponding to the release in use, e.g.,
@@ -25,11 +25,11 @@
     git merge feature-my-feature
     ```
 
-1. Rebuild (to create the vignette and help pages) and reinstall the package in your local machine,
+1. Rebuild (to create the vignette and help pages) and reinstall the package in your local machine by running in the parent directory of _ExamplePackage_
 
     ```
     R CMD build ExamplePackage
-    R CMD INSTALL ExamplePackage_<version.number.tar.gz>
+    R CMD INSTALL ExamplePackage_<version.number>.tar.gz
     ```
 
 1. The package with the changes should be available in your local _R_ installation.
