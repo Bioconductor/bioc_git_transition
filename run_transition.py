@@ -14,7 +14,7 @@ Usage:
 
 from src.local_svn_dump import LocalSvnDump
 from src.git_bioconductor_repository import GitBioconductorRepository
-from src.lfs import Lfs
+from src.git_experiment_repository import Lfs
 import os
 import logging as log
 import ConfigParser
@@ -34,7 +34,7 @@ def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
 
     if lfs_object is not None:
         log.info("Running LFS transtion")
-        lfs_object.run_lfs_transition(temp_git_repo)
+        lfs_object.run_data_transition(temp_git_repo)
     # Step 6: Make Git repo bare
     log.info("Make git repo: Creating bare repositories")
     gitrepo.create_bare_repos()
@@ -161,4 +161,4 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
 
 if __name__ == '__main__':
     run_transition("./settings.ini", new_svn_dump=True)
-    run_experiment_data_transition("./settings.ini", new_svn_dump=False)
+    run_experiment_data_transition("./settings.ini", new_svn_dump=True)
