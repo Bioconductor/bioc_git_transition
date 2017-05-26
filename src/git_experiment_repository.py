@@ -91,7 +91,7 @@ class Lfs:
         """Commit data as regular git objects."""
         try:
             package_dir = os.path.join(self.temp_git_repo, package)
-            msg = "Commiting experiment data for %s" % package
+            msg = "Committing experiment data for %s" % package
             git_commit(msg, cwd=package_dir)
         except Exception as e:
             log.error("Error in commiting data in package %s" % package)
