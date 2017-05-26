@@ -27,7 +27,7 @@ class LocalSvnDump(object):
     """Local SVN dump."""
     __metaclass__ = Singleton
 
-    def __init__(self, svn_root, bioc_git_repo, users_db, remote_svn_server,
+    def __init__(self, svn_root, temp_git_repo, users_db, remote_svn_server,
                  package_path):
         """Initialize Loval SVN dump.
 
@@ -35,14 +35,14 @@ class LocalSvnDump(object):
         svn_root = 'file:///home/git/hedgehog.fhcrc.org/
         # Initialize dump
         dump = svn_dump(svn_root=svn_root,
-                        bioc_git_repo="git_repo",
+                        temp_git_repo="git_repo",
                         users_db="/home/nturaga/user_db.txt")
         """
         self.svn_root = svn_root
         self.svn_root_dir = svn_root.replace("file://", "")
         self.users_db = users_db
         self.remote_svn_server = remote_svn_server
-        self.bioc_git_repo = bioc_git_repo
+        self.temp_git_repo = temp_git_repo
         self.package_path = package_path
 
     def get_pack_list(self, branch="trunk"):
@@ -88,7 +88,7 @@ class LocalSvnDump(object):
             try:
                 cmd = ['git', 'svn', 'clone',
                        '--authors-file=' + self.users_db, package_dump]
-                subprocess.check_call(cmd, cwd=self.bioc_git_repo)
+                subprocess.check_call(cmd, cwd=self.temp_git_repo)
                 log.debug("Finished git-svn clone for package: %s" % pack)
             except subprocess.CalledProcessError as e:
                 log.error("Error : %s in package %s" % (e, pack))
