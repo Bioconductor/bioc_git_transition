@@ -1,4 +1,4 @@
 transition.log
 *.pyc
-update.svn
+update*.svn
 extdata
