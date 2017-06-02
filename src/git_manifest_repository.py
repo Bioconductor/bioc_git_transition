@@ -52,14 +52,15 @@ class GitManifestRepository(object):
                        if "RELEASE" in item]
         return branch_list
 
-    def manifest_clone(self):
-        package_dir = self.svn_root + '/' + 'trunk' + self.package_path
-        print("package_dir: %s" % package_dir)
+    def manifest_clone(self, new=True):
+        if new==False:
+            return
+        svndump_dir = self.svn_root + '/' + 'trunk' + self.package_path
         try:
             cmd = ['git', 'svn', 'clone',
-                   '--include-paths=bioc_.*.manifest', package_dir]
-            # subprocess.check_call(cmd, cwd=self.temp_git_repo)
-            print("manifest clone: %s" % cmd)
+                   '--include-paths=bioc_.*.manifest', svndump_dir]
+            subprocess.check_call(cmd, cwd=self.temp_git_repo)
+            log.info("manifest clone pass %s" % cmd)
         except subprocess.CalledProcessError as e:
             log.error("Error : %s in package %s" % e)
         except Exception as e:
@@ -67,45 +68,44 @@ class GitManifestRepository(object):
         return
 
     def add_config(self, release):
-        package_dir = self.svn_root + '/' + 'trunk' + self.package_path
-        print("package_dir: %s" % package_dir)
-
+        #svndump_dir = self.svn_root + '/' + 'trunk' + self.package_path
+        package_dir = self.temp_git_repo + "/" + "Rpacks" 
+        # TODO:Error in RELEASE_1_0_branch
         manifest_file = ('bioc_' +
                          release.replace("RELEASE_", "").replace("_", ".") +
                          '.manifest')
         try:
-            # config add include path
+            #config add include path
             include_paths = ['git', 'config', '--add',
                              'svn-remote.' + release + '.include-paths',
                              manifest_file]
-            # subprocess.check_call(include_paths, cwd=package_dir)
-            print("include paths: %s" % include_paths)
+            subprocess.check_call(include_paths, cwd=package_dir)
+            log.debug("include paths: %s" % include_paths)
             remote_url = ['git', 'config', '--add',
                           'svn-remote.' + release + '.url',
-                          self.svn_root + '/' + 'branches' + release +
+                          self.svn_root + '/' + 'branches' + '/' + release +
                           self.package_path]
-            # subprocess.check_call(remote_url, cwd=package_dir)
-            print("remote_url: %s" % remote_url)
+            subprocess.check_call(remote_url, cwd=package_dir)
+            log.debug("remote_url: %s" % remote_url)
             remote_fetch = ['git', 'config', '--add',
-                            ' svn-remote.' + release + '.fetch',
+                            'svn-remote.' + release + '.fetch',
                             ':refs/remotes/git-svn-' + release]
-            # subprocess.check_call(remote_fetch, cwd=package_dir)
-            print("remote_fetch: %s" % remote_fetch)
+            subprocess.check_call(remote_fetch, cwd=package_dir)
+            log.debug("remote_fetch: %s" % remote_fetch)
         except Exception as e:
-            print(e)
+            log.error(e)
         return
 
     def add_orphan_branch_points(self):
-        package_dir = self.svn_root + '/' + 'trunk' + self.package_path
-        print("package_dir: %s" % package_dir)
-
+        #svndump_dir = self.svn_root + '/' + 'trunk' + self.package_path
+        package_dir = self.temp_git_repo + '/' + 'Rpacks'
         branches = self.get_branch_list()
         for release in branches:
             self.add_config(release)
         # Try git_svn_fetch('--all', cwd=package_dir)
-        fetch = ['git', 'svn', 'fetch', '-all']
-        # subprocess.check_call(fetch, cwd=package_dir)
-        print("add_orphan_branch_points: %s " % fetch)
+        fetch = ['git', 'svn', 'fetch', '--all']
+        subprocess.check_call(fetch, cwd=package_dir)
+        log.debug("add_orphan_branch_points: %s " % fetch)
         return
 
     def _svn_revision_branch_id(self, svn_url):
@@ -125,19 +125,17 @@ class GitManifestRepository(object):
             revision = self._svn_revision_branch_id(svn_branch_url)
             rel_rev_dict[release] = revision
             log.debug("release: %s, revision %s" % (release, revision))
-        # print
-        for k, v in rel_rev_dict:
-            print("Release: %s, revision: %s" % (release, revision))
         return rel_rev_dict
 
     def find_branch_points(self, from_revision, release):
         """Find branch points in the git revision history."""
-        package_dir = (self.svn_root + '/' + 'branches' + release +
-                       self.package_path)
+        #svndump_dir = (self.svn_root + '/' + 'branches' + release +
+        #               self.package_path)
+        package_dir = self.temp_git_repo + '/' + 'Rpacks'
         # Get branch root from git-svn-RELEASE_x_y
         cmd = ['git', 'log', '--format=%H', 'git-svn-' + release]
         branch_root = subprocess.check_output(cmd, cwd=package_dir).split()[-1]
-
+        log.debug("find branch points:  %s" % cmd)
         # Be careful, as there is an empty string at end of list
         commits = subprocess.check_output(['git', 'svn', 'log',
                                            '--oneline', '--show-commit',
@@ -165,23 +163,30 @@ class GitManifestRepository(object):
         The graft file contains the parent commit_id and the orphan-branch
         commit_id. It connects the two by adding the commit history.
         """
-        package_dir = (self.svn_root + '/' + 'branches' + release +
-                       self.package_path)
+        #svndump_dir = (self.svn_root + '/' + 'branches' + release +
+        #               self.package_path)
+        package_dir = self.temp_git_repo + "/" + "Rpacks" 
+    
         log.info("Graft package directory: %s" % package_dir)
         branch_point = self.find_branch_points(release_revision_dict, release)
         if branch_point:
             offspring_sha1, parent_sha1 = branch_point
+            log.debug("offspring_sha1: %s , parent_sha1: %s" % (offspring_sha1,parent_sha1))
             with open(os.path.join(package_dir, ".git/info/grafts"), 'a') as f:
                 f.write(offspring_sha1 + " " + parent_sha1 + "\n")
             graft_range = parent_sha1 + ".." + 'git-svn-' + release
+            log.debug("Graft range: %s" % graft_range)
             git_filter_branch(graft_range, cwd=package_dir)
         return
 
     def prune_branch(self, release):
-        package_dir = (self.svn_root + '/' + 'branches' + release +
-                       self.package_path)
-        prune = ['git', 'filter-branch', '--prune-empty', 'git-svn-' + release]
+        package_dir = self.temp_git_repo + "/" + "Rpacks" 
+#          git filter-branch --prune-empty git-svn-RELEASE_3_4
+        prune = ['git', 'filter-branch', '-f', '--prune-empty', 'git-svn-' + release]
+        log.debug("Starting Pruning in branch: %s" % release)
+        log.debug("prune command: %s" % prune)
         subprocess.check_call(prune, cwd=package_dir)
+        log.debug("Pruning ended: %s" % release)
         return
 
     def add_commit_history(self):
@@ -191,6 +196,7 @@ class GitManifestRepository(object):
         .git/info/grafts file. By calling git filter-branch the grafts
         are placed in the specific branch.
         """
+        package_dir = self.temp_git_repo + '/' + 'Rpacks'
         # Get list of branches
         branch_list = self.get_branch_list()
         release_revision_dict = self.release_revision_dict(branch_list)
@@ -212,5 +218,11 @@ class GitManifestRepository(object):
             # Prune branch
             self.prune_branch(release)
             # after prune checkout branch
-            git_checkout(release, new=True)
+            log.debug("Add commit history: git_checkout release")
+            subprocess.check_call(['git', 'checkout', '-b', release, 'git-svn-' + release], cwd=package_dir)
+            log.debug("Add commit history:  git_checkout master")
+            git_checkout('master', cwd=package_dir,  new=False)
+        # rename repository to manifest
+        manifest_repo_name = self.temp_git_repo + '/' + 'manifest'
+        os.rename(package_dir, manifest_repo_name)
         return

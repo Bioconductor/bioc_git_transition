@@ -15,6 +15,7 @@ Usage:
 from src.local_svn_dump import LocalSvnDump
 from src.git_bioconductor_repository import GitBioconductorRepository
 from src.git_experiment_repository import Lfs
+from src.git_manifest_repository import GitManifestRepository
 import os
 import logging as log
 import ConfigParser
@@ -159,6 +160,40 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     return
 
 
+def run_manifest_transition(configfile, new_svn_dump=False):
+    """Run manifest file transition."""
+    # Settings
+    Config = ConfigParser.ConfigParser()
+    Config.read(configfile)
+    temp_git_repo = Config.get('Software', 'temp_git_repo')
+    remote_url = Config.get('Software', 'remote_url')
+    bare_git_repo = Config.get('Software', 'bare_git_repo')
+    svn_root = Config.get('SVN', 'svn_root')
+    remote_svn_server = Config.get('SVN', 'remote_svn_server')
+    package_path = Config.get('Software', 'package_path')
+    trunk = Config.get('SVN', 'trunk')
+
+    manifest_log = Config.get("Software", "manifest_log")
+    log.basicConfig(filename=manifest_log,
+                    level=log.DEBUG,
+                    format='%(asctime)s %(message)s')
+    log.debug("Bioconductor manifest files transition log file: \n")
+
+    # Create new manifest repo
+
+    manifest_repo = GitManifestRepository(svn_root, temp_git_repo, bare_git_repo,
+                                          remote_url, package_path)
+    # 1. Create manifest clone 
+    manifest_repo.manifest_clone(new_svn_dump)
+    # 2. Add orphan branch points
+    manifest_repo.add_orphan_branch_points()
+    # 3. Add commit history
+    manifest_repo.add_commit_history() 
+    
+    return
+
+
 if __name__ == '__main__':
-    run_transition("./settings.ini", new_svn_dump=True)
-    run_experiment_data_transition("./settings.ini", new_svn_dump=True)
+    run_manifest_transition("./settings.ini", new_svn_dump=True)
+#    run_transition("./settings.ini", new_svn_dump=True)
+#    run_experiment_data_transition("./settings.ini", new_svn_dump=True)
