@@ -200,7 +200,11 @@ class GitManifestRepository(object):
         # Get list of branches
         branch_list = self.get_branch_list()
         release_revision_dict = self.release_revision_dict(branch_list)
-        for release in branch_list:
+        l = ['RELEASE_1_0', 'RELEASE_1_0_branch',
+             'RELEASE_1_4', 'RELEASE_1_4_branch',
+             'RELEASE_1_5']
+        branch_list_diff = list(set(branch_list) - set(l))
+        for release in branch_list_diff:
             try:
                 log.info("Adding graft for release: %s" % release)
                 # TODO: Bug here
