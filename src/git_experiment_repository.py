@@ -13,7 +13,7 @@ import os
 import subprocess
 from git_api.git_api import git_add
 from git_api.git_api import git_commit
-import logging as log
+import logging
 from local_svn_dump import Singleton
 
 
@@ -53,7 +53,7 @@ class Lfs:
             # Get references from external_data_source.txt
             refs = self.parse_external_refs(package_dir)
         except IOError, err:
-            log.error("Error: No data : missing file %s, in package %s "
+            logging.error("Error: No data : missing file %s, in package %s "
                       % (err.filename, package))
             return
         for ref in refs:
@@ -67,8 +67,8 @@ class Lfs:
                 print "CMD to add data: ", cmd
                 subprocess.check_call(cmd)
             except Exception as e:
-                log.error("Error adding ref: %s, package: %s" % (ref, package))
-                log.error(e)
+                logging.error("Error adding ref: %s, package: %s" % (ref, package))
+                logging.error(e)
         after_files = self.list_files(package_dir)
         # Add list of files newly added to object.
         self.lfs_files = list(set(after_files) - set(before_files))
@@ -83,8 +83,8 @@ class Lfs:
                 # add files to git
                 git_add(item, cwd=package_dir)
         except Exception as e:
-            log.error("Error in adding data, package %s" % package)
-            log.error(e)
+            logging.error("Error in adding data, package %s" % package)
+            logging.error(e)
         return
 
     def commit_data_as_git_objects(self, package):
@@ -94,8 +94,8 @@ class Lfs:
             msg = "Committing experiment data for %s" % package
             git_commit(msg, cwd=package_dir)
         except Exception as e:
-            log.error("Error in commiting data in package %s" % package)
-            log.error(e)
+            logging.error("Error in commiting data in package %s" % package)
+            logging.error(e)
         return
 
     def run_data_transition(self, temp_git_repo):
@@ -103,14 +103,14 @@ class Lfs:
         for package in os.listdir(os.path.abspath(temp_git_repo)):
             try:
                 if "bioc-data-experiment" not in package:
-                    log.info("Experiment data: Add data to package %s" % package)
+                    logging.info("Experiment data: Add data to package %s" % package)
                     self.add_data(package)
-                    log.info("Experiment data: Add data to package %s" % package)
+                    logging.info("Experiment data: Add data to package %s" % package)
                     self.add_data_as_git_objects(package)
-                    log.info("Experiment data: Commit data to package %s" % package)
+                    logging.info("Experiment data: Commit data to package %s" % package)
                     self.commit_data_as_git_objects(package)
             except Exception as e:
-                log.error("Experiment data: Error in package %s: " % package)
-                log.error(e)
+                logging.error("Experiment data: Error in package %s: " % package)
+                logging.error(e)
                 pass
         return

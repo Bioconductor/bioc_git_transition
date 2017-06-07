@@ -7,12 +7,12 @@ Usage:
 """
 
 from src.local_svn_dump import LocalSvnDump
-import logging as log
+import logging
 import ConfigParser
-log.basicConfig(filename='svn_dump_update.log',
+logging.basicConfig(filename='svn_dump_update.log',
                 format='%(asctime)s %(message)s',
-                level=log.DEBUG)
-log.debug("Bioconductor SVN Dump Log File: \n")
+                level=logging.DEBUG)
+logging.debug("Bioconductor SVN Dump Log File: \n")
 
 
 def svn_root_update(configfile):
@@ -29,7 +29,7 @@ def svn_root_update(configfile):
 
     for s in Config.sections():
         for k, v in Config.items(s):
-            log.info("%s: %s" % (k, v))
+            logging.info("%s: %s" % (k, v))
 
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db, remote_svn_server, package_path)
     dump.svn_get_revision()
@@ -52,7 +52,7 @@ def svn_experiment_root_update(configfile):
 
     for s in Config.sections():
         for k, v in Config.items(s):
-            log.info("%s: %s" % (k, v))
+            logging.info("%s: %s" % (k, v))
 
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db, remote_svn_server, package_path)
     dump.svn_get_revision()

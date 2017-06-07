@@ -13,7 +13,7 @@ import subprocess
 from src.git_api.git_api import git_commit
 from src.git_api.git_api import git_checkout
 from local_svn_dump import Singleton
-import logging as log
+import logging
 
 
 class ReleaseProcess(object):
@@ -55,7 +55,7 @@ class ReleaseProcess(object):
         doc_list[index] = "Version: " + version
         with open(description_file, "w") as f:
             f.write("\n".join(doc_list))
-        log.info("Package: %s updated version to: %s" % (package, version))
+        logging.info("Package: %s updated version to: %s" % (package, version))
         return
 
     def release_branch(self, package, new_release):
@@ -82,7 +82,7 @@ class ReleaseProcess(object):
         msg2 = ("bump x.y.z versions to odd 'y' after creation of " +
                 new_release)
         git_commit(msg2, cwd=package_dir)
-        log.info("New branch created for package %s" % package)
+        logging.info("New branch created for package %s" % package)
         return
 
     def create_new_release_branch(self, new_release):

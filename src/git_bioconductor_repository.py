@@ -13,6 +13,7 @@ import os
 import re
 import sys
 import subprocess
+import logging
 from src.git_api.git_api import git_clone
 from src.git_api.git_api import git_remote_add
 from src.git_api.git_api import git_svn_fetch
@@ -23,8 +24,6 @@ from src.git_api.git_api import git_checkout
 from src.git_api.git_api import git_remote_remove
 from src.git_api.git_api import git_branch_exists
 from local_svn_dump import Singleton
-# Logging configuration
-import logging as log
 
 
 class GitBioconductorRepository(object):
@@ -73,7 +72,7 @@ class GitBioconductorRepository(object):
 
         Usage: cd /home/git/packages and run function.
         """
-        log.info("Adding remote url to bare git repo.")
+        logging.info("Adding remote url to bare git repo.")
         for package in os.listdir(self.bare_git_repo):
             if ".git" in package:
                 remote = self.remote_url + package
@@ -82,7 +81,7 @@ class GitBioconductorRepository(object):
                                   package))
                 git_remote_add('origin', remote, os.path.join(
                                self.bare_git_repo, package))
-                log.info("Add remote to package: %s" % os.path.join(
+                logging.info("Add remote to package: %s" % os.path.join(
                          self.bare_git_repo, package))
         return
 
@@ -137,24 +136,24 @@ class GitBioconductorRepository(object):
 
                 git_package_dir = os.path.join(self.temp_git_repo, package)
                 package_url = os.path.join(package_list_url, package)
-                log.info("git_package_dir:\n %s, package_url:\n %s" %
+                logging.info("git_package_dir:\n %s, package_url:\n %s" %
                          (git_package_dir, package_url))
                 if package in os.listdir(self.temp_git_repo):
                     try:
-                        log.info("Adding release branches to package: %s"
+                        logging.info("Adding release branches to package: %s"
                                  % package)
                         if not git_branch_exists(branch, git_package_dir):
                             self.add_orphan_branch_points(branch, package)
-                            log.info("Add orphan branch: %s" % git_package_dir)
+                            logging.info("Add orphan branch: %s" % git_package_dir)
                     except OSError as e:
-                        log.error("Error: Package missing in repository")
-                        log.error(e)
+                        logging.error("Error: Package missing in repository")
+                        logging.error(e)
                         pass
                     except subprocess.CalledProcessError as e:
-                        log.error("Branch: %s, Package: %s, Error: %s"
+                        logging.error("Branch: %s, Package: %s, Error: %s"
                                   % (branch, package, e))
                 else:
-                    log.warning("Package %s not in directory" % package)
+                    logging.warning("Package %s not in directory" % package)
         return "Finished adding release branches"
 
     def _svn_revision_branch_id(self, svn_url):
@@ -173,7 +172,7 @@ class GitBioconductorRepository(object):
             svn_branch_url = branch_url + "/" + release
             revision = self._svn_revision_branch_id(svn_branch_url)
             rel_rev_dict[release] = revision
-            log.debug("release: %s, revision %s" % (release, revision))
+            logging.debug("release: %s, revision %s" % (release, revision))
         return rel_rev_dict
 
     def find_branch_points(self, from_revision, package, release):
@@ -209,7 +208,7 @@ class GitBioconductorRepository(object):
         commit_id. It connects the two by adding the commit history.
         """
         cwd = os.path.join(self.temp_git_repo, package)
-        log.info("Graft package directory: %s" % cwd)
+        logging.info("Graft package directory: %s" % cwd)
         branch_point = self.find_branch_points(release_revision_dict, package,
                                                release)
         if branch_point:
@@ -236,15 +235,15 @@ class GitBioconductorRepository(object):
                                        self.package_path)
             for package in packs:
                 try:
-                    log.info("Adding graft to package: %s" % package)
+                    logging.info("Adding graft to package: %s" % package)
                     self.graft(package, release, release_revision_dict)
                 except OSError as e:
-                    log.error("Grafting Error: %s, Package not found: %s" %
+                    logging.error("Grafting Error: %s, Package not found: %s" %
                               (e, package))
                     pass
                 except:
                     e = sys.exc_info()[0]  # Catch all exceptions
-                    log.error("Unexpected Grafting Error: %s in package: %s" %
+                    logging.error("Unexpected Grafting Error: %s in package: %s" %
                               (e, package))
                     pass
         return
@@ -269,11 +268,11 @@ class GitBioconductorRepository(object):
                                           cwd=os.path.join(self.bare_git_repo,
                                                            package + ".git"))
                 except subprocess.CalledProcessError as e:
-                    log.error("Error creating bare repo: %s in package %s"
+                    logging.error("Error creating bare repo: %s in package %s"
                               % (e, package))
                     pass
                 except OSError as e:
-                    log.error("Error: %s, Package: %s" % (e, package))
+                    logging.error("Error: %s, Package: %s" % (e, package))
                     pass
         finally:
             os.umask(old_mask)
@@ -285,7 +284,7 @@ class GitBioconductorRepository(object):
         This function is used to add a new package to the bioconductor
         repository and reconfigure remotes after cloning the package.
         """
-        log.info("Cloning NEW Bare repository to temp_git_repo")
+        logging.info("Cloning NEW Bare repository to temp_git_repo")
         package_dir = git_clone(new_package_url, self.bare_git_repo, bare=True)
         git_remote_rename(package_dir, 'origin', 'upstream')
         git_remote_add('origin', package_dir, package_dir)
