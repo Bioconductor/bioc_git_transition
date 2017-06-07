@@ -4,7 +4,7 @@
 
 ## Steps:
 
-1. Follow [Scenario-9][] to sync your local repository with _Bioconductor_ and Github. Do this for both the master and release branches.
+1. Follow [Scenario-9][] to sync your local repository with _Bioconductor_ and GitHub. Do this for both the master and release branches.
 
     ```
     git fetch --all
@@ -54,7 +54,7 @@
     git merge master
     ## FIXME: version bump in master not same as in release
     ```
-1. Push your changes to both the Github and _Bioconductor_ `master` and `<RELEASE_X_Y>` branches. Make sure you are on the correct branch on your local machine.
+1. Push your changes to both the GitHub and _Bioconductor_ `master` and `<RELEASE_X_Y>` branches. Make sure you are on the correct branch on your local machine.
 
    For the `master` branch,
 

@@ -10,7 +10,7 @@ Developers have write access to the most recent release branch (currently, the `
 
 ## Steps:
 
-1. Fetch and merge changes from the _Bioconductor_ and Github repositories following [Scenario 9][].
+1. Fetch and merge changes from the _Bioconductor_ and GitHub repositories following [Scenario 9][].
 
     ```
     git fetch --all
