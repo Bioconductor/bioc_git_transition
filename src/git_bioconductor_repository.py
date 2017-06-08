@@ -40,7 +40,6 @@ class GitBioconductorRepository(object):
         self.package_path = package_path
         return
 
-    # NOT Broken
     def get_branch_list(self):
         """Get list of branches.
 
