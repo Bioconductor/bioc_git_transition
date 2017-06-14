@@ -9,7 +9,7 @@ Author: Nitesh Turaga
 """
 import os
 import subprocess
-import logging as log
+import logging
 
 
 class Singleton(type):
@@ -82,8 +82,8 @@ class LocalSvnDump(object):
                                     stderr=subprocess.PIPE)
             output, error = proc.communicate()
         except Exception as e:
-            log.error("Error in search git files: %s" % path)
-            log.error(e)
+            logging.error("Error in search git files: %s" % path)
+            logging.error(e)
         return output
 
     def svn_dump(self, packs):
@@ -105,9 +105,9 @@ class LocalSvnDump(object):
                     subprocess.check_call(cmd, cwd=self.temp_git_repo)
                     log.debug("Finished git-svn clone for package: %s" % pack)
                 except subprocess.CalledProcessError as e:
-                    log.error("Error : %s in package %s" % (e, pack))
+                    logging.error("Error : %s in package %s" % (e, pack))
                 except Exception as e:  # All other errors
-                    log.error("Unexpected error: %s" % e)
+                    logging.error("Unexpected error: %s" % e)
         return
 
     def svn_get_revision(self):
@@ -120,7 +120,7 @@ class LocalSvnDump(object):
                     if "Revision" in line]
         revision = int(revision[0])
         self.revision = revision
-        log.info("SVN dump revision: %s" % revision)
+        logging.info("SVN dump revision: %s" % revision)
         return
 
     def svn_dump_update(self, update_file):
@@ -135,7 +135,7 @@ class LocalSvnDump(object):
             ret_code = proc.wait()
             # Write dump update to file
             f.flush()
-        log.info("Finshed dump to local file: %s" % update_file)
+        logging.info("Finshed dump to local file: %s" % update_file)
         return ret_code
 
     def update_local_svn_dump(self, update_file):
@@ -143,5 +143,5 @@ class LocalSvnDump(object):
         cmd = ('svnadmin load ' + self.svn_root_dir + ' < ' +
                os.path.abspath(update_file))
         subprocess.call(cmd, shell=True)
-        log.info("Finished dump update")
+        logging.info("Finished dump update")
         return
