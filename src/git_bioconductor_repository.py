@@ -128,33 +128,37 @@ class GitBioconductorRepository(object):
         branch_url = os.path.join(self.svn_root, "branches")
         branch_list = self.get_branch_list()
         for branch in branch_list:
-            # Special case to avoid badly named branches in SVN
-            package_list_url = branch_url + "/" + branch + self.package_path
-            # Get list of packages for EACH branch
-            # TODO: This is not CORRECT
-            package_list = self.get_pack_list(package_list_url)
-            for package in package_list:
+            try:
+                # Special case to avoid badly named branches in SVN
+                package_list_url = branch_url + "/" + branch + self.package_path
+                # Get list of packages for EACH branch
+                # TODO: This is not CORRECT
+                package_list = self.get_pack_list(package_list_url)
+                for package in package_list:
 
-                git_package_dir = os.path.join(self.temp_git_repo, package)
-                package_url = os.path.join(package_list_url, package)
-                log.info("git_package_dir:\n %s, package_url:\n %s" %
-                         (git_package_dir, package_url))
-                if package in os.listdir(self.temp_git_repo):
-                    try:
-                        log.info("Adding release branches to package: %s"
-                                 % package)
-                        if not git_branch_exists(branch, git_package_dir):
-                            self.add_orphan_branch_points(branch, package)
-                            log.info("Add orphan branch: %s" % git_package_dir)
-                    except OSError as e:
-                        log.error("Error: Package missing in repository")
-                        log.error(e)
-                        pass
-                    except subprocess.CalledProcessError as e:
-                        log.error("Branch: %s, Package: %s, Error: %s"
-                                  % (branch, package, e))
-                else:
-                    log.warning("Package %s not in directory" % package)
+                    git_package_dir = os.path.join(self.temp_git_repo, package)
+                    package_url = os.path.join(package_list_url, package)
+                    log.info("git_package_dir:\n %s, package_url:\n %s" %
+                             (git_package_dir, package_url))
+                    if package in os.listdir(self.temp_git_repo):
+                        try:
+                            log.info("Adding release branches to package: %s"
+                                     % package)
+                            if not git_branch_exists(branch, git_package_dir):
+                                self.add_orphan_branch_points(branch, package)
+                                log.info("Add orphan branch: %s" % git_package_dir)
+                        except OSError as e:
+                            log.error("Error: Package missing in repository")
+                            log.error(e)
+                            pass
+                        except subprocess.CalledProcessError as e:
+                            log.error("Branch: %s, Package: %s, Error: %s"
+                                      % (branch, package, e))
+                    else:
+                        log.warning("Package %s not in directory" % package)
+            except subprocess.CalledProcessError as e:
+                log.error("Branch %s missing" % branch)
+                pass
         return "Finished adding release branches"
 
     def _svn_revision_branch_id(self, svn_url):
@@ -232,21 +236,25 @@ class GitBioconductorRepository(object):
         release_revision_dict = self.release_revision_dict(branch_list)
         branch_url = os.path.join(self.svn_root, "branches")
         for release in branch_list:
-            packs = self.get_pack_list(branch_url + "/" + release +
+            try:
+                packs = self.get_pack_list(branch_url + "/" + release +
                                        self.package_path)
-            for package in packs:
-                try:
-                    log.info("Adding graft to package: %s" % package)
-                    self.graft(package, release, release_revision_dict)
-                except OSError as e:
-                    log.error("Grafting Error: %s, Package not found: %s" %
-                              (e, package))
-                    pass
-                except:
-                    e = sys.exc_info()[0]  # Catch all exceptions
-                    log.error("Unexpected Grafting Error: %s in package: %s" %
-                              (e, package))
-                    pass
+                for package in packs:
+                    try:
+                        log.info("Adding graft to package: %s" % package)
+                        self.graft(package, release, release_revision_dict)
+                    except OSError as e:
+                        log.error("Grafting Error: %s, Package not found: %s" %
+                                  (e, package))
+                        pass
+                    except:
+                        e = sys.exc_info()[0]  # Catch all exceptions
+                        log.error("Unexpected Grafting Error: %s in package: %s" %
+                                  (e, package))
+                        pass
+            except subprocess.CalledProcessError as e:
+                log.error("Branch %s missing" % release)
+                pass
         return
 
     def create_bare_repos(self):
