@@ -266,7 +266,6 @@ class GitManifestRepository(object):
         git_checkout('master', cwd=package_dir)
         return
 
-    # TODO: admin_repo has to change to admin_repo
     def create_bare_repos(self):
         try:
             package_dir = os.path.join(self.temp_git_repo, 'manifest')

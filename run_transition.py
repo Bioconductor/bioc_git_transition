@@ -245,9 +245,9 @@ def run_workflow_transition(configfile, new_svn_dump=False):
 
 if __name__ == '__main__':
     conf = "./settings.ini"
-    run_manifest_transition(conf, new_svn_dump=True)
+    # run_manifest_transition(conf, new_svn_dump=True)
     run_data_manifest_transition(conf)
-    run_transition(conf ,new_svn_dump=True)
-    run_experiment_data_transition(conf, new_svn_dump=True)
-    run_workflow_transition(conf, new_svn_dump=True)
-    run_updates()
+    # run_transition(conf ,new_svn_dump=True)
+    # run_experiment_data_transition(conf, new_svn_dump=True)
+    # run_workflow_transition(conf, new_svn_dump=True)
+    # run_updates()
