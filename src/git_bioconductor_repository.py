@@ -135,26 +135,26 @@ class GitBioconductorRepository(object):
                 for package in package_list:
                     git_package_dir = os.path.join(self.temp_git_repo, package)
                     package_url = os.path.join(package_list_url, package)
-                    log.info("git_package_dir:\n %s, package_url:\n %s" %
+                    logging.info("git_package_dir:\n %s, package_url:\n %s" %
                              (git_package_dir, package_url))
                     if package in os.listdir(self.temp_git_repo):
                         try:
-                            log.info("Adding release branches to package: %s"
+                            logging.info("Adding release branches to package: %s"
                                      % package)
                             if not git_branch_exists(branch, git_package_dir):
                                 self.add_orphan_branch_points(branch, package)
-                                log.info("Add orphan branch: %s" % git_package_dir)
+                                logging.info("Add orphan branch: %s" % git_package_dir)
                         except OSError as e:
-                            log.error("Error: Package missing in repository")
-                            log.error(e)
+                            logging.error("Error: Package missing in repository")
+                            logging.error(e)
                             pass
                         except subprocess.CalledProcessError as e:
-                            log.error("Branch: %s, Package: %s, Error: %s"
+                            logging.error("Branch: %s, Package: %s, Error: %s"
                                       % (branch, package, e))
                     else:
-                        log.warning("Package %s not in directory" % package)
+                        logging.warning("Package %s not in directory" % package)
             except subprocess.CalledProcessError as e:
-                log.error("Branch %s missing" % branch)
+                logging.error("Branch %s missing" % branch)
                 pass
         return "Finished adding release branches"
 
@@ -238,19 +238,19 @@ class GitBioconductorRepository(object):
                                        self.package_path)
                 for package in packs:
                     try:
-                        log.info("Adding graft to package: %s" % package)
+                        logging.info("Adding graft to package: %s" % package)
                         self.graft(package, release, release_revision_dict)
                     except OSError as e:
-                        log.error("Grafting Error: %s, Package not found: %s" %
+                        logging.error("Grafting Error: %s, Package not found: %s" %
                                   (e, package))
                         pass
                     except:
                         e = sys.exc_info()[0]  # Catch all exceptions
-                        log.error("Unexpected Grafting Error: %s in package: %s" %
+                        logging.error("Unexpected Grafting Error: %s in package: %s" %
                                   (e, package))
                         pass
             except subprocess.CalledProcessError as e:
-                log.error("Branch %s missing" % release)
+                logging.error("Branch %s missing" % release)
                 pass
         return
 

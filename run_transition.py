@@ -18,7 +18,7 @@ from src.git_experiment_repository import Lfs
 from src.git_manifest_repository import GitManifestRepository
 from src.update_temp_git_repo import UpdateGitRepository
 import os
-import logging as log
+import logging
 import ConfigParser
 
 
@@ -28,19 +28,19 @@ def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
     gitrepo = GitBioconductorRepository(svn_root, temp_git_repo,
                                         bare_git_repo, remote_url,
                                         package_path)
-    log.info("Make git repo: Adding release branches")
+    logging.info("Make git repo: Adding release branches")
     gitrepo.add_release_branches()
     # Step 5: Add commit history
-    log.info("Make git repo: Adding commit history")
+    logging.info("Make git repo: Adding commit history")
     gitrepo.add_commit_history()
 
     if lfs_object is not None:
-        log.info("Running LFS transtion")
+        logging.info("Running LFS transtion")
         lfs_object.run_data_transition(temp_git_repo)
     # Step 6: Make Git repo bare
-    log.info("Make git repo: Creating bare repositories")
+    logging.info("Make git repo: Creating bare repositories")
     gitrepo.create_bare_repos()
-    log.info("Make git repo: Adding remotes to make git server available")
+    logging.info("Make git repo: Adding remotes to make git server available")
     gitrepo.add_remote()
     return
 
@@ -67,15 +67,15 @@ def run_transition(configfile, new_svn_dump=False):
     users_db = Config.get('SVN', 'users_db')
     svn_transition_log = Config.get('SVN', 'svn_transition_log')
 
-    log.basicConfig(filename=svn_transition_log,
-                    level=log.DEBUG,
+    logging.basicConfig(filename=svn_transition_log,
+                    level=logging.DEBUG,
                     format='%(asctime)s %(message)s')
-    log.debug("Bioconductor Transition Log File: \n")
+    logging.debug("Bioconductor Transition Log File: \n")
 
     # Print in the log file.
     for s in Config.sections():
         for k, v in Config.items(s):
-            log.info("%s: %s" % (k, v))
+            logging.info("%s: %s" % (k, v))
 
     if not os.path.isdir(temp_git_repo):
         os.mkdir(temp_git_repo)
@@ -87,7 +87,7 @@ def run_transition(configfile, new_svn_dump=False):
     ###################################################
     # Create a local dump of SVN packages in a location
     if new_svn_dump:
-        log.info("Create a local SVN dump")
+        logging.info("Create a local SVN dump")
         dump.svn_dump(packs)
     ###################################################
 
@@ -96,12 +96,12 @@ def run_transition(configfile, new_svn_dump=False):
         os.mkdir(bare_git_repo)
 
     # Make temp git repo, with all commit history
-    log.info("Make git repo")
+    logging.info("Make git repo")
     make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
                   package_path)
 
     # EOF message
-    log.info("Finished setting up bare git repo")
+    logging.info("Finished setting up bare git repo")
     return
 
 
@@ -125,10 +125,10 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     ref_file = Config.get('ExperimentData', 'ref_file')
 
     data_log = Config.get("ExperimentData", "data_log")
-    log.basicConfig(filename=data_log,
-                    level=log.DEBUG,
+    logging.basicConfig(filename=data_log,
+                    level=logging.DEBUG,
                     format='%(asctime)s %(message)s')
-    log.debug("Bioconductor Experiment data transition log File: \n")
+    logging.debug("Bioconductor Experiment data transition log File: \n")
 
     # Create temp_git_repo directory
     if not os.path.isdir(temp_git_repo):
@@ -142,7 +142,7 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     ###################################################
     # Create a local dump of SVN packages in a location
     if new_svn_dump:
-        log.info("Create a local SVN dump of experiment data")
+        logging.info("Create a local SVN dump of experiment data")
         dump.svn_dump(packs)
     ###################################################
     # Make bare repo, if it does not exist
@@ -150,14 +150,14 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
         os.mkdir(bare_git_repo)
 
     # Make temp git repo, with all commit history
-    log.info("Make git repo for experiment data packages")
+    logging.info("Make git repo for experiment data packages")
     # Create a new git LFS object
     lfs = Lfs(svn_root, trunk, data_store_path, ref_file, temp_git_repo)
     # Run make_git_repo, with new LFS object
     make_git_repo(svn_root, temp_git_repo, bare_git_repo,
                   remote_url, package_path, lfs_object=lfs)
     # EOF message
-    log.info("Finished setting up bare git repo for experiment data packages")
+    logging.info("Finished setting up bare git repo for experiment data packages")
     return
 
 
@@ -174,10 +174,10 @@ def run_manifest_transition(configfile, new_svn_dump=False):
 
     manifest_log = Config.get("Software", "manifest_log")
     manifest_files = Config.get("Software", "manifest_files")
-    log.basicConfig(filename=manifest_log,
-                    level=log.DEBUG,
+    logging.basicConfig(filename=manifest_log,
+                    level=logging.DEBUG,
                     format='%(asctime)s %(message)s')
-    log.debug("Bioconductor manifest files transition log file: \n")
+    logging.debug("Bioconductor manifest files transition log file: \n")
 
     # Create new manifest repo
 
@@ -204,6 +204,7 @@ def run_updates(configfile):
     return
 
 def run_workflow_transition(configfile, new_svn_dump=False):
+    """Run workflow transition."""
     # Settings
     Config = ConfigParser.ConfigParser()
     Config.read(configfile)
@@ -217,29 +218,29 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     users_db = Config.get('SVN', 'users_db')
     workflow_log = Config.get('Workflow', 'workflow_log')
 
-    log.basicConfig(filename=workflow_log,
-                    level=log.DEBUG,
+    logging.basicConfig(filename=workflow_log,
+                    level=logging.DEBUG,
                     format='%(asctime)s %(message)s')
-    log.debug("Bioconductor Workflow Transition Log File: \n")
+    logging.debug("Bioconductor Workflow Transition Log File: \n")
 
-    # Print in the log file.
+    # Print in the logging file.
     if not os.path.isdir(temp_git_repo):
         os.mkdir(temp_git_repo)
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
 						remote_svn_server, package_path)
     packs = dump.get_pack_list(branch="trunk")
     if new_svn_dump:
-        log.info("Create workflow dump")
+        logging.info("Create workflow dump")
         dump.svn_dump(packs)
     # Make bare repo, if it does not exist
     if not os.path.isdir(bare_git_repo):
         os.mkdir(bare_git_repo)
 
-    log.info("Make workflow git repo")
+    logging.info("Make workflow git repo")
     make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
                   package_path)
     # EOF message
-    log.info("Finished setting up bare git repo")
+    logging.info("Finished setting up bare git repo")
     return
 
 if __name__ == '__main__':
