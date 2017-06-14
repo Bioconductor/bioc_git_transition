@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+
+"""Bioconductor Git rapid update
+
+This module provides functions for working with the Bioconductor
+`git` repository. This allows users to rapidly update only the master
+and the most recent release branch.
+
+Author: Nitesh Turaga
+"""
+
 import os
 import subprocess
 import logging
@@ -48,7 +59,7 @@ class UpdateGitRepository(object):
                 # Checkout release updates
                 git_checkout(recent_release, cwd=package_dir)
                 # Merge release updates WITHOUT edits to commit message
-                subprocess.check_call['git', 'merge', '--no-edit'
+                subprocess.check_call['git', 'merge', '--no-edit',
                                       'git-svn-' + recent_release]
                 merge_commit = self.most_recent_commit(cwd=package_dir)
                 git_reset(merge_commit, cwd=package_dir)

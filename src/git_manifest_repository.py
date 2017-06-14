@@ -17,6 +17,9 @@ from src.git_api.git_api import git_filter_branch
 from src.git_api.git_api import git_clone
 from src.git_api.git_api import git_remote_add
 from src.git_api.git_api import git_checkout
+from src.git_api.git_api import git_commit
+from src.git_api.git_api import git_mv
+from src.git_api.git_api import git_rm
 from local_svn_dump import Singleton
 # Logging configuration
 import logging
@@ -26,16 +29,15 @@ class GitManifestRepository(object):
     """Git Bioconductor Repository."""
     __metaclass__ = Singleton
 
-    # TODO: change bare_git_repo to admin_repo
-    def __init__(self, svn_root, temp_git_repo, bare_git_repo, remote_url,
-                 package_path, manifest_name):
+    def __init__(self, svn_root, temp_git_repo, admin_repo, remote_url,
+                 package_path, manifest_files):
         """Initialize Git Bioconductor repository."""
         self.svn_root = svn_root
         self.temp_git_repo = temp_git_repo
-        self.bare_git_repo = bare_git_repo
+        self.admin_repo = admin_repo
         self.remote_url = remote_url
         self.package_path = package_path
-        self.manifest_name = manifest_name
+        self.manifest_files = manifest_files
         return
 
     def get_branch_list(self):
@@ -62,7 +64,8 @@ class GitManifestRepository(object):
         svndump_dir = self.svn_root + '/' + 'trunk' + self.package_path
         try:
             cmd = ['git', 'svn', 'clone',
-                   '--include-paths=bioc_.*.manifest', svndump_dir]
+                   '--include-paths=' + self.manifest_files,
+                   svndump_dir]
             subprocess.check_call(cmd, cwd=self.temp_git_repo)
             logging.info("manifest clone pass %s" % cmd)
         except subprocess.CalledProcessError as e:
@@ -71,13 +74,17 @@ class GitManifestRepository(object):
             logging.error("Unexpected error: %s" % e)
         return
 
+    def release_to_manifest(self, release):
+        manifest_file = ('bioc_' +
+                         release.replace("RELEASE_", "").replace("_", ".") +
+                         '.manifest')
+        return manifest_file
+
     def add_config(self, release):
         """Add git config options for manifest repo."""
         package_dir = self.temp_git_repo + "/" + "Rpacks"
         # TODO:Error in RELEASE_1_0_branch
-        manifest_file = ('bioc_' +
-                         release.replace("RELEASE_", "").replace("_", ".") +
-                         '.manifest')
+        manifest_file = self.release_to_manifest(release)
         try:
             # config add include path
             include_paths = ['git', 'config', '--add',
@@ -189,7 +196,7 @@ class GitManifestRepository(object):
         logging.debug("Pruning ended: %s" % release)
         return
 
-    def add_commit_history(self, manifest_name):
+    def add_commit_history(self):
         """
         Add commit history by fixing b.
 
@@ -229,14 +236,41 @@ class GitManifestRepository(object):
             logging.debug("Add commit history:  git_checkout master")
             git_checkout('master', cwd=package_dir,  new=False)
         # rename repository to manifest
-        os.rename(package_dir, self.temp_git_repo + '/' + self.manifest_name)
+        os.rename(package_dir, self.temp_git_repo + '/' + 'manifest')
         return
 
-    # TODO: bare_git_repo has to change to admin_repo
+    def rename_files_in_branches(self):
+        package_dir = os.path.join(self.temp_git_repo, 'manifest')
+
+        branch_list = self.get_branch_list()
+        l = ['RELEASE_1_0', 'RELEASE_1_0_branch',
+             'RELEASE_1_4', 'RELEASE_1_4_branch',
+             'RELEASE_1_5']
+        branches = list(set(branch_list) - set(l))
+        # For master branch, RELEASE_3_6
+        git_checkout('master')
+        # Rename, delete other manifests and commit
+        manifest_file = self.release_to_manifest('RELEASE_3_6')
+        git_mv(manifest_file, 'software.txt', cwd=package_dir)
+        git_rm('bioc*', cwd=package_dir)
+        commit_message = ("Change %s to software.txt" % manifest_file)
+        git_commit(commit_message, cwd=package_dir)
+        # In all release branches
+        for release in branches:
+            git_checkout(release, cwd=package_dir)
+            manifest_file = self.release_to_manifest(release)
+            git_mv(manifest_file, "software.txt", cwd=package_dir)
+            commit_message = ("Change %s to software.txt" % manifest_file)
+            git_commit(commit_message, cwd=package_dir)
+        # Checkout master at the end
+        git_checkout('master', cwd=package_dir)
+        return
+
+    # TODO: admin_repo has to change to admin_repo
     def create_bare_repos(self):
         try:
-            package_dir = os.path.join(self.temp_git_repo, self.manifest_name)
-            git_clone(package_dir, self.bare_git_repo, bare=True)
+            package_dir = os.path.join(self.temp_git_repo, 'manifest')
+            git_clone(package_dir, self.admin_repo, bare=True)
         except Exception as e:
             logging.error("Error while making a bare clone for %s" %
                           package_dir)
@@ -252,10 +286,10 @@ class GitManifestRepository(object):
         try:
             remote = self.remote_url + self.manifest_file + ".git"
             # Run remote command
-            package = os.path.join(self.bare_git_repo, self.manifest_file +
-                                   ".git")
-            git_remote_add('origin', remote, package)
-            logging.info("Add remote to package: %s" % package)
+            package_dir = os.path.join(self.admin_repo, self.manifest_file +
+                                       ".git")
+            git_remote_add('origin', remote, package_dir)
+            logging.info("Add remote to package: %s" % package_dir)
         except Exception as e:
             logging.error(e)
         return

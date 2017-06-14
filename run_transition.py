@@ -16,6 +16,7 @@ from src.local_svn_dump import LocalSvnDump
 from src.git_bioconductor_repository import GitBioconductorRepository
 from src.git_experiment_repository import Lfs
 from src.git_manifest_repository import GitManifestRepository
+from src.update_temp_git_repo import UpdateGitRepository
 import os
 import logging as log
 import ConfigParser
@@ -167,11 +168,12 @@ def run_manifest_transition(configfile, new_svn_dump=False):
     Config.read(configfile)
     temp_git_repo = Config.get('Software', 'temp_git_repo')
     remote_url = Config.get('Software', 'remote_url')
-    bare_git_repo = Config.get('Software', 'bare_git_repo')
+    admin_repo = Config.get('Software', 'admin_repo')
     svn_root = Config.get('SVN', 'svn_root')
     package_path = Config.get('Software', 'package_path')
 
     manifest_log = Config.get("Software", "manifest_log")
+    manifest_files = Config.get("Software", "manifest_files")
     log.basicConfig(filename=manifest_log,
                     level=log.DEBUG,
                     format='%(asctime)s %(message)s')
@@ -180,20 +182,31 @@ def run_manifest_transition(configfile, new_svn_dump=False):
     # Create new manifest repo
 
     manifest_repo = GitManifestRepository(svn_root, temp_git_repo,
-                                          bare_git_repo, remote_url,
-                                          package_path)
+                                          admin_repo, remote_url,
+                                          package_path, manifest_files)
     # 1. Create manifest clone
     manifest_repo.manifest_clone(new_svn_dump)
     # 2. Add orphan branch points
     manifest_repo.add_orphan_branch_points()
     # 3. Add commit history
-    manifest_repo.add_commit_history("software_manifest")
+    manifest_repo.add_commit_history()
+    manifest_repo.rename_files_in_branch()
     manifest_repo.create_bare_repos()
     manifest_repo.add_remote()
     return
 
+def run_data_manifest_transition(configfile, new_svn_dump=False):
+    """Run data manifest transition."""
+    return
+
+def run_updates(configfile):
+    """Run updates on all branches"""
+    return
 
 if __name__ == '__main__':
-    run_manifest_transition("./settings.ini", new_svn_dump=True)
-#    run_transition("./settings.ini", new_svn_dump=True)
-#    run_experiment_data_transition("./settings.ini", new_svn_dump=True)
+    conf = "./settings.ini"
+    run_manifest_transition(conf, new_svn_dump=True)
+    run_data_manifest_transition(conf)
+    run_transition("./settings.ini", new_svn_dump=True)
+    run_experiment_data_transition("./settings.ini", new_svn_dump=True)
+    run_updates()

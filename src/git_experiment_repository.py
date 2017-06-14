@@ -2,11 +2,13 @@
 
 Add data content to data package.
 
-In this svn repository, the data subdir of a package is
+In this svn repository, the data directory of a package is
 stored separately in svn.  add_data.py can be used to add
 the data subdir to a given package.
 
 The appropriate data dir will be added to the specified package.
+
+Author: Nitesh Turaga
 """
 
 import os
