@@ -203,10 +203,50 @@ def run_updates(configfile):
     """Run updates on all branches"""
     return
 
+def run_workflow_transition(configfile, new_svn_dump=False):
+    # Settings
+    Config = ConfigParser.ConfigParser()
+    Config.read(configfile)
+    temp_git_repo = Config.get('Workflow', 'temp_git_repo')
+    remote_url = Config.get('Software', 'remote_url')
+    bare_git_repo = Config.get('Workflow', 'bare_git_repo')
+    package_path = Config.get('Workflow', 'package_path')
+
+    svn_root = Config.get('SVN', 'svn_root')
+    remote_svn_server = Config.get('SVN', 'remote_svn_server')
+    users_db = Config.get('SVN', 'users_db')
+    workflow_log = Config.get('Workflow', 'workflow_log')
+
+    log.basicConfig(filename=workflow_log,
+                    level=log.DEBUG,
+                    format='%(asctime)s %(message)s')
+    log.debug("Bioconductor Workflow Transition Log File: \n")
+
+    # Print in the log file.
+    if not os.path.isdir(temp_git_repo):
+        os.mkdir(temp_git_repo)
+    dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
+						remote_svn_server, package_path)
+    packs = dump.get_pack_list(branch="trunk")
+    if new_svn_dump:
+        log.info("Create workflow dump")
+        dump.svn_dump(packs)
+    # Make bare repo, if it does not exist
+    if not os.path.isdir(bare_git_repo):
+        os.mkdir(bare_git_repo)
+
+    log.info("Make workflow git repo")
+    make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
+                  package_path)
+    # EOF message
+    log.info("Finished setting up bare git repo")
+    return
+
 if __name__ == '__main__':
     conf = "./settings.ini"
     run_manifest_transition(conf, new_svn_dump=True)
     run_data_manifest_transition(conf)
-    run_transition("./settings.ini", new_svn_dump=True)
-    run_experiment_data_transition("./settings.ini", new_svn_dump=True)
+    run_transition(conf ,new_svn_dump=True)
+    run_experiment_data_transition(conf, new_svn_dump=True)
+    run_workflow_transition(conf, new_svn_dump=True)
     run_updates()
