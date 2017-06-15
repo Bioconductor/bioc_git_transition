@@ -11,7 +11,6 @@ Ideas taken from Jim Hester's code in Bioconductor/mirror
 
 import os
 import re
-import sys
 import subprocess
 from src.git_api.git_api import git_filter_branch
 from src.git_api.git_api import git_clone
@@ -220,8 +219,8 @@ class GitManifestRepository(object):
                 logging.error("Grafting Error: %s, Package not found: %s" %
                               (e, release))
                 pass
-            except:
-                e = sys.exc_info()[0]  # Catch all exceptions
+            except Exception as e:
+                # Catch all exceptions
                 logging.error("Unexpected Grafting Error: %s in package: %s" %
                               (e, release))
                 pass
