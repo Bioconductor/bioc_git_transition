@@ -62,7 +62,7 @@ git-http-backend
 
 #### Configure Apache2 for https as described here 
 
-https://github.com/Bioconductor/AWS_management/blob/master/docs/Configure_Apache_HOWTO.md
+https://github.com/Bioconductor/AWS_management/blob/master/docs/Configure_Apache.md
 
 #### Enable support for Common Gateway Interface (CGI)
 
