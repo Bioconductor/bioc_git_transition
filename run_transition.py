@@ -201,7 +201,7 @@ def run_manifest_transition(configfile, new_svn_dump=False):
     # because it the parent class is a singleton.
     data_manifest_repo = GitDataManifestRepository(data_svn_root,
                                                    temp_git_repo,
-                                                   data_package_path, 
+                                                   data_package_path,
                                                    data_manifest_files)
     data_manifest_repo.manifest_clone(new_svn_dump=False)
 
@@ -209,7 +209,7 @@ def run_manifest_transition(configfile, new_svn_dump=False):
     # Create bare repos and add remote
     if not os.path.isdir(bare_git_repo):
         os.mkdir(bare_git_repo)
-    
+
     manifest_repo.create_unified_repo()
 
     manifest_repo.create_bare_repos()

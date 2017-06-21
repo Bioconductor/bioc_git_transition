@@ -57,7 +57,7 @@ class GitManifestRepository(object):
         return branch_list
 
     def manifest_clone(self, new_svn_dump=True):
-        if not new:
+        if not new_svn_dump:
             return
         svndump_dir = self.svn_root + '/' + 'trunk' + self.package_path
         try:
@@ -294,7 +294,7 @@ class GitManifestRepository(object):
     def data_manifest_to_release(self, manifest):
         """ Convert bioc-data-experiment.2.14.manifest to RELEASE_2_4."""
         release = manifest.replace("bioc-data-experiment.","").replace(".manifest","").replace(".","_")
-        return release
+        return "RELEASE_" + release
 
 
     def create_unified_repo(self):
@@ -305,22 +305,23 @@ class GitManifestRepository(object):
         data_repo = os.path.join(self.temp_git_repo, 'pkgs')
         software_repo = os.path.join(self.temp_git_repo, 'manifest')
         # move most recent data manifest to master branch in manifest repo
-        os.rename(old=os.path.join(data_repo,"bioc-data-experiment.3.6.manifest" ),
-                  new=os.path.join(software_repo,"bioc-data-experiment.3.6.manifest"))
+        os.rename(os.path.join(data_repo,"bioc-data-experiment.3.6.manifest" ),
+                  os.path.join(software_repo,"bioc-data-experiment.3.6.manifest"))
         # For rest of the files
         for data_manifest in os.listdir(data_repo):
-            release = self.data_manifest_to_release(data_manifest)
-            git_checkout(release, cwd=software_repo)
-            os.rename(old=os.path.join(data_repo,data_manifest),
-                      new=os.path.join(software_repo,data_manifest)
+            if not data_manifest.startswith("."):
+                release = self.data_manifest_to_release(data_manifest)
+                git_checkout(release, cwd=software_repo)
+                os.rename(os.path.join(data_repo,data_manifest),
+                          os.path.join(software_repo,data_manifest))
         git_checkout('master', cwd=software_repo)
         return
 
 
 class GitDataManifestRepository(GitManifestRepository):
-    """Version Bioconductor experiment data manifest files."""    
-    
-    def __init__(self, svn_root, temp_git_repo, 
+    """Version Bioconductor experiment data manifest files."""
+
+    def __init__(self, svn_root, temp_git_repo,
                  package_path, manifest_files):
         self.svn_root = svn_root
         self.temp_git_repo = temp_git_repo
