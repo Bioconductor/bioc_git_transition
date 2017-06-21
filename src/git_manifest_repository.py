@@ -28,13 +28,12 @@ class GitManifestRepository(object):
     """Git Bioconductor Repository."""
     __metaclass__ = Singleton
 
-    def __init__(self, svn_root, temp_git_repo, admin_repo, remote_url,
+    def __init__(self, svn_root, temp_git_repo, bare_git_repo,
                  package_path, manifest_files):
         """Initialize Git Bioconductor repository."""
         self.svn_root = svn_root
         self.temp_git_repo = temp_git_repo
-        self.admin_repo = admin_repo
-        self.remote_url = remote_url
+        self.bare_git_repo = bare_git_repo
         self.package_path = package_path
         self.manifest_files = manifest_files
         return
@@ -57,7 +56,7 @@ class GitManifestRepository(object):
                        if "RELEASE" in item]
         return branch_list
 
-    def manifest_clone(self, new=True):
+    def manifest_clone(self, new_svn_dump=True):
         if not new:
             return
         svndump_dir = self.svn_root + '/' + 'trunk' + self.package_path
@@ -247,7 +246,7 @@ class GitManifestRepository(object):
              'RELEASE_1_5']
         branches = list(set(branch_list) - set(l))
         # For master branch, RELEASE_3_6
-        git_checkout('master')
+        git_checkout('master', cwd=package_dir)
         # Rename, delete other manifests and commit
         manifest_file = self.release_to_manifest('RELEASE_3_6')
         git_mv(manifest_file, 'software.txt', cwd=package_dir)
@@ -268,7 +267,7 @@ class GitManifestRepository(object):
     def create_bare_repos(self):
         try:
             package_dir = os.path.join(self.temp_git_repo, 'manifest')
-            git_clone(package_dir, self.admin_repo, bare=True)
+            git_clone(package_dir, self.bare_git_repo, bare=True)
         except Exception as e:
             logging.error("Error while making a bare clone for %s" %
                           package_dir)
@@ -282,12 +281,48 @@ class GitManifestRepository(object):
         """
         logging.info("Adding remote url to bare git repo.")
         try:
-            remote = self.remote_url + self.manifest_file + ".git"
+            remote = 'admin' + '/' + self.manifest_file + ".git"
             # Run remote command
-            package_dir = os.path.join(self.admin_repo, self.manifest_file +
+            package_dir = os.path.join(self.bare_git_repo, self.manifest_file +
                                        ".git")
             git_remote_add('origin', remote, package_dir)
             logging.info("Add remote to package: %s" % package_dir)
         except Exception as e:
             logging.error(e)
         return
+
+    def data_manifest_to_release(self, manifest):
+        """ Convert bioc-data-experiment.2.14.manifest to RELEASE_2_4."""
+        release = manifest.replace("bioc-data-experiment.","").replace(".manifest","").replace(".","_")
+        return release
+
+
+    def create_unified_repo(self):
+        """Create a unified repo for data and software repos."""
+        # software repo, checkout release
+        # move data manifest --> release
+        # loop through files in data_manifest
+        data_repo = os.path.join(self.temp_git_repo, 'pkgs')
+        software_repo = os.path.join(self.temp_git_repo, 'manifest')
+        # move most recent data manifest to master branch in manifest repo
+        os.rename(old=os.path.join(data_repo,"bioc-data-experiment.3.6.manifest" ),
+                  new=os.path.join(software_repo,"bioc-data-experiment.3.6.manifest"))
+        # For rest of the files
+        for data_manifest in os.listdir(data_repo):
+            release = self.data_manifest_to_release(data_manifest)
+            git_checkout(release, cwd=software_repo)
+            os.rename(old=os.path.join(data_repo,data_manifest),
+                      new=os.path.join(software_repo,data_manifest)
+        git_checkout('master', cwd=software_repo)
+        return
+
+
+class GitDataManifestRepository(GitManifestRepository):
+    """Version Bioconductor experiment data manifest files."""    
+    
+    def __init__(self, svn_root, temp_git_repo, 
+                 package_path, manifest_files):
+        self.svn_root = svn_root
+        self.temp_git_repo = temp_git_repo
+        self.package_path = package_path
+        self.manifest_files = manifest_files

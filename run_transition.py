@@ -16,6 +16,7 @@ from src.local_svn_dump import LocalSvnDump
 from src.git_bioconductor_repository import GitBioconductorRepository
 from src.git_experiment_repository import Lfs
 from src.git_manifest_repository import GitManifestRepository
+from src.git_manifest_repository import GitDataManifestRepository
 from src.update_temp_git_repo import UpdateGitRepository
 import os
 import logging
@@ -167,45 +168,67 @@ def run_manifest_transition(configfile, new_svn_dump=False):
     Config = ConfigParser.ConfigParser()
     Config.read(configfile)
     temp_git_repo = Config.get('Software', 'temp_git_repo')
-    remote_url = Config.get('Software', 'remote_url')
-    admin_repo = Config.get('Software', 'admin_repo')
+    bare_git_repo = Config.get('Manifest', 'bare_git_repo')
     svn_root = Config.get('SVN', 'svn_root')
     package_path = Config.get('Software', 'package_path')
 
-    manifest_log = Config.get("Software", "manifest_log")
-    manifest_files = Config.get("Software", "manifest_files")
+    manifest_log = Config.get("Manifest", "manifest_log")
+    manifest_files = Config.get("Manifest", "software_manifest_files")
     logging.basicConfig(filename=manifest_log,
                     level=logging.DEBUG,
                     format='%(asctime)s %(message)s')
     logging.debug("Bioconductor manifest files transition log file: \n")
 
-    # Create new manifest repo
-
+    #####################################
+    # Create new manifest repo for software
     manifest_repo = GitManifestRepository(svn_root, temp_git_repo,
-                                          admin_repo, remote_url,
+                                          bare_git_repo,
                                           package_path, manifest_files)
     # 1. Create manifest clone
-    manifest_repo.manifest_clone(new_svn_dump)
+    manifest_repo.manifest_clone(new_svn_dump=False)
     # 2. Add orphan branch points
-    manifest_repo.add_orphan_branch_points()
+#    manifest_repo.add_orphan_branch_points()
     # 3. Add commit history
-    manifest_repo.add_commit_history()
-    manifest_repo.rename_files_in_branch()
+#    manifest_repo.add_commit_history()
+#    manifest_repo.rename_files_in_branches()
+
+    #####################################
+    # Run data manifest transition
+    data_svn_root = Config.get("ExperimentData", "svn_root")
+    data_package_path = Config.get("ExperimentData", "package_path")
+    data_manifest_files = Config.get("Manifest", "data_manifest_files")
+    # A new class is defined which inherits from GitManifestRepo,
+    # because it the parent class is a singleton.
+    data_manifest_repo = GitDataManifestRepository(data_svn_root,
+                                                   temp_git_repo,
+                                                   data_package_path, 
+                                                   data_manifest_files)
+    data_manifest_repo.manifest_clone(new_svn_dump=False)
+
+    #####################################
+    # Create bare repos and add remote
+    if not os.path.isdir(bare_git_repo):
+        os.mkdir(bare_git_repo)
+    
+    manifest_repo.create_unified_repo()
+
     manifest_repo.create_bare_repos()
     manifest_repo.add_remote()
     return
+
 
 def run_data_manifest_transition(configfile, new_svn_dump=False):
     """Run data manifest transition."""
     return
 
+
 def run_updates(configfile):
     """Run updates on all branches"""
     return
 
+
 def run_workflow_transition(configfile, new_svn_dump=False):
     """Run workflow transition."""
-    # Settings
     Config = ConfigParser.ConfigParser()
     Config.read(configfile)
     temp_git_repo = Config.get('Workflow', 'temp_git_repo')
@@ -245,8 +268,7 @@ def run_workflow_transition(configfile, new_svn_dump=False):
 
 if __name__ == '__main__':
     conf = "./settings.ini"
-    # run_manifest_transition(conf, new_svn_dump=True)
-    run_data_manifest_transition(conf)
+    run_manifest_transition(conf, new_svn_dump=True)
     # run_transition(conf ,new_svn_dump=True)
     # run_experiment_data_transition(conf, new_svn_dump=True)
     # run_workflow_transition(conf, new_svn_dump=True)

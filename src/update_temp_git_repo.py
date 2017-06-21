@@ -36,10 +36,10 @@ class UpdateGitRepository(object):
         return self.branch_list[-1]
 
     def most_recent_commit(self, cwd):
-        """Get most recent commit in git repository."""
-        x = subprocess.check_output(['git', 'log', '--format=%H', '-n', '1'],
+        """Get most recent commit in git repository, before merge."""
+        x = subprocess.check_output(['git', 'log', '--format=%H', '-n', '2'],
                                     cwd=cwd)
-        return x.strip()
+        return x.split()[-1]
 
     def update_temp_git_repo(self):
         """Create bare repos in the repository directory.
@@ -61,7 +61,9 @@ class UpdateGitRepository(object):
                 # Merge release updates WITHOUT edits to commit message
                 subprocess.check_call['git', 'merge', '--no-edit',
                                       'git-svn-' + recent_release]
+                # Get the commit id before the merge
                 merge_commit = self.most_recent_commit(cwd=package_dir)
+                # Reset to commit id before that
                 git_reset(merge_commit, cwd=package_dir)
                 git_checkout('master', cwd=package_dir)
             except subprocess.CalledProcessError as e:
