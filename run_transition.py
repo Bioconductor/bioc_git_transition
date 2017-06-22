@@ -67,17 +67,12 @@ def run_transition(configfile, new_svn_dump=False):
     svn_root = Config.get('SVN', 'svn_root')
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
-    svn_transition_log = Config.get('SVN', 'svn_transition_log')
+    software_transition_log = Config.get('SVN', 'software_transition_log')
 
-    logging.basicConfig(filename=svn_transition_log,
-                    level=logging.DEBUG,
-                    format='%(asctime)s %(message)s')
-    logging.debug("Bioconductor Transition Log File: \n")
-
-    # Print in the log file.
-    for s in Config.sections():
-        for k, v in Config.items(s):
-            logging.info("%s: %s" % (k, v))
+    logging.basicConfig(filename=software_transition_log,
+                        level=logging.DEBUG,
+                        format='%(asctime)s %(message)s')
+    logging.debug("Bioconductor Software Transition Log File: \n")
 
     if not os.path.isdir(temp_git_repo):
         os.mkdir(temp_git_repo)
@@ -108,8 +103,7 @@ def run_transition(configfile, new_svn_dump=False):
 
 
 def run_experiment_data_transition(configfile, new_svn_dump=False):
-    """Run experiment data transtion.
-    """
+    """Run experiment data transtion."""
     # Settings
     Config = ConfigParser.ConfigParser()
     Config.read(configfile)
@@ -128,8 +122,8 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
 
     data_log = Config.get("ExperimentData", "data_log")
     logging.basicConfig(filename=data_log,
-                    level=logging.DEBUG,
-                    format='%(asctime)s %(message)s')
+                        level=logging.DEBUG,
+                        format='%(asctime)s %(message)s')
     logging.debug("Bioconductor Experiment data transition log File: \n")
 
     # Create temp_git_repo directory
@@ -159,7 +153,7 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     make_git_repo(svn_root, temp_git_repo, bare_git_repo,
                   remote_url, package_path, lfs_object=lfs)
     # EOF message
-    logging.info("Finished setting up bare git repo for experiment data packages")
+    logging.info("Completed bare git repo for experiment data packages")
     return
 
 
@@ -174,22 +168,25 @@ def run_manifest_transition(configfile, new_svn_dump=False):
     package_path = Config.get('Software', 'package_path')
 
     manifest_log = Config.get("Manifest", "manifest_log")
-    manifest_files = Config.get("Manifest", "software_manifest_files")
+    include_path = Config.get("Manifest", "software_manifest_include_path")
     logging.basicConfig(filename=manifest_log,
-                    level=logging.DEBUG,
-                    format='%(asctime)s %(message)s')
+                        level=logging.DEBUG,
+                        format='%(asctime)s %(message)s')
     logging.debug("Bioconductor manifest files transition log file: \n")
 
     #####################################
     # Create new manifest repo for software
     manifest_repo = GitManifestRepository(svn_root, temp_git_repo,
                                           bare_git_repo,
-                                          package_path, manifest_files)
+                                          package_path, include_path)
     # 1. Create manifest clone
+    logging.info("Create a new software manifest dump")
     manifest_repo.manifest_clone(new_svn_dump)
     # 2. Add orphan branch points
+    logging.info("Add orphan branch points to manifest files")
     manifest_repo.add_orphan_branch_points()
     # 3. Add commit history
+    logging.info("Add commit history to manifest files")
     manifest_repo.add_commit_history()
     manifest_repo.rename_files_in_branches()
 
@@ -197,14 +194,16 @@ def run_manifest_transition(configfile, new_svn_dump=False):
     # Run data manifest transition
     data_svn_root = Config.get("ExperimentData", "svn_root")
     data_package_path = Config.get("ExperimentData", "package_path")
-    data_manifest_files = Config.get("Manifest", "data_manifest_files")
+    data_include_path = Config.get("Manifest", "data_manifest_include_path")
     # A new class is defined which inherits from GitManifestRepo,
     # because it the parent class is a singleton.
     data_manifest_repo = GitDataManifestRepository(data_svn_root,
                                                    temp_git_repo,
                                                    data_package_path,
-                                                   data_manifest_files)
+                                                   data_include_path)
+    logging.info("Copy data manifest log files")
     data_manifest_repo.manifest_clone(new_svn_dump)
+    logging.info("Create unified repo for software and data manifest")
     manifest_repo.create_unified_repo()
     #####################################
     # Create bare repos and add remote
@@ -214,8 +213,9 @@ def run_manifest_transition(configfile, new_svn_dump=False):
 
     logging.info("Create bare manifest repository")
     manifest_repo.create_bare_repos()
-# TODO: FIX ME, remotes are not added properly
-#    manifest_repo.add_remote()
+    # FIXME: Possibly broken, remotes are not added properly.
+    logging.info("Add remote to manifest repo")
+    manifest_repo.add_remote()
     return
 
 
@@ -224,12 +224,17 @@ def run_updates(configfile):
     Config = ConfigParser.ConfigParser()
     Config.read(configfile)
     software_temp_git_repo = Config.get('Software', 'temp_git_repo')
-    software_root = Config.get('SVN', 'svn_root')
-    # TODO: FIXME Get branch list, there has to be a simpler way to do this
-    branch_list = get_branch_list(software_root)
- 
+    svn_root = Config.get('SVN', 'svn_root')
+    updater_log = Config.get('Software', 'updater_log')
+    logging.basicConfig(filename=updater_log,
+                        level=logging.DEBUG,
+                        format='%(asctime)s %(message)s')
+
+    # FIXME: Get branch list, there has to be a simpler way to do this
+    branch_list = get_branch_list(svn_root)
+    logging.info("Start update of software temp git repo")
     updater = UpdateGitRepository(software_temp_git_repo, branch_list)
-    updater.update_temp_git_repo() 
+    updater.update_temp_git_repo()
     return
 
 
@@ -248,15 +253,15 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     workflow_log = Config.get('Workflow', 'workflow_log')
 
     logging.basicConfig(filename=workflow_log,
-                    level=logging.DEBUG,
-                    format='%(asctime)s %(message)s')
+                        level=logging.DEBUG,
+                        format='%(asctime)s %(message)s')
     logging.debug("Bioconductor Workflow Transition Log File: \n")
 
     # Print in the logging file.
     if not os.path.isdir(temp_git_repo):
         os.mkdir(temp_git_repo)
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
-						remote_svn_server, package_path)
+                        remote_svn_server, package_path)
     packs = dump.get_pack_list(branch="trunk")
     if new_svn_dump:
         logging.info("Create workflow dump")
@@ -272,10 +277,11 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     logging.info("Finished setting up bare git repo")
     return
 
+
 if __name__ == '__main__':
     conf = "./settings.ini"
-    # run_manifest_transition(conf, new_svn_dump=False)
-    # run_transition(conf ,new_svn_dump=True)
-    # run_experiment_data_transition(conf, new_svn_dump=True)
-    # run_workflow_transition(conf, new_svn_dump=True)
+    run_manifest_transition(conf, new_svn_dump=False)
+    run_transition(conf, new_svn_dump=False)
+    run_experiment_data_transition(conf, new_svn_dump=False)
+    run_workflow_transition(conf, new_svn_dump=False)
     run_updates(conf)

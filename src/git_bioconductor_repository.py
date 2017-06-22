@@ -11,7 +11,6 @@ Ideas taken from Jim Hester's code in Bioconductor/mirror
 
 import os
 import re
-import sys
 import subprocess
 import logging
 from src.git_api.git_api import git_clone
@@ -23,6 +22,7 @@ from src.git_api.git_api import git_filter_branch
 from src.git_api.git_api import git_checkout
 from src.git_api.git_api import git_remote_remove
 from src.git_api.git_api import git_branch_exists
+from src.helper.helper import get_branch_list
 from local_svn_dump import Singleton
 
 
@@ -39,22 +39,6 @@ class GitBioconductorRepository(object):
         self.remote_url = remote_url
         self.package_path = package_path
         return
-
-    def get_branch_list(self):
-        """Get list of branches.
-
-        Input:
-            svn_root path.
-        Return:
-            List of branches in the reverse order of releases, i.e,
-            latest first.
-        """
-        branch_url = os.path.join(self.svn_root, "branches")
-        branch_list = [item.replace('/', '')
-                       for item in
-                       subprocess.check_output(['svn', 'list', branch_url]).split()
-                       if "RELEASE" in item]
-        return branch_list
 
     def get_pack_list(self, path):
         """Get list of packages on SVN."""
@@ -92,7 +76,8 @@ class GitBioconductorRepository(object):
         to the fetched commits. Checkout master at the end.
         """
         branch_url = os.path.join(self.svn_root, "branches")
-        package_url = branch_url + "/" + release + self.package_path + "/" + package
+        package_url = (branch_url + "/" + release + self.package_path
+                       + "/" + package)
         package_dir = os.path.join(self.temp_git_repo, package)
         # Configure remote svn url
         config_remote_url = ['git', 'config', '--add',
@@ -124,11 +109,12 @@ class GitBioconductorRepository(object):
         """
         # Get list of branches
         branch_url = os.path.join(self.svn_root, "branches")
-        branch_list = self.get_branch_list()
+        branch_list = get_branch_list(self.svn_root)
         for branch in branch_list:
             try:
                 # Special case to avoid badly named branches in SVN
-                package_list_url = branch_url + "/" + branch + self.package_path
+                package_list_url = (branch_url + "/" +
+                                    branch + self.package_path)
                 # Get list of packages for EACH branch
                 # TODO: This is not CORRECT
                 package_list = self.get_pack_list(package_list_url)
@@ -136,23 +122,25 @@ class GitBioconductorRepository(object):
                     git_package_dir = os.path.join(self.temp_git_repo, package)
                     package_url = os.path.join(package_list_url, package)
                     logging.info("git_package_dir:\n %s, package_url:\n %s" %
-                             (git_package_dir, package_url))
+                                 (git_package_dir, package_url))
                     if package in os.listdir(self.temp_git_repo):
                         try:
-                            logging.info("Adding release branches to package: %s"
-                                     % package)
+                            logging.info("Adding release branch to package: %s"
+                                         % package)
                             if not git_branch_exists(branch, git_package_dir):
                                 self.add_orphan_branch_points(branch, package)
-                                logging.info("Add orphan branch: %s" % git_package_dir)
+                                logging.info("Add orphan branch: %s" %
+                                             git_package_dir)
                         except OSError as e:
-                            logging.error("Error: Package missing in repository")
+                            logging.error("Error: Package missing in repo")
                             logging.error(e)
                             pass
                         except subprocess.CalledProcessError as e:
                             logging.error("Branch: %s, Package: %s, Error: %s"
-                                      % (branch, package, e))
+                                          % (branch, package, e))
                     else:
-                        logging.warning("Package %s not in directory" % package)
+                        logging.warning("Package %s not in directory"
+                                        % package)
             except subprocess.CalledProcessError as e:
                 logging.error("Branch %s missing" % branch)
                 pass
@@ -229,25 +217,25 @@ class GitBioconductorRepository(object):
         are placed in the specific branch.
         """
         # Get list of branches
-        branch_list = self.get_branch_list()
+        branch_list = get_branch_list(self.svn_root)
         release_revision_dict = self.release_revision_dict(branch_list)
         branch_url = os.path.join(self.svn_root, "branches")
         for release in branch_list:
             try:
                 packs = self.get_pack_list(branch_url + "/" + release +
-                                       self.package_path)
+                                           self.package_path)
                 for package in packs:
                     try:
                         logging.info("Adding graft to package: %s" % package)
                         self.graft(package, release, release_revision_dict)
                     except OSError as e:
-                        logging.error("Grafting Error: %s, Package not found: %s" %
-                                  (e, package))
+                        logging.error("Package not found: %s" % package)
+                        logging.error("Graft error %s " % e)
                         pass
-                    except:
-                        e = sys.exc_info()[0]  # Catch all exceptions
-                        logging.error("Unexpected Grafting Error: %s in package: %s" %
-                                  (e, package))
+                    except Exception as e:
+                        logging.error("Unexpected Graft error in package %s" %
+                                      package)
+                        logging.error("Unexpected Graft Error: %s" % e)
                         pass
             except subprocess.CalledProcessError as e:
                 logging.error("Branch %s missing" % release)
@@ -275,7 +263,7 @@ class GitBioconductorRepository(object):
                                                            package + ".git"))
                 except subprocess.CalledProcessError as e:
                     logging.error("Error creating bare repo: %s in package %s"
-                              % (e, package))
+                                  % (e, package))
                     pass
                 except OSError as e:
                     logging.error("Error: %s, Package: %s" % (e, package))
