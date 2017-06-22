@@ -185,12 +185,12 @@ def run_manifest_transition(configfile, new_svn_dump=False):
                                           bare_git_repo,
                                           package_path, manifest_files)
     # 1. Create manifest clone
-    manifest_repo.manifest_clone(new_svn_dump=False)
+    manifest_repo.manifest_clone(new_svn_dump)
     # 2. Add orphan branch points
-#    manifest_repo.add_orphan_branch_points()
+    manifest_repo.add_orphan_branch_points()
     # 3. Add commit history
-#    manifest_repo.add_commit_history()
-#    manifest_repo.rename_files_in_branches()
+    manifest_repo.add_commit_history()
+    manifest_repo.rename_files_in_branches()
 
     #####################################
     # Run data manifest transition
@@ -203,22 +203,16 @@ def run_manifest_transition(configfile, new_svn_dump=False):
                                                    temp_git_repo,
                                                    data_package_path,
                                                    data_manifest_files)
-    data_manifest_repo.manifest_clone(new_svn_dump=False)
-
+    data_manifest_repo.manifest_clone(new_svn_dump)
+    manifest_repo.create_unified_repo()
     #####################################
     # Create bare repos and add remote
     if not os.path.isdir(bare_git_repo):
         os.mkdir(bare_git_repo)
 
-    manifest_repo.create_unified_repo()
 
     manifest_repo.create_bare_repos()
     manifest_repo.add_remote()
-    return
-
-
-def run_data_manifest_transition(configfile, new_svn_dump=False):
-    """Run data manifest transition."""
     return
 
 
@@ -268,7 +262,7 @@ def run_workflow_transition(configfile, new_svn_dump=False):
 
 if __name__ == '__main__':
     conf = "./settings.ini"
-    run_manifest_transition(conf, new_svn_dump=True)
+    run_manifest_transition(conf, new_svn_dump=False)
     # run_transition(conf ,new_svn_dump=True)
     # run_experiment_data_transition(conf, new_svn_dump=True)
     # run_workflow_transition(conf, new_svn_dump=True)

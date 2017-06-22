@@ -14,6 +14,7 @@ import re
 import subprocess
 from src.git_api.git_api import git_filter_branch
 from src.git_api.git_api import git_clone
+from src.git_api.git_api import git_add
 from src.git_api.git_api import git_remote_add
 from src.git_api.git_api import git_checkout
 from src.git_api.git_api import git_commit
@@ -307,14 +308,23 @@ class GitManifestRepository(object):
         # move most recent data manifest to master branch in manifest repo
         os.rename(os.path.join(data_repo,"bioc-data-experiment.3.6.manifest" ),
                   os.path.join(software_repo,"bioc-data-experiment.3.6.manifest"))
+        git_add(os.path.join(software_repo,"bioc-data-experiment.3.6.manifest"),
+                cwd=software_repo)
+        git_commit("Add data experiemnt manifest to RELEASE_3_6", cwd=software_repo)
         # For rest of the files
         for data_manifest in os.listdir(data_repo):
-            if not data_manifest.startswith("."):
+            if not data_manifest.startswith(".") and ("3.6" not in data_manifest):
                 release = self.data_manifest_to_release(data_manifest)
+                print(release)
                 git_checkout(release, cwd=software_repo)
                 os.rename(os.path.join(data_repo,data_manifest),
                           os.path.join(software_repo,data_manifest))
+                git_add(os.path.join(software_repo,data_manifest), cwd=software_repo)
+                git_commit("Add data experiment manifest to %s" % release, cwd=software_repo)
         git_checkout('master', cwd=software_repo)
+        # Remove empty pkgs folder in temp_packages
+        os.rmdir(data_repo)
+        log.info("Delete data repo")
         return
 
 
