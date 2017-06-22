@@ -11,12 +11,17 @@ Ideas taken from Jim Hester's code in Bioconductor/mirror
 
 import os
 import re
-import sys
 import subprocess
 from src.git_api.git_api import git_filter_branch
 from src.git_api.git_api import git_clone
+from src.git_api.git_api import git_add
 from src.git_api.git_api import git_remote_add
 from src.git_api.git_api import git_checkout
+from src.git_api.git_api import git_commit
+from src.git_api.git_api import git_mv
+from src.git_api.git_api import git_rm
+from src.git_api.git_api import git_remote_remove
+from src.helper.helper import get_branch_list
 from local_svn_dump import Singleton
 # Logging configuration
 import logging
@@ -26,43 +31,24 @@ class GitManifestRepository(object):
     """Git Bioconductor Repository."""
     __metaclass__ = Singleton
 
-    # TODO: change bare_git_repo to admin_repo
-    def __init__(self, svn_root, temp_git_repo, bare_git_repo, remote_url,
-                 package_path, manifest_name):
+    def __init__(self, svn_root, temp_git_repo, bare_git_repo,
+                 package_path, manifest_files):
         """Initialize Git Bioconductor repository."""
         self.svn_root = svn_root
         self.temp_git_repo = temp_git_repo
         self.bare_git_repo = bare_git_repo
-        self.remote_url = remote_url
         self.package_path = package_path
-        self.manifest_name = manifest_name
+        self.manifest_files = manifest_files
         return
 
-    def get_branch_list(self):
-        """Get list of branches.
-
-        Input:
-            svn_root path.
-        Return:
-            List of branches in the reverse order of releases, i.e,
-            latest first.
-        """
-        branch_url = os.path.join(self.svn_root, "branches")
-        branch_list = [item.replace('/', '')
-                       for item in
-                       subprocess.check_output(['svn',
-                                                'list',
-                                                branch_url]).split()
-                       if "RELEASE" in item]
-        return branch_list
-
-    def manifest_clone(self, new=True):
-        if not new:
+    def manifest_clone(self, new_svn_dump=True):
+        if not new_svn_dump:
             return
         svndump_dir = self.svn_root + '/' + 'trunk' + self.package_path
         try:
             cmd = ['git', 'svn', 'clone',
-                   '--include-paths=bioc_.*.manifest', svndump_dir]
+                   '--include-paths=' + self.manifest_files,
+                   svndump_dir]
             subprocess.check_call(cmd, cwd=self.temp_git_repo)
             logging.info("manifest clone pass %s" % cmd)
         except subprocess.CalledProcessError as e:
@@ -71,13 +57,17 @@ class GitManifestRepository(object):
             logging.error("Unexpected error: %s" % e)
         return
 
+    def release_to_manifest(self, release):
+        manifest_file = ('bioc_' +
+                         release.replace("RELEASE_", "").replace("_", ".") +
+                         '.manifest')
+        return manifest_file
+
     def add_config(self, release):
         """Add git config options for manifest repo."""
         package_dir = self.temp_git_repo + "/" + "Rpacks"
         # TODO:Error in RELEASE_1_0_branch
-        manifest_file = ('bioc_' +
-                         release.replace("RELEASE_", "").replace("_", ".") +
-                         '.manifest')
+        manifest_file = self.release_to_manifest(release)
         try:
             # config add include path
             include_paths = ['git', 'config', '--add',
@@ -103,7 +93,7 @@ class GitManifestRepository(object):
     def add_orphan_branch_points(self):
         """Add orphan branch points to manifest repo."""
         package_dir = self.temp_git_repo + '/' + 'Rpacks'
-        branches = self.get_branch_list()
+        branches = get_branch_list(self.svn_root)
         for release in branches:
             self.add_config(release)
         # Try git_svn_fetch('--all', cwd=package_dir)
@@ -189,7 +179,7 @@ class GitManifestRepository(object):
         logging.debug("Pruning ended: %s" % release)
         return
 
-    def add_commit_history(self, manifest_name):
+    def add_commit_history(self):
         """
         Add commit history by fixing b.
 
@@ -198,7 +188,7 @@ class GitManifestRepository(object):
         """
         package_dir = self.temp_git_repo + '/' + 'Rpacks'
         # Get list of branches
-        branch_list = self.get_branch_list()
+        branch_list = get_branch_list(self.svn_root)
         release_revision_dict = self.release_revision_dict(branch_list)
         l = ['RELEASE_1_0', 'RELEASE_1_0_branch',
              'RELEASE_1_4', 'RELEASE_1_4_branch',
@@ -213,8 +203,8 @@ class GitManifestRepository(object):
                 logging.error("Grafting Error: %s, Package not found: %s" %
                               (e, release))
                 pass
-            except:
-                e = sys.exc_info()[0]  # Catch all exceptions
+            except Exception as e:
+                # Catch all exceptions
                 logging.error("Unexpected Grafting Error: %s in package: %s" %
                               (e, release))
                 pass
@@ -229,13 +219,39 @@ class GitManifestRepository(object):
             logging.debug("Add commit history:  git_checkout master")
             git_checkout('master', cwd=package_dir,  new=False)
         # rename repository to manifest
-        os.rename(package_dir, self.temp_git_repo + '/' + self.manifest_name)
+        os.rename(package_dir, self.temp_git_repo + '/' + 'manifest')
         return
 
-    # TODO: bare_git_repo has to change to admin_repo
+    def rename_files_in_branches(self):
+        package_dir = os.path.join(self.temp_git_repo, 'manifest')
+
+        branch_list = get_branch_list(self.svn_root)
+        l = ['RELEASE_1_0', 'RELEASE_1_0_branch',
+             'RELEASE_1_4', 'RELEASE_1_4_branch',
+             'RELEASE_1_5']
+        branches = list(set(branch_list) - set(l))
+        # For master branch, RELEASE_3_6
+        git_checkout('master', cwd=package_dir)
+        # Rename, delete other manifests and commit
+        manifest_file = self.release_to_manifest('RELEASE_3_6')
+        git_mv(manifest_file, 'software.txt', cwd=package_dir)
+        git_rm('bioc*', cwd=package_dir)
+        commit_message = ("Change %s to software.txt" % manifest_file)
+        git_commit(commit_message, cwd=package_dir)
+        # In all release branches
+        for release in branches:
+            git_checkout(release, cwd=package_dir)
+            manifest_file = self.release_to_manifest(release)
+            git_mv(manifest_file, "software.txt", cwd=package_dir)
+            commit_message = ("Change %s to software.txt" % manifest_file)
+            git_commit(commit_message, cwd=package_dir)
+        # Checkout master at the end
+        git_checkout('master', cwd=package_dir)
+        return
+
     def create_bare_repos(self):
         try:
-            package_dir = os.path.join(self.temp_git_repo, self.manifest_name)
+            package_dir = os.path.join(self.temp_git_repo, 'manifest')
             git_clone(package_dir, self.bare_git_repo, bare=True)
         except Exception as e:
             logging.error("Error while making a bare clone for %s" %
@@ -250,12 +266,67 @@ class GitManifestRepository(object):
         """
         logging.info("Adding remote url to bare git repo.")
         try:
-            remote = self.remote_url + self.manifest_file + ".git"
+            remote = 'admin/manifest.git'
             # Run remote command
-            package = os.path.join(self.bare_git_repo, self.manifest_file +
-                                   ".git")
-            git_remote_add('origin', remote, package)
-            logging.info("Add remote to package: %s" % package)
+            package_dir = os.path.join(self.bare_git_repo, self.manifest_file +
+                                       ".git")
+            print(package_dir)
+            git_remote_remove('origin', cwd=package_dir)
+            git_remote_add('origin', remote, package_dir)
+            logging.info("Add remote to package: %s" % package_dir)
         except Exception as e:
             logging.error(e)
         return
+
+    def data_manifest_to_release(self, manifest):
+        """ Convert bioc-data-experiment.2.14.manifest to RELEASE_2_4."""
+        release = manifest.replace("bioc-data-experiment.",
+                                   "").replace(".manifest",
+                                               "").replace(".", "_")
+        return "RELEASE_" + release
+
+    def create_unified_repo(self):
+        """Create a unified repo for data and software repos."""
+        # software repo, checkout release
+        # move data manifest --> release
+        # loop through files in data_manifest
+        data_repo = os.path.join(self.temp_git_repo, 'pkgs')
+        software_repo = os.path.join(self.temp_git_repo, 'manifest')
+        # move most recent data manifest to master branch in manifest repo
+        logging.info("Move data manifest 3.6 to manfiest repo")
+        os.rename(os.path.join(data_repo, "bioc-data-experiment.3.6.manifest"),
+                  os.path.join(software_repo, "data-experiment.txt"))
+        git_add(os.path.join(software_repo, "data-experiment.txt"),
+                cwd=software_repo)
+        git_commit("Add data-experiemnt.txt manifest to RELEASE_3_6",
+                   cwd=software_repo)
+        # For rest of the files
+        for data_manifest in os.listdir(data_repo):
+            # TODO: This is magic number "3.6" stands for RELEASE_3_6
+            if ((not data_manifest.startswith(".")) and
+               ("3.6" not in data_manifest)):
+                release = self.data_manifest_to_release(data_manifest)
+                logging.info("Move data manifest %s to repo" % release)
+                git_checkout(release, cwd=software_repo)
+                os.rename(os.path.join(data_repo, data_manifest),
+                          os.path.join(software_repo, "data-experiment.txt"))
+                git_add(os.path.join(software_repo, "data-experiment.txt"),
+                        cwd=software_repo)
+                git_commit("Add data-experiment.txt manifest to %s" % release,
+                           cwd=software_repo)
+        git_checkout('master', cwd=software_repo)
+        # Remove empty pkgs folder in temp_packages
+        os.rmdir(data_repo)
+        logging.info("Delete data repo")
+        return
+
+
+class GitDataManifestRepository(GitManifestRepository):
+    """Version Bioconductor experiment data manifest files."""
+
+    def __init__(self, svn_root, temp_git_repo,
+                 package_path, manifest_files):
+        self.svn_root = svn_root
+        self.temp_git_repo = temp_git_repo
+        self.package_path = package_path
+        self.manifest_files = manifest_files

@@ -66,7 +66,6 @@ class LocalSvnDump(object):
         """
         manifest = (self.svn_root + "/" + "trunk" + self.package_path +
                     "/" + manifest_file)
-        print manifest
         cmd = ['svn', 'cat', manifest]
         out = subprocess.check_output(cmd)
         # with open(manifest, 'r') as f:
@@ -103,8 +102,9 @@ class LocalSvnDump(object):
                 try:
                     cmd = ['git', 'svn', 'clone',
                            '--authors-file=' + self.users_db, package_dump]
-                    subprocess.check_call(cmd, cwd=self.bioc_git_repo)
-                    logging.debug("Finished git-svn clone for package: %s" % pack)
+                    subprocess.check_call(cmd, cwd=self.temp_git_repo)
+                    logging.debug("Finished git-svn clone for package: %s"
+                                  % pack)
                 except subprocess.CalledProcessError as e:
                     logging.error("Error : %s in package %s" % (e, pack))
                 except Exception as e:  # All other errors

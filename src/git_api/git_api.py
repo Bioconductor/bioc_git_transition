@@ -120,3 +120,21 @@ def git_commit(message, cwd):
     cmd = ['git', 'commit', '-m', message]
     subprocess.check_call(cmd, cwd=cwd)
     return
+
+def git_mv(old, new, cwd):
+    cmd = ['git', 'mv', old, new]
+    subprocess.check_call(cmd, cwd=cwd)
+    return
+
+def git_rm(regex, cwd):
+    cmd = ['git', 'rm', regex]
+    subprocess.check_call(cmd, cwd=cwd)
+    return
+
+def git_reset(commit_id, cwd, hard=False):
+    if hard:
+        cmd = ['git', 'reset', '--hard', commit_id]
+    else:
+        cmd = ['git', 'reset', commit_id]
+    subprocess.check_call(cmd, cwd=cwd)
+    return

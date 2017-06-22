@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+
+"""Bioconductor Git rapid update
+
+This module provides functions for working with the Bioconductor
+`git` repository. This allows users to rapidly update only the master
+and the most recent release branch.
+
+Author: Nitesh Turaga
+"""
+
 import os
 import subprocess
 import logging
@@ -25,10 +36,10 @@ class UpdateGitRepository(object):
         return self.branch_list[-1]
 
     def most_recent_commit(self, cwd):
-        """Get most recent commit in git repository."""
-        x = subprocess.check_output(['git', 'log', '--format=%H', '-n', '1'],
+        """Get most recent commit in git repository, before merge."""
+        x = subprocess.check_output(['git', 'log', '--format=%H', '-n', '2'],
                                     cwd=cwd)
-        return x.strip()
+        return x.split()[-1]
 
     def update_temp_git_repo(self):
         """Create bare repos in the repository directory.
@@ -40,17 +51,23 @@ class UpdateGitRepository(object):
         for package in os.listdir(self.temp_git_repo):
             try:
                 package_dir = os.path.join(self.temp_git_repo, package)
+                logging.info("Updating package %s" % package)
                 # Rebase assumes that the branch is "master"
                 git_svn_rebase(cwd=package_dir)
                 recent_release = self.most_recent_release()
+                logging.info("Updating release %s" % recent_release)
                 # Fetch release updates
                 git_svn_fetch(recent_release, cwd=package_dir)
                 # Checkout release updates
                 git_checkout(recent_release, cwd=package_dir)
                 # Merge release updates WITHOUT edits to commit message
-                subprocess.check_call['git', 'merge', '--no-edit'
-                                      'git-svn-' + recent_release]
+
+                subprocess.check_call(['git', 'merge', '--no-edit',
+                                      'git-svn-' + recent_release],
+                                      cwd=package_dir)
+                # Get the commit id before the merge
                 merge_commit = self.most_recent_commit(cwd=package_dir)
+                # Reset to commit id before that
                 git_reset(merge_commit, cwd=package_dir)
                 git_checkout('master', cwd=package_dir)
             except subprocess.CalledProcessError as e:
