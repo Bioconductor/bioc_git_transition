@@ -103,7 +103,8 @@ class LocalSvnDump(object):
                     cmd = ['git', 'svn', 'clone',
                            '--authors-file=' + self.users_db, package_dump]
                     subprocess.check_call(cmd, cwd=self.temp_git_repo)
-                    logging.debug("Finished git-svn clone for package: %s" % pack)
+                    logging.debug("Finished git-svn clone for package: %s"
+                                  % pack)
                 except subprocess.CalledProcessError as e:
                     logging.error("Error : %s in package %s" % (e, pack))
                 except Exception as e:  # All other errors

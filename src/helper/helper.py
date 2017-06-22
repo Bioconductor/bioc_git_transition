@@ -1,6 +1,7 @@
 import subprocess
 import os
 
+
 def is_github_repo(url):
     """Check if it is a valid github repo.
 

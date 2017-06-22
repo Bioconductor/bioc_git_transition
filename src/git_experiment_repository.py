@@ -56,7 +56,7 @@ class Lfs:
             refs = self.parse_external_refs(package_dir)
         except IOError, err:
             logging.error("Error: No data : missing file %s, in package %s "
-                      % (err.filename, package))
+                          % (err.filename, package))
             return
         for ref in refs:
             # TODO: PATH ISSUE here.
@@ -69,7 +69,8 @@ class Lfs:
                 print "CMD to add data: ", cmd
                 subprocess.check_call(cmd)
             except Exception as e:
-                logging.error("Error adding ref: %s, package: %s" % (ref, package))
+                logging.error("Error adding ref: %s, package: %s"
+                              % (ref, package))
                 logging.error(e)
         after_files = self.list_files(package_dir)
         # Add list of files newly added to object.
@@ -105,14 +106,18 @@ class Lfs:
         for package in os.listdir(os.path.abspath(temp_git_repo)):
             try:
                 if "bioc-data-experiment" not in package:
-                    logging.info("Experiment data: Add data to package %s" % package)
+                    logging.info("Experiment data: Add data to package %s"
+                                 % package)
                     self.add_data(package)
-                    logging.info("Experiment data: Add data to package %s" % package)
+                    logging.info("Experiment data: Add data to package %s"
+                                 % package)
                     self.add_data_as_git_objects(package)
-                    logging.info("Experiment data: Commit data to package %s" % package)
+                    logging.info("Experiment data: Commit data to package %s"
+                                 % package)
                     self.commit_data_as_git_objects(package)
             except Exception as e:
-                logging.error("Experiment data: Error in package %s: " % package)
+                logging.error("Experiment data: Error in package %s: "
+                              % package)
                 logging.error(e)
                 pass
         return

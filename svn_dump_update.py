@@ -10,8 +10,8 @@ from src.local_svn_dump import LocalSvnDump
 import logging
 import ConfigParser
 logging.basicConfig(filename='svn_dump_update.log',
-                format='%(asctime)s %(message)s',
-                level=logging.DEBUG)
+                    format='%(asctime)s %(message)s',
+                    level=logging.DEBUG)
 logging.debug("Bioconductor SVN Dump Log File: \n")
 
 
@@ -31,7 +31,8 @@ def svn_root_update(configfile):
         for k, v in Config.items(s):
             logging.info("%s: %s" % (k, v))
 
-    dump = LocalSvnDump(svn_root, temp_git_repo, users_db, remote_svn_server, package_path)
+    dump = LocalSvnDump(svn_root, temp_git_repo,
+                        users_db, remote_svn_server, package_path)
     dump.svn_get_revision()
     dump.svn_dump_update(update_file)
     dump.update_local_svn_dump(update_file)
@@ -54,12 +55,14 @@ def svn_experiment_root_update(configfile):
         for k, v in Config.items(s):
             logging.info("%s: %s" % (k, v))
 
-    dump = LocalSvnDump(svn_root, temp_git_repo, users_db, remote_svn_server, package_path)
+    dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
+                        remote_svn_server, package_path)
     dump.svn_get_revision()
     dump.svn_dump_update(update_file)
     dump.update_local_svn_dump(update_file)
     return
 
+
 if __name__ == '__main__':
-    #svn_root_update("./settings.ini")
+    svn_root_update("./settings.ini")
     svn_experiment_root_update("./settings.ini")
