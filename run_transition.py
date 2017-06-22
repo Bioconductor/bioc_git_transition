@@ -18,6 +18,7 @@ from src.git_experiment_repository import Lfs
 from src.git_manifest_repository import GitManifestRepository
 from src.git_manifest_repository import GitDataManifestRepository
 from src.update_temp_git_repo import UpdateGitRepository
+from src.helper.helper import get_branch_list
 import os
 import logging
 import ConfigParser
@@ -208,16 +209,27 @@ def run_manifest_transition(configfile, new_svn_dump=False):
     #####################################
     # Create bare repos and add remote
     if not os.path.isdir(bare_git_repo):
+        logging.info("Create bare_git_repo %s" % bare_git_repo)
         os.mkdir(bare_git_repo)
 
-
+    logging.info("Create bare manifest repository")
     manifest_repo.create_bare_repos()
-    manifest_repo.add_remote()
+# TODO: FIX ME, remotes are not added properly
+#    manifest_repo.add_remote()
     return
 
 
 def run_updates(configfile):
     """Run updates on all branches"""
+    Config = ConfigParser.ConfigParser()
+    Config.read(configfile)
+    software_temp_git_repo = Config.get('Software', 'temp_git_repo')
+    software_root = Config.get('SVN', 'svn_root')
+    # TODO: FIXME Get branch list, there has to be a simpler way to do this
+    branch_list = get_branch_list(software_root)
+ 
+    updater = UpdateGitRepository(software_temp_git_repo, branch_list)
+    updater.update_temp_git_repo() 
     return
 
 
@@ -262,8 +274,8 @@ def run_workflow_transition(configfile, new_svn_dump=False):
 
 if __name__ == '__main__':
     conf = "./settings.ini"
-    run_manifest_transition(conf, new_svn_dump=False)
+    # run_manifest_transition(conf, new_svn_dump=False)
     # run_transition(conf ,new_svn_dump=True)
     # run_experiment_data_transition(conf, new_svn_dump=True)
     # run_workflow_transition(conf, new_svn_dump=True)
-    # run_updates()
+    run_updates(conf)

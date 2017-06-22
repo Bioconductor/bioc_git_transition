@@ -51,16 +51,19 @@ class UpdateGitRepository(object):
         for package in os.listdir(self.temp_git_repo):
             try:
                 package_dir = os.path.join(self.temp_git_repo, package)
+                print package_dir
                 # Rebase assumes that the branch is "master"
                 git_svn_rebase(cwd=package_dir)
                 recent_release = self.most_recent_release()
+                print recent_release
                 # Fetch release updates
                 git_svn_fetch(recent_release, cwd=package_dir)
                 # Checkout release updates
                 git_checkout(recent_release, cwd=package_dir)
                 # Merge release updates WITHOUT edits to commit message
-                subprocess.check_call['git', 'merge', '--no-edit',
-                                      'git-svn-' + recent_release]
+            
+                subprocess.check_call(['git', 'merge', '--no-edit',
+                                      'git-svn-' + recent_release], cwd=package_dir)
                 # Get the commit id before the merge
                 merge_commit = self.most_recent_commit(cwd=package_dir)
                 # Reset to commit id before that

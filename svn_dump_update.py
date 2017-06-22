@@ -61,5 +61,5 @@ def svn_experiment_root_update(configfile):
     return
 
 if __name__ == '__main__':
-    svn_root_update("./settings.ini")
+    #svn_root_update("./settings.ini")
     svn_experiment_root_update("./settings.ini")

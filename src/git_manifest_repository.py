@@ -282,10 +282,12 @@ class GitManifestRepository(object):
         """
         logging.info("Adding remote url to bare git repo.")
         try:
-            remote = 'admin' + '/' + self.manifest_file + ".git"
+            remote = 'admin/manifest.git'
             # Run remote command
             package_dir = os.path.join(self.bare_git_repo, self.manifest_file +
                                        ".git")
+            print(package_dir)
+            git_remote_remove('origin',cwd=package_dir)
             git_remote_add('origin', remote, package_dir)
             logging.info("Add remote to package: %s" % package_dir)
         except Exception as e:
@@ -306,6 +308,7 @@ class GitManifestRepository(object):
         data_repo = os.path.join(self.temp_git_repo, 'pkgs')
         software_repo = os.path.join(self.temp_git_repo, 'manifest')
         # move most recent data manifest to master branch in manifest repo
+        logging.info("Move data manifest 3.6 to manfiest repo")
         os.rename(os.path.join(data_repo,"bioc-data-experiment.3.6.manifest" ),
                   os.path.join(software_repo,"bioc-data-experiment.3.6.manifest"))
         git_add(os.path.join(software_repo,"bioc-data-experiment.3.6.manifest"),
@@ -315,7 +318,7 @@ class GitManifestRepository(object):
         for data_manifest in os.listdir(data_repo):
             if not data_manifest.startswith(".") and ("3.6" not in data_manifest):
                 release = self.data_manifest_to_release(data_manifest)
-                print(release)
+                logging.info("Move data manifest %s to manifest repo" % release) 
                 git_checkout(release, cwd=software_repo)
                 os.rename(os.path.join(data_repo,data_manifest),
                           os.path.join(software_repo,data_manifest))
@@ -324,7 +327,7 @@ class GitManifestRepository(object):
         git_checkout('master', cwd=software_repo)
         # Remove empty pkgs folder in temp_packages
         os.rmdir(data_repo)
-        log.info("Delete data repo")
+        logging.info("Delete data repo")
         return
 
 
