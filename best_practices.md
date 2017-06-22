@@ -13,7 +13,7 @@ are limited to a `List of available packages` (refer below).
 
 * Clone a package:
 
-  `git clone ubuntu@git.bioconductor.org:/packages/<package_of_choice>.git`
+  `git clone git@git.bioconductor.org:/packages/<package_of_choice>.git`
 
 * See the branches available:
 

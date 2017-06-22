@@ -6,10 +6,6 @@ This module assembles the functions from `git_script.py` and
 can be run in a sequential manner.
 
 Author: Nitesh Turaga
-Ideas taken from Jim Hester's code in Bioconductor/mirror
-
-Usage:
-    `python run_transition.py`
 """
 
 from src.local_svn_dump import LocalSvnDump
@@ -47,7 +43,7 @@ def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
     return
 
 
-def run_transition(configfile, new_svn_dump=False):
+def run_software_transition(configfile, new_svn_dump=False):
     """Update SVN local dump and run gitify-bioconductor.
 
     Step 0: Create dump
@@ -276,12 +272,3 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     # EOF message
     logging.info("Finished setting up bare git repo")
     return
-
-
-if __name__ == '__main__':
-    conf = "./settings.ini"
-    run_manifest_transition(conf, new_svn_dump=False)
-    run_transition(conf, new_svn_dump=False)
-    run_experiment_data_transition(conf, new_svn_dump=False)
-    run_workflow_transition(conf, new_svn_dump=False)
-    run_updates(conf)
