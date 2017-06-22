@@ -63,7 +63,7 @@ def run_software_transition(configfile, new_svn_dump=False):
     svn_root = Config.get('SVN', 'svn_root')
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
-    software_transition_log = Config.get('SVN', 'software_transition_log')
+    software_transition_log = Config.get('Software', 'software_transition_log')
 
     logging.basicConfig(filename=software_transition_log,
                         level=logging.DEBUG,
@@ -153,7 +153,7 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     return
 
 
-def run_manifest_transition(configfile, new_svn_dump=False):
+def run_manifest_transition(configfile, new_svn_clone=True):
     """Run manifest file transition."""
     # Settings
     Config = ConfigParser.ConfigParser()
@@ -177,7 +177,7 @@ def run_manifest_transition(configfile, new_svn_dump=False):
                                           package_path, include_path)
     # 1. Create manifest clone
     logging.info("Create a new software manifest dump")
-    manifest_repo.manifest_clone(new_svn_dump)
+    manifest_repo.manifest_clone(new_svn_clone)
     # 2. Add orphan branch points
     logging.info("Add orphan branch points to manifest files")
     manifest_repo.add_orphan_branch_points()
@@ -198,7 +198,7 @@ def run_manifest_transition(configfile, new_svn_dump=False):
                                                    data_package_path,
                                                    data_include_path)
     logging.info("Copy data manifest log files")
-    data_manifest_repo.manifest_clone(new_svn_dump)
+    data_manifest_repo.manifest_clone(new_svn_clone)
     logging.info("Create unified repo for software and data manifest")
     manifest_repo.create_unified_repo()
     #####################################
