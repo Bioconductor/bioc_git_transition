@@ -63,12 +63,12 @@ def run_software_transition(configfile, new_svn_dump=False):
     svn_root = Config.get('SVN', 'svn_root')
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
+    
     software_transition_log = Config.get('Software', 'software_transition_log')
-
     logging.basicConfig(filename=software_transition_log,
                         level=logging.DEBUG,
                         format='%(asctime)s %(message)s')
-    logging.debug("Bioconductor Software Transition Log File: \n")
+    logging.info("Bioconductor Software Transition Log File: \n")
 
     if not os.path.isdir(temp_git_repo):
         os.mkdir(temp_git_repo)

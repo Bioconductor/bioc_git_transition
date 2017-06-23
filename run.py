@@ -5,6 +5,8 @@ can be run in a sequential manner.
 
 It runs the following aspects fo the Bioconductor transition.
 
+Note: Update the SVN dump
+
 1. Run Bioconductor Software package transition
 2. Run Bioconductor Experiment Data package transition
 3. Run Workflow package transition
@@ -17,18 +19,23 @@ Manual tasks which need to be done:
 2. Copy manifest bare git repo to repositories/admin
 """
 
-import run_transition as rt
+import src.run_transition as rt
+import src.svn_dump_update as sdu
 
+def svn_dump_update(config_file):
+    sdu.svn_root_update(config_file)
+    sdu.svn_experiment_root_update(config_file) 
 
-def run():
-    config_file = "./settings.ini"
-    rt.run_manifest_transition(config_file, new_svn_dump=False)
-    rt.run_software_transition(config_file, new_svn_dump=False)
-    rt.run_experiment_data_transition(config_file, new_svn_dump=False)
-    rt.run_workflow_transition(config_file, new_svn_dump=False)
-    rt.run_updates(config_file)
+def run(config_file):
+    rt.run_software_transition(config_file, new_svn_dump=True)
+    rt.run_experiment_data_transition(config_file, new_svn_dump=True)
+    #rt.run_workflow_transition(config_file, new_svn_dump=True)
+    #rt.run_manifest_transition(config_file, new_svn_clone=True)
+    # rt.run_updates(config_file)
     return
 
 
 if __name__ == '__main__':
-    run()
+    config_file = "./settings.ini"
+    #svn_dump_update(config_file)
+    run(config_file)

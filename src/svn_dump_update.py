@@ -9,10 +9,6 @@ Usage:
 from src.local_svn_dump import LocalSvnDump
 import logging
 import ConfigParser
-logging.basicConfig(filename='svn_dump_update.log',
-                    format='%(asctime)s %(message)s',
-                    level=logging.DEBUG)
-logging.debug("Bioconductor SVN Dump Log File: \n")
 
 
 def svn_root_update(configfile):
@@ -26,10 +22,11 @@ def svn_root_update(configfile):
     users_db = Config.get('SVN', 'users_db')
     update_file = Config.get('SVN', 'update_file')
     package_path = Config.get('Software', 'package_path')
-
-    for s in Config.sections():
-        for k, v in Config.items(s):
-            logging.info("%s: %s" % (k, v))
+    
+    logging.basicConfig(filename='svn_dump_update.log',
+                    format='%(asctime)s %(message)s',
+                    level=logging.DEBUG)
+    logging.debug("Bioconductor SVN Dump Log File: \n")
 
     dump = LocalSvnDump(svn_root, temp_git_repo,
                         users_db, remote_svn_server, package_path)
@@ -51,9 +48,10 @@ def svn_experiment_root_update(configfile):
     update_file = Config.get('ExperimentData', 'update_file')
     package_path = Config.get('ExperimentData', 'package_path')
 
-    for s in Config.sections():
-        for k, v in Config.items(s):
-            logging.info("%s: %s" % (k, v))
+    logging.basicConfig(filename='svn_dump_update.log',
+                    format='%(asctime)s %(message)s',
+                    level=logging.DEBUG)
+    logging.debug("Bioconductor SVN Dump Log File: \n")
 
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
                         remote_svn_server, package_path)
@@ -62,7 +60,3 @@ def svn_experiment_root_update(configfile):
     dump.update_local_svn_dump(update_file)
     return
 
-
-if __name__ == '__main__':
-    svn_root_update("./settings.ini")
-    svn_experiment_root_update("./settings.ini")
