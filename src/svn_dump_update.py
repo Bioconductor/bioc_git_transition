@@ -22,7 +22,7 @@ def svn_root_update(configfile):
     users_db = Config.get('SVN', 'users_db')
     update_file = Config.get('SVN', 'update_file')
     package_path = Config.get('Software', 'package_path')
-    
+
     logging.basicConfig(filename='svn_dump_update.log',
                     format='%(asctime)s %(message)s',
                     level=logging.DEBUG)
@@ -33,6 +33,7 @@ def svn_root_update(configfile):
     dump.svn_get_revision()
     dump.svn_dump_update(update_file)
     dump.update_local_svn_dump(update_file)
+    del dump
     return
 
 
@@ -58,5 +59,6 @@ def svn_experiment_root_update(configfile):
     dump.svn_get_revision()
     dump.svn_dump_update(update_file)
     dump.update_local_svn_dump(update_file)
+    del dump
     return
 

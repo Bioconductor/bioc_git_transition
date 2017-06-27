@@ -81,7 +81,8 @@ def run_software_transition(configfile, new_svn_dump=False):
     ###################################################
     # Create a local dump of SVN packages in a location
     if new_svn_dump:
-        logging.info("Create a local SVN dump")
+        logging.info("Create a local SVN dump for software packages")
+        # Git svn clone software packages
         dump.svn_dump(packs)
     ###################################################
 
@@ -96,6 +97,7 @@ def run_software_transition(configfile, new_svn_dump=False):
 
     # EOF message
     logging.info("Finished setting up bare git repo")
+    del dump
     return
 
 
@@ -136,6 +138,7 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     # Create a local dump of SVN packages in a location
     if new_svn_dump:
         logging.info("Create a local SVN dump of experiment data")
+        # Git svn clone all packages
         dump.svn_dump(packs)
     ###################################################
     # Make bare repo, if it does not exist
@@ -151,10 +154,11 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
                   remote_url, package_path, lfs_object=lfs)
     # EOF message
     logging.info("Completed bare git repo for experiment data packages")
+    del dump
     return
 
 
-def run_manifest_transition(configfile, new_svn_clone=True):
+def run_manifest_transition(configfile, new_svn_dump=False):
     """Run manifest file transition."""
     # Settings
     Config = ConfigParser.ConfigParser()
@@ -173,12 +177,13 @@ def run_manifest_transition(configfile, new_svn_clone=True):
 
     #####################################
     # Create new manifest repo for software
+    ######################################
     manifest_repo = GitManifestRepository(svn_root, temp_git_repo,
                                           bare_git_repo,
                                           package_path, include_path)
     # 1. Create manifest clone
     logging.info("Create a new software manifest dump")
-    manifest_repo.manifest_clone(new_svn_clone)
+    manifest_repo.manifest_clone(new_svn_dump)
     # 2. Add orphan branch points
     logging.info("Add orphan branch points to manifest files")
     manifest_repo.add_orphan_branch_points()
@@ -189,6 +194,7 @@ def run_manifest_transition(configfile, new_svn_clone=True):
 
     #####################################
     # Run data manifest transition
+    ######################################
     data_svn_root = Config.get("ExperimentData", "svn_root")
     data_package_path = Config.get("ExperimentData", "package_path")
     data_include_path = Config.get("Manifest", "data_manifest_include_path")
@@ -199,18 +205,17 @@ def run_manifest_transition(configfile, new_svn_clone=True):
                                                    data_package_path,
                                                    data_include_path)
     logging.info("Copy data manifest log files")
-    data_manifest_repo.manifest_clone(new_svn_clone)
+    data_manifest_repo.manifest_clone(new_svn_dump)
     logging.info("Create unified repo for software and data manifest")
     manifest_repo.create_unified_repo()
     #####################################
     # Create bare repos and add remote
+    ######################################
     if not os.path.isdir(bare_git_repo):
         logging.info("Create bare_git_repo %s" % bare_git_repo)
         os.mkdir(bare_git_repo)
-
     logging.info("Create bare manifest repository")
     manifest_repo.create_bare_repos()
-    # FIXME: Possibly broken, remotes are not added properly.
     logging.info("Add remote to manifest repo")
     manifest_repo.add_remote()
     return
@@ -257,23 +262,32 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     # Print in the logging file.
     if not os.path.isdir(temp_git_repo):
         os.mkdir(temp_git_repo)
+
+    ######################################
+    # Create a local svn dump
+    ######################################
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
                         remote_svn_server, package_path)
     packs = dump.get_pack_list(branch="trunk")
+    # Git svn clone workflow packages
     if new_svn_dump:
         logging.info("Create workflow dump")
         dump.svn_dump(packs)
+    ######################################
     # Make bare repo, if it does not exist
+    ######################################
     if not os.path.isdir(bare_git_repo):
         os.mkdir(bare_git_repo)
-
     logging.info("Make workflow git repo")
     make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
                   package_path)
+    ######################################
     # Remove packages which are not supposed to be in the directory
+    ######################################
     shutil.rmtree(os.path.join(temp_git_repo, "testproj"))
     shutil.rmtree(os.path.join(temp_git_repo, "packages"))
 
     # EOF message
     logging.info("Finished setting up bare git repo")
+    del dump
     return
