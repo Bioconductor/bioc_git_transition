@@ -16,6 +16,7 @@ from src.git_manifest_repository import GitDataManifestRepository
 from src.update_temp_git_repo import UpdateGitRepository
 from src.helper.helper import get_branch_list
 import os
+import shutil
 import logging
 import ConfigParser
 
@@ -63,7 +64,7 @@ def run_software_transition(configfile, new_svn_dump=False):
     svn_root = Config.get('SVN', 'svn_root')
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
-    
+
     software_transition_log = Config.get('Software', 'software_transition_log')
     logging.basicConfig(filename=software_transition_log,
                         level=logging.DEBUG,
@@ -269,6 +270,10 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     logging.info("Make workflow git repo")
     make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
                   package_path)
+    # Remove packages which are not supposed to be in the directory
+    shutil.rmtree(os.path.join(temp_git_repo, "testproj"))
+    shutil.rmtree(os.path.join(temp_git_repo, "packages"))
+
     # EOF message
     logging.info("Finished setting up bare git repo")
     return
