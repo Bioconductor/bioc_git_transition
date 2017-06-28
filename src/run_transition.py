@@ -314,9 +314,13 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     ######################################
     # Remove packages which are not supposed to be in the directory
     ######################################
-    shutil.rmtree(os.path.join(temp_git_repo, "testproj"))
-    shutil.rmtree(os.path.join(temp_git_repo, "packages"))
-
+    try:
+        shutil.rmtree(os.path.join(temp_git_repo, "testproj"))
+        shutil.rmtree(os.path.join(temp_git_repo, "packages"))
+    except Exception as e:
+        logging.error("packages -testproj- and -packages- not deleted")
+        logging.error(e)
+        pass
     # EOF message
     logging.info("Finished setting up bare git repo")
     try:
