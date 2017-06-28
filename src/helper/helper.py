@@ -1,6 +1,6 @@
 import subprocess
 import os
-
+import logging
 
 def is_github_repo(url):
     """Check if it is a valid github repo.
@@ -34,3 +34,17 @@ def get_branch_list(svn_root):
                    subprocess.check_output(['svn', 'list', branch_url]).split()
                    if "RELEASE" in item]
     return branch_list
+
+
+def setup_logger(logger_name, log_file):
+    l = logging.getLogger(logger_name)
+    formatter = logging.Formatter('%(levelname)s : %(asctime)s : %(message)s')
+    fileHandler = logging.FileHandler(log_file, mode='w')
+    fileHandler.setFormatter(formatter)
+    streamHandler = logging.StreamHandler()
+    streamHandler.setFormatter(formatter)
+
+    l.setLevel(logging.DEBUG)
+    l.addHandler(fileHandler)
+    l.addHandler(streamHandler)
+

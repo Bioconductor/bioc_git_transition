@@ -22,20 +22,21 @@ Manual tasks which need to be done:
 import src.run_transition as rt
 import src.svn_dump_update as sdu
 
+
 def svn_dump_update(config_file):
     sdu.svn_root_update(config_file)
     sdu.svn_experiment_root_update(config_file)
 
 def run(config_file):
-    #rt.run_software_transition(config_file, new_svn_dump=True)
-    #rt.run_experiment_data_transition(config_file, new_svn_dump=True)
-    #rt.run_workflow_transition(config_file, new_svn_dump=True)
+    rt.run_software_transition(config_file, new_svn_dump=True)
+    rt.run_experiment_data_transition(config_file, new_svn_dump=True)
+    rt.run_workflow_transition(config_file, new_svn_dump=True)
     rt.run_manifest_transition(config_file, new_svn_dump=True)
-    # rt.run_updates(config_file)
+    rt.run_updates(config_file)
     return
 
 
 if __name__ == '__main__':
     config_file = "./settings.ini"
-    #svn_dump_update(config_file)
+    svn_dump_update(config_file)
     run(config_file)

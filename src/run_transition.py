@@ -41,6 +41,12 @@ def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
     gitrepo.create_bare_repos()
     logging.info("Make git repo: Adding remotes to make git server available")
     gitrepo.add_remote()
+    # FIXME: delete gitrepo singleton
+    try:
+        del gitrepo
+    except Exception as e:
+        logging.error(e)
+        pass
     return
 
 
@@ -97,7 +103,12 @@ def run_software_transition(configfile, new_svn_dump=False):
 
     # EOF message
     logging.info("Finished setting up bare git repo")
-    del dump
+    # FIXME: Delete singleton instances
+    try:
+        del dump
+    except Exception as e:
+        logging.error(e)
+        pass
     return
 
 
@@ -154,7 +165,13 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
                   remote_url, package_path, lfs_object=lfs)
     # EOF message
     logging.info("Completed bare git repo for experiment data packages")
-    del dump
+    # FIXME: delete singleton instances
+    try:
+        del dump
+        del lfs
+    except Exception as e:
+        logging.error(e)
+        pass
     return
 
 
@@ -218,6 +235,13 @@ def run_manifest_transition(configfile, new_svn_dump=False):
     manifest_repo.create_bare_repos()
     logging.info("Add remote to manifest repo")
     manifest_repo.add_remote()
+    # FIXME: Delete singleton instances
+    try:
+        del manifest_repo
+        del data_manifest_repo
+    except Exception as e:
+        logging.error(e)
+        pass
     return
 
 
@@ -237,6 +261,12 @@ def run_updates(configfile):
     logging.info("Start update of software temp git repo")
     updater = UpdateGitRepository(software_temp_git_repo, branch_list)
     updater.update_temp_git_repo()
+    # FIXME: Delete singleton instances
+    try:
+        del updater
+    except Exception as e:
+        logging.error(e)
+        pass
     return
 
 
@@ -289,5 +319,9 @@ def run_workflow_transition(configfile, new_svn_dump=False):
 
     # EOF message
     logging.info("Finished setting up bare git repo")
-    del dump
+    try:
+        del dump
+    except Exception as e:
+        logging.error(e)
+        pass
     return

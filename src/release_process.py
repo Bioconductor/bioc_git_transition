@@ -12,13 +12,11 @@ import os
 import subprocess
 from src.git_api.git_api import git_commit
 from src.git_api.git_api import git_checkout
-from local_svn_dump import Singleton
 import logging
 
 
 class ReleaseProcess(object):
     """Git Edit repository."""
-    __metaclass__ = Singleton
 
     def __init__(self, bare_git_repo):
         """Initialize Git edit repo."""
