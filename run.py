@@ -21,7 +21,10 @@ Manual tasks which need to be done:
 
 import src.run_transition as rt
 import src.svn_dump_update as sdu
-
+import logging
+logging.basicConfig(filename='transition.log',
+                    format='%(levelname)s %(asctime)s %(message)s',
+                    level=logging.DEBUG)
 
 def svn_dump_update(config_file):
     sdu.svn_root_update(config_file)

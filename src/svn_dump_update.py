@@ -23,9 +23,6 @@ def svn_root_update(configfile):
     update_file = Config.get('SVN', 'update_file')
     package_path = Config.get('Software', 'package_path')
 
-    logging.basicConfig(filename='svn_dump_update.log',
-                    format='%(asctime)s %(message)s',
-                    level=logging.DEBUG)
     logging.debug("Bioconductor SVN Dump Log File: \n")
 
     dump = LocalSvnDump(svn_root, temp_git_repo,
@@ -49,9 +46,6 @@ def svn_experiment_root_update(configfile):
     update_file = Config.get('ExperimentData', 'update_file')
     package_path = Config.get('ExperimentData', 'package_path')
 
-    logging.basicConfig(filename='svn_dump_update.log',
-                    format='%(asctime)s %(message)s',
-                    level=logging.DEBUG)
     logging.debug("Bioconductor SVN Dump Log File: \n")
 
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
