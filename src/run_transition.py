@@ -71,10 +71,6 @@ def run_software_transition(configfile, new_svn_dump=False):
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
 
-    software_transition_log = Config.get('Software', 'software_transition_log')
-    logging.basicConfig(filename=software_transition_log,
-                        level=logging.DEBUG,
-                        format='%(asctime)s %(message)s')
     logging.info("Bioconductor Software Transition Log File: \n")
 
     if not os.path.isdir(temp_git_repo):
@@ -130,10 +126,6 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     data_store_path = Config.get('ExperimentData', 'data_store_path')
     ref_file = Config.get('ExperimentData', 'ref_file')
 
-    data_log = Config.get("ExperimentData", "data_log")
-    logging.basicConfig(filename=data_log,
-                        level=logging.DEBUG,
-                        format='%(asctime)s %(message)s')
     logging.debug("Bioconductor Experiment data transition log File: \n")
 
     # Create temp_git_repo directory
@@ -185,11 +177,7 @@ def run_manifest_transition(configfile, new_svn_dump=False):
     svn_root = Config.get('SVN', 'svn_root')
     package_path = Config.get('Software', 'package_path')
 
-    manifest_log = Config.get("Manifest", "manifest_log")
     include_path = Config.get("Manifest", "software_manifest_include_path")
-    logging.basicConfig(filename=manifest_log,
-                        level=logging.DEBUG,
-                        format='%(asctime)s %(message)s')
     logging.debug("Bioconductor manifest files transition log file: \n")
 
     #####################################
@@ -251,10 +239,6 @@ def run_updates(configfile):
     Config.read(configfile)
     software_temp_git_repo = Config.get('Software', 'temp_git_repo')
     svn_root = Config.get('SVN', 'svn_root')
-    updater_log = Config.get('Software', 'updater_log')
-    logging.basicConfig(filename=updater_log,
-                        level=logging.DEBUG,
-                        format='%(asctime)s %(message)s')
 
     # FIXME: Get branch list, there has to be a simpler way to do this
     branch_list = get_branch_list(svn_root)
@@ -282,11 +266,6 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     svn_root = Config.get('SVN', 'svn_root')
     remote_svn_server = Config.get('SVN', 'remote_svn_server')
     users_db = Config.get('SVN', 'users_db')
-    workflow_log = Config.get('Workflow', 'workflow_log')
-
-    logging.basicConfig(filename=workflow_log,
-                        level=logging.DEBUG,
-                        format='%(asctime)s %(message)s')
     logging.debug("Bioconductor Workflow Transition Log File: \n")
 
     # Print in the logging file.
