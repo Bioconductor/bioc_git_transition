@@ -16,12 +16,12 @@ import subprocess
 from git_api.git_api import git_add
 from git_api.git_api import git_commit
 import logging
-from local_svn_dump import Singleton
+#from local_svn_dump import Singleton
 
 
 class Lfs:
     """Create git LFS based experiment data packages."""
-    __metaclass__ = Singleton
+#    __metaclass__ = Singleton
 
     def __init__(self, svn_root, trunk, data_store_path, ref_file,
                  temp_git_repo):

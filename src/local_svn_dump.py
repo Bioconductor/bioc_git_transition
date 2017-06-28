@@ -12,20 +12,20 @@ import subprocess
 import logging
 
 
-class Singleton(type):
-    """Singleton Factory pattern."""
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args,
-                                                                 **kwargs)
-        return cls._instances[cls]
+#class Singleton(type):
+#    """Singleton Factory pattern."""
+#    _instances = {}
+#
+#    def __call__(cls, *args, **kwargs):
+#        if cls not in cls._instances:
+#            cls._instances[cls] = super(Singleton, cls).__call__(*args,
+#                                                                 **kwargs)
+#        return cls._instances[cls]
 
 
 class LocalSvnDump(object):
     """Local SVN dump."""
-    __metaclass__ = Singleton
+    #__metaclass__ = Singleton
 
     def __init__(self, svn_root, temp_git_repo, users_db, remote_svn_server,
                  package_path):

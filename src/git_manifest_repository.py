@@ -22,14 +22,14 @@ from src.git_api.git_api import git_mv
 from src.git_api.git_api import git_rm
 from src.git_api.git_api import git_remote_remove
 from src.helper.helper import get_branch_list
-from local_svn_dump import Singleton
+#from local_svn_dump import Singleton
 # Logging configuration
 import logging
 
 
 class GitManifestRepository(object):
     """Git Bioconductor Repository."""
-    __metaclass__ = Singleton
+    #__metaclass__ = Singleton
 
     def __init__(self, svn_root, temp_git_repo, bare_git_repo,
                  package_path, manifest_files):
