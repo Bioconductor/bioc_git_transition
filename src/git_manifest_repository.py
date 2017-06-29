@@ -12,6 +12,7 @@ Ideas taken from Jim Hester's code in Bioconductor/mirror
 import os
 import re
 import subprocess
+import shutil
 from src.git_api.git_api import git_filter_branch
 from src.git_api.git_api import git_clone
 from src.git_api.git_api import git_add
@@ -316,7 +317,11 @@ class GitManifestRepository(object):
                            cwd=software_repo)
         git_checkout('master', cwd=software_repo)
         # Remove empty pkgs folder in temp_packages
-        os.rmdir(data_repo)
+        try:
+            shutil.rmtree(data_repo)
+        except Exception as e:
+            logging.error(e)
+            pass
         logging.info("Delete data repo")
         return
 
