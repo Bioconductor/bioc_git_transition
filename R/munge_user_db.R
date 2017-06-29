@@ -1,8 +1,12 @@
-## svn log -q $svn | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | sort -u > users.txt
+## export svn=file:///home/git/hedgehog.fhcrc.org/bioconductor
+## svn log -q $svn | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | sort -u > users-software.txt
+## export svn=file:///home/git/bioc-data.hedgehog.fhcrc.org
+## svn log -q $svn | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | sort -u > users-bioc-data.txt
+## cat users*|sort|uniq > users.txt
 
 fin1 <- "bioc_git_transition/extdata/users.txt"
 fin2 <- "bioc_git_transition/extdata/user_db.csv"
-fout <- "bioc_git_transition/extdata/user_db.txt"
+fout <- "bioc_git_transition/extdata/users_db.txt"
 
 txt <- readLines(fin1)
 txt <- sub(
