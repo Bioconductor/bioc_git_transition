@@ -296,6 +296,8 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     try:
         shutil.rmtree(os.path.join(temp_git_repo, "testproj"))
         shutil.rmtree(os.path.join(temp_git_repo, "packages"))
+        shutil.rmtree(os.path.join(bare_git_repo, "testproj.git"))
+        shutil.rmtree(os.path.join(bare_git_repo, "packages.git"))
     except Exception as e:
         logging.error("packages -testproj- and -packages- not deleted")
         logging.error(e)
