@@ -15,7 +15,7 @@ txt <- sub(
     txt
 )
 txt <- cbind(strcapture(
-    "(\\(?[[:alnum:].@ ]+\\)?) = .*", txt,
+    "(\\(?[[:alnum:].@ -]+\\)?) = .*", txt,
     data.frame(id=character(), stringsAsFactors=FALSE)
 ), data.frame(name="unknown", email="unknown", stringsAsFactors=FALSE))
 idx <- grep("@", txt$id)
