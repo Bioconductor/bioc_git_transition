@@ -1,0 +1,96 @@
+# TODO
+
+## Public beta
+
+team
+
+- [ ] SSH keys
+
+    - all team keys added
+
+- [ ] Review current state
+
+    - all packages under `packages/`
+
+      - read / write: `git clone git@git.bioconductor.org:packages/<pkgname>`
+      - read-only: `git clone https://git.bioconductor.org/packages/<pkgname>`
+
+    - 'manifest'
+
+      - `git clone git@git.bioconductor.org:admin/manifest`
+      - `git clone https://git.bioconductor.org/admin/manifest`
+      - `git log --follow` for full history
+
+- [ ] BBS
+
+    - Has a full build been run?
+      - Need for initial clone of all pkgs -- `git clone --depth 1`
+      - How long does a shallow update take? for all pkgs, `git pull`
+
+- Other ??
+
+- [ ] `bioc_git_transition`
+
+    - [ ] GlobalAncova
+    - [ ] psygenet2r
+    - [ ] minfiDataEPIC
+    - [ ] ...and other true positives
+    - [ ] clean up 'doc' directory so only beta-tester docs present
+      (create `admin-doc` or similar)
+    - [ ] manifest repository should not be large
+    
+- [ ] New packages
+
+    - [ ] BiocCheck
+      - [ ] Cloned repo size
+      - [ ] SSH key present
+
+
+    - [ ] GitContribution repos
+      - Accept:
+        - [ ] harvest ssh key
+        - [ ] add bare repo, only 'master' branch
+          - `git clone --bare --single-branch --branch master <repos>`
+
+public
+
+- [ ] harvest ssh keys
+
+    - github user: from github
+    - non-github user: ssh public key
+    - https://goo.gl/forms/eg36vcBkIUjfZfLe2
+
+- [ ] email to bioc-devel
+
+    - General
+      - schedule: transition July 31 (Monday after conference)
+      - fate of github.com/Bioconductor-mirror
+        - will not be updated after transition
+
+    - Beta
+      - Link to https://goo.gl/forms/eg36vcBkIUjfZfLe2
+      - Beta test period open
+      - Beta commits go away
+      - point to [scenarios][]
+      
+[scenarios]: https://github.com/Bioconductor/bioc_git_transition/tree/master/doc
+
+## Transition
+
+1. (T - 1 day)
+
+    - add last package(s) to svn
+    - disable svn commits to experiment data packages
+    - rebuild all 'bare' repositories
+
+1. (T - 6 hours)
+
+    - stop all commits to svn
+    - stop all (beta) commits to git
+    - `rm -rf repositories/packages/*`
+    - `git svn rebase` all packages
+
+1. (T - 0 hours)
+
+    - enable commits to git
+    - switch BBS
