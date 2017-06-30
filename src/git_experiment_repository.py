@@ -60,13 +60,11 @@ class Lfs:
             return
         for ref in refs:
             # TODO: PATH ISSUE here.
-            src = "/".join([self.svn_root, self.trunk,
-                            self.data_store_path, package, ref])
+            src = self.svn_root + self.trunk + self.data_store_path + "/" + package + "/" + ref
             dest = "/".join([package_dir, ref])
             try:
                 cmd = ['svn', 'export', '--username', 'readonly', '--password',
                        'readonly', '--non-interactive', src, dest]
-                print "CMD to add data: ", cmd
                 subprocess.check_call(cmd)
             except Exception as e:
                 logging.error("Error adding ref: %s, package: %s"
