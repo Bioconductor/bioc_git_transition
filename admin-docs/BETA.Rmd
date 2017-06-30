@@ -21,6 +21,10 @@ team
       - `git clone https://git.bioconductor.org/admin/manifest`
       - `git log --follow` for full history
 
+- [ ] SPB
+
+    - No changes?!
+
 - [ ] BBS
 
     - Has a full build been run?
@@ -33,15 +37,14 @@ team
 
     - [ ] GlobalAncova
     - [ ] psygenet2r
-    - [ ] minfiDataEPIC
-    - [ ] ...and other true positives
-    - [ ] clean up 'doc' directory so only beta-tester docs present
+    - [ ] minfiDataEPIC ...and other true positives
+    - [x] clean up 'doc' directory so only beta-tester docs present
       (create `admin-doc` or similar)
     - [ ] manifest repository should not be large
     
 - [ ] New packages
 
-    - [ ] BiocCheck
+    - [ ] BiocCheck -- option for new packages only
       - [ ] Cloned repo size
       - [ ] SSH key present
 
@@ -51,6 +54,16 @@ team
         - [ ] harvest ssh key
         - [ ] add bare repo, only 'master' branch
           - `git clone --bare --single-branch --branch master <repos>`
+
+- [ ] git push hooks?
+
+    - size
+    - disable force push?
+
+- [ ] other functionality
+
+    - BBS / coverage; codecov.io; uses Bioconductor-mirror ?
+    - svn commit hooks
 
 public
 
@@ -70,27 +83,46 @@ public
     - Beta
       - Link to https://goo.gl/forms/eg36vcBkIUjfZfLe2
       - Beta test period open
-      - Beta commits go away
-      - point to [scenarios][]
+      - Beta commits: purposeful commits that don't break packages;
+        commits go away at end of test period
+      - Point to [scenarios][]
+      - New to github? https://try.github.io
       
 [scenarios]: https://github.com/Bioconductor/bioc_git_transition/tree/master/doc
 
 ## Transition
 
+2-stage transition?
+
+- Data experiment first (1-2 weeks)
+- Challenge to users of two separate systems -- commit my changes to
+  data experiment via git, then commit software changes to svn
+
+What if things go wrong?
+
+- Switch back to SVN?
+  - Easy for BBS, but then commits in git but not SVN
+  - Herve: don't go backward! Fix instead
+
 1. (T - 1 day)
 
-    - add last package(s) to svn
-    - disable svn commits to experiment data packages
-    - rebuild all 'bare' repositories
+    - Add last package(s) to svn
+    - Disable svn commits to data experiment packages
+      - Pre-commit hook indicating what's going on
+    - Rebuild all git 'bare' repositories
 
 1. (T - 6 hours)
 
-    - stop all commits to svn
-    - stop all (beta) commits to git
+    - Stop all commits to svn. Ever.
+    - Stop all (beta) commits to git
     - `rm -rf repositories/packages/*`
     - `git svn rebase` all packages
 
 1. (T - 0 hours)
 
-    - enable commits to git
-    - switch BBS
+    - Enable commits to git
+    - Switch BBS
+    
+1. (T + n hours)
+
+    - Hilarity
