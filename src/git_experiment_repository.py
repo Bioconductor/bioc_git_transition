@@ -63,7 +63,7 @@ class Lfs:
             src = self.svn_root + self.trunk + self.data_store_path + "/" + package + "/" + ref
             dest = "/".join([package_dir, ref])
             try:
-                cmd = ['svn', 'export', '--username', 'readonly', '--password',
+                cmd = ['svn', 'export', '--force', '--username', 'readonly', '--password',
                        'readonly', '--non-interactive', src, dest]
                 subprocess.check_call(cmd)
             except Exception as e:
