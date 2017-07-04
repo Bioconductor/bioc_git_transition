@@ -22,6 +22,7 @@ Manual tasks which need to be done:
 import src.run_transition as rt
 import src.svn_dump_update as sdu
 import logging
+import time
 logging.basicConfig(filename='transition.log',
                     format='%(levelname)s %(asctime)s %(message)s',
                     level=logging.DEBUG)
@@ -40,6 +41,9 @@ def run(config_file):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     config_file = "./settings.ini"
     svn_dump_update(config_file)
     run(config_file)
+    logging.info("--- %s seconds ---" % (time.time() - start_time))
+
