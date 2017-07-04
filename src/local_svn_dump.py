@@ -12,17 +12,6 @@ import subprocess
 import logging
 
 
-#class Singleton(type):
-#    """Singleton Factory pattern."""
-#    _instances = {}
-#
-#    def __call__(cls, *args, **kwargs):
-#        if cls not in cls._instances:
-#            cls._instances[cls] = super(Singleton, cls).__call__(*args,
-#                                                                 **kwargs)
-#        return cls._instances[cls]
-
-
 class LocalSvnDump(object):
     """Local SVN dump."""
     #__metaclass__ = Singleton
@@ -68,7 +57,6 @@ class LocalSvnDump(object):
                     "/" + manifest_file)
         cmd = ['svn', 'cat', manifest]
         out = subprocess.check_output(cmd)
-        # with open(manifest, 'r') as f:
         doc = out.split("\n")
         package_list = [line.replace("Package: ", "").strip()
                         for line in doc if line.startswith("Package")]
@@ -76,7 +64,7 @@ class LocalSvnDump(object):
 
     def search_git_files(self, path):
         """Check if path has pre exisiting .git files."""
-        cmd = 'svn list --depth=infinity ' + path + " | grep \\.git"
+        cmd = 'svn list --depth=infinity ' + path + " | grep -f .git"
         try:
             proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
@@ -96,9 +84,8 @@ class LocalSvnDump(object):
         package_dir = self.svn_root + '/' + 'trunk' + self.package_path
         for pack in packs:
             package_dump = os.path.join(package_dir, pack)
-            # If .git files exsit in package, throw error.
-            pre_exisiting_git = self.search_git_files(package_dump)
-            if not pre_exisiting_git:
+            pre_existing_git = self.search_git_files(package_dump)
+            if not pre_existing_git:
                 try:
                     cmd = ['git', 'svn', 'clone',
                            '--authors-file=' + self.users_db, package_dump]
