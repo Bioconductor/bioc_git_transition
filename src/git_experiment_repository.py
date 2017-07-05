@@ -83,7 +83,7 @@ class Lfs:
             # all the new data files added.
             for item in self.lfs_files:
                 # add files to git
-                git_add(item, cwd=package_dir)
+                git_add(item, cwd=package_dir, force=True)
         except Exception as e:
             logging.error("Error in adding data, package %s" % package)
             logging.error(e)

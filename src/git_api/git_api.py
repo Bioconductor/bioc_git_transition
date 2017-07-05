@@ -108,9 +108,11 @@ def git_lfs_track(path, cwd):
     return
 
 
-def git_add(path, cwd):
+def git_add(path, cwd, force=False):
     """Add files to git."""
     cmd = ['git', 'add', path]
+    if force:
+        cmd = ['git', 'add', '-f', path]
     subprocess.check_call(cmd, cwd=cwd)
     return
 
