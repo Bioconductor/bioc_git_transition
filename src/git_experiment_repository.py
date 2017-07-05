@@ -57,6 +57,7 @@ class Lfs:
         except IOError, err:
             logging.error("Error: No data : missing file %s, in package %s "
                           % (err.filename, package))
+            self.lfs_files = []
             return
         for ref in refs:
             # TODO: PATH ISSUE here.
