@@ -41,6 +41,19 @@ class UpdateGitRepository(object):
                                     cwd=cwd)
         return x.split()[-1]
 
+    def manifest_package_list(self, release="RELEASE_3_5",
+                              manifest_file="bioc_3.5.manifest"):
+        """Get the package list from Bioconductor manifest file."""
+        manifest = (self.svn_root + "/" + "branches" + "/" + release + "/madman/Rpacks" +
+                    "/" + manifest_file)
+        cmd = ['svn', 'cat', manifest]
+        out = subprocess.check_output(cmd)
+        doc = out.split("\n")
+        package_list = [line.replace("Package: ", "").strip()
+                        for line in doc if line.startswith("Package")]
+        return package_list
+
+
     def update_temp_git_repo(self):
         """Create bare repos in the repository directory.
 
@@ -48,17 +61,22 @@ class UpdateGitRepository(object):
         NOTE: Set `umask` environment variable to 0027 before making
             bare repositories for git.
         """
+        recent_release = self.most_recent_release()
+        manifest_list = self.manifest_package_list()
         for package in os.listdir(self.temp_git_repo):
             try:
                 package_dir = os.path.join(self.temp_git_repo, package)
                 logging.info("Updating package %s" % package)
                 # Rebase assumes that the branch is "master"
                 git_svn_rebase(cwd=package_dir)
-                recent_release = self.most_recent_release()
+                if package not in manifest_list:
+                    logging.info("Package %s not in RELEASE_3_5" % package)
+                    continue
                 logging.info("Updating release %s" % recent_release)
                 # Fetch release updates
                 git_svn_fetch(recent_release, cwd=package_dir)
                 # Checkout release updates
+
                 git_checkout(recent_release, cwd=package_dir)
                 # Merge release updates WITHOUT edits to commit message
 

@@ -55,12 +55,11 @@ class Lfs:
             # Get references from external_data_source.txt
             refs = self.parse_external_refs(package_dir)
         except IOError, err:
-            logging.error("Error: No data : missing file %s, in package %s "
+            logging.info("Missing file %s, in package %s "
                           % (err.filename, package))
             self.lfs_files = []
             return
         for ref in refs:
-            # TODO: PATH ISSUE here.
             src = self.svn_root + self.trunk + self.data_store_path + "/" + package + "/" + ref
             dest = "/".join([package_dir, ref])
             try:
@@ -91,6 +90,8 @@ class Lfs:
 
     def commit_data_as_git_objects(self, package):
         """Commit data as regular git objects."""
+        if len(self.lfs_files) <= 0:
+            return
         try:
             package_dir = os.path.join(self.temp_git_repo, package)
             msg = "Committing experiment data for %s" % package

@@ -47,21 +47,6 @@ class LocalSvnDump(object):
                  for pack in pack_list if pack.endswith("/")]
         return packs
 
-    def manifest_package_list(self, manifest_file):
-        """Get the package list from Bioconductor manifest file.
-
-        Usage:
-            dump.manifest_package_list("bioc_3.4.manifest")
-        """
-        manifest = (self.svn_root + "/" + "trunk" + self.package_path +
-                    "/" + manifest_file)
-        cmd = ['svn', 'cat', manifest]
-        out = subprocess.check_output(cmd)
-        doc = out.split("\n")
-        package_list = [line.replace("Package: ", "").strip()
-                        for line in doc if line.startswith("Package")]
-        return package_list
-
     def search_git_files(self, path):
         """Check if path has pre exisiting .git files."""
         cmd = 'svn list --depth=infinity ' + path + " | grep -f .git"
