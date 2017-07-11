@@ -18,6 +18,7 @@ package_template <- paste(
     "repo packages/%s",
     "    RW master = %s",
     "    RW RELEASE_3_5 = %s",
+    "    option hook.pre-receive = disable-large-commits",
     "",
     sep="\n"
 )
