@@ -68,7 +68,7 @@
 
     `ExamplePackage`: This is being used a place holder for a package name.
 
-    SVN trunk` and git `master` branch are now the development branches.
+    SVN `trunk` and git `master` branch are now the development branches.
 
 13. I'm a Bioconductor developer only on the Bioconductor server. I do not have/want a GitHub account. What should I do?
 
