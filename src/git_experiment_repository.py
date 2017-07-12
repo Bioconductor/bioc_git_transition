@@ -16,12 +16,10 @@ import subprocess
 from git_api.git_api import git_add
 from git_api.git_api import git_commit
 import logging
-#from local_svn_dump import Singleton
 
 
 class Lfs:
     """Create git LFS based experiment data packages."""
-#    __metaclass__ = Singleton
 
     def __init__(self, svn_root, trunk, data_store_path, ref_file,
                  temp_git_repo):
@@ -56,15 +54,17 @@ class Lfs:
             refs = self.parse_external_refs(package_dir)
         except IOError, err:
             logging.info("Missing file %s, in package %s "
-                          % (err.filename, package))
+                         % (err.filename, package))
             self.lfs_files = []
             return
         for ref in refs:
-            src = self.svn_root + self.trunk + self.data_store_path + "/" + package + "/" + ref
+            src = (self.svn_root + self.trunk + self.data_store_path + "/" +
+                   package + "/" + ref)
             dest = "/".join([package_dir, ref])
             try:
-                cmd = ['svn', 'export', '--force', '--username', 'readonly', '--password',
-                       'readonly', '--non-interactive', src, dest]
+                cmd = ['svn', 'export', '--force', '--username', 'readonly',
+                       '--password', 'readonly', '--non-interactive',
+                       src, dest]
                 subprocess.check_call(cmd)
             except Exception as e:
                 logging.error("Error adding ref: %s, package: %s"

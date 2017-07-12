@@ -14,7 +14,6 @@ import logging
 
 class LocalSvnDump(object):
     """Local SVN dump."""
-    #__metaclass__ = Singleton
 
     def __init__(self, svn_root, temp_git_repo, users_db, remote_svn_server,
                  package_path):

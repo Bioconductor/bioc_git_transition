@@ -23,12 +23,10 @@ from src.git_api.git_api import git_checkout
 from src.git_api.git_api import git_remote_remove
 from src.git_api.git_api import git_branch_exists
 from src.helper.helper import get_branch_list
-#from local_svn_dump import Singleton
 
 
 class GitBioconductorRepository(object):
     """Git Bioconductor Repository."""
-    #__metaclass__ = Singleton
 
     def __init__(self, svn_root, temp_git_repo, bare_git_repo, remote_url,
                  package_path):

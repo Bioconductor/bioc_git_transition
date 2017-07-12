@@ -16,7 +16,6 @@ from src.git_api.git_api import git_svn_rebase
 from src.git_api.git_api import git_checkout
 from src.git_api.git_api import git_svn_fetch
 from src.git_api.git_api import git_reset
-#from local_svn_dump import Singleton
 
 
 class UpdateGitRepository(object):
@@ -25,7 +24,6 @@ class UpdateGitRepository(object):
     This allows for updating only the master and most recent release
     to speed up the transition process.
     """
-    #__metaclass__ = Singleton
 
     def __init__(self, temp_git_repo, branch_list):
         self.temp_git_repo = temp_git_repo

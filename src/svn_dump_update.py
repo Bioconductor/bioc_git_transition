@@ -55,4 +55,3 @@ def svn_experiment_root_update(configfile):
     dump.update_local_svn_dump(update_file)
     del dump
     return
-

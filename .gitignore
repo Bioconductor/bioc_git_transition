@@ -2,3 +2,5 @@ transition.log
 *.pyc
 update*.svn
 extdata
+admin-docs/*Bioc2017*
+.gitignore
