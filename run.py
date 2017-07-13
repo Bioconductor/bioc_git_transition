@@ -27,16 +27,18 @@ logging.basicConfig(filename='transition.log',
                     format='%(levelname)s %(asctime)s %(message)s',
                     level=logging.DEBUG)
 
+
 def svn_dump_update(config_file):
     sdu.svn_root_update(config_file)
     sdu.svn_experiment_root_update(config_file)
 
+
 def run(config_file):
     rt.run_software_transition(config_file, new_svn_dump=True)
-    rt.run_experiment_data_transition(config_file, new_svn_dump=True)
-    rt.run_workflow_transition(config_file, new_svn_dump=True)
-    rt.run_manifest_transition(config_file, new_svn_dump=True)
-    rt.run_updates(config_file)
+    # rt.run_experiment_data_transition(config_file, new_svn_dump=True)
+    # rt.run_workflow_transition(config_file, new_svn_dump=True)
+    # rt.run_manifest_transition(config_file, new_svn_dump=True)
+    # rt.run_updates(config_file)
     return
 
 
@@ -46,4 +48,3 @@ if __name__ == '__main__':
     svn_dump_update(config_file)
     run(config_file)
     logging.info("--- %s seconds ---" % (time.time() - start_time))
-

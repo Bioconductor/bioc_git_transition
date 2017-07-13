@@ -46,6 +46,7 @@ class GitBioconductorRepository(object):
         pack_list = result.split()
         packs = [pack.replace("/", "")
                  for pack in pack_list if pack.endswith("/")]
+        packs = ["mzR"]
         return packs
 
     def add_remote(self):

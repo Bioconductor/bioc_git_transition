@@ -44,6 +44,7 @@ class LocalSvnDump(object):
         pack_list = result.split()
         packs = [pack.replace("/", "")
                  for pack in pack_list if pack.endswith("/")]
+        packs = ["mzR"]
         return packs
 
     def search_git_files(self, path):
