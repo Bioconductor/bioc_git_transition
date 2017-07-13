@@ -16,7 +16,7 @@
 
 4. I'm not sure how to fetch the updates from `git.bioconductor.org` with regards to my package, how do I do this?
 
-    Take a look at [Scenario-3: Get updates from Bioconductor and update GitHub][]. This will give you the information needed.
+    Take a look at [Scenario 3: Get updates from Bioconductor and update GitHub][]. This will give you the information needed.
 
 5. I'm just a package user, do I need to do any of this?
 
@@ -68,11 +68,16 @@
 
     `ExamplePackage`: This is being used a place holder for a package name.
 
-12. SVN `devel` and git `master` branch, similarities and
+    SVN `trunk` and git `master` branch are now the development branches.
 
 13. I'm a Bioconductor developer only on the Bioconductor server. I do not have/want a GitHub account. What should I do?
-    **TODO:** This becomes a scenario.
-    Good idea to get one.
+
+    You do not have to get a Github account if you do not want one. But it is a really good idea,
+    to maintain your package publicly and interact with the community via the social coding features
+    available in Github.
+
+    We highlight this in [Scenario-11: Maintain-without-github][]
+
 
 ## More questions?
 
@@ -129,6 +134,8 @@ If you have additional questions which are not answered here already, please sen
 [Scenario 8: New package workflow]: scenario-8-new-package-workflow.md
 
 [Scenario 9: Sync existing GitHub and Bioconductor repositories]: scenario-9-sync-existing-github-gitbioc.md
+
+[Scenario-11: Maintain-without-github]: scenario-11-maintain-without-github.md
 
 [Adding a new SSH key to your GitHub account]: https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 
