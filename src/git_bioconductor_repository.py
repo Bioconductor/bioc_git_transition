@@ -36,6 +36,7 @@ class GitBioconductorRepository(object):
         self.bare_git_repo = bare_git_repo
         self.remote_url = remote_url
         self.package_path = package_path
+        self.manifest_dictionary = {}
         return
 
     def get_pack_list(self, path):
@@ -66,6 +67,31 @@ class GitBioconductorRepository(object):
                 logging.info("Add remote to package: %s" % os.path.join(
                          self.bare_git_repo, package))
         return
+
+
+	def release_to_manifest(self, release):
+		manifest_file = ('bioc_' +
+						 release.replace("RELEASE_", "").replace("_", ".") +
+						 '.manifest')
+		return manifest_file
+
+	def manifest_package_list(self, release) :
+		"""Get the package list from Bioconductor manifest file."""
+		
+		if release in self.manifest_dictionary.keys():
+			return self.manifest_dictionary[release]
+		
+        manifest = (self.svn_root + "/" + "branches" + "/" + release + "/madman/Rpacks" + 
+                    "/" + self.release_to_manifest(release))
+
+        cmd = ['svn', 'cat', manifest]
+        out = subprocess.check_output(cmd)
+        doc = out.split("\n")
+        package_list = [line.replace("Package: ", "").strip() 
+                        for line in doc if line.startswith("Package")]
+        self.manifest_dictionary[release] = package_list
+        return
+ 
 
     def add_orphan_branch_points(self, release, package):
         """Add orphan branch.
@@ -110,6 +136,7 @@ class GitBioconductorRepository(object):
         branch_url = os.path.join(self.svn_root, "branches")
         branch_list = get_branch_list(self.svn_root)
         for branch in branch_list:
+            self.manifest_package_list(branch)
             try:
                 # Special case to avoid badly named branches in SVN
                 package_list_url = (branch_url + "/" +
@@ -118,6 +145,10 @@ class GitBioconductorRepository(object):
                 # TODO: This is not CORRECT
                 package_list = self.get_pack_list(package_list_url)
                 for package in package_list:
+					# check if package is in manifest before doing
+					# anything related to adding release branches
+                    if package not in self.manifest_dictionary[branch]:
+                        pass
                     git_package_dir = os.path.join(self.temp_git_repo, package)
                     package_url = os.path.join(package_list_url, package)
                     logging.info("git_package_dir:\n %s, package_url:\n %s" %
@@ -127,9 +158,10 @@ class GitBioconductorRepository(object):
                             logging.info("Adding release branch to package: %s"
                                          % package)
                             if not git_branch_exists(branch, git_package_dir):
-                                self.add_orphan_branch_points(branch, package)
                                 logging.info("Add orphan branch: %s" %
                                              git_package_dir)
+                                self.add_orphan_branch_points(branch, package)
+                                logging.info("Added orphan branch point")
                         except OSError as e:
                             logging.error("Error: Package missing in repo")
                             logging.error(e)

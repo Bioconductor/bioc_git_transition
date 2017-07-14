@@ -72,8 +72,9 @@ class LocalSvnDump(object):
             pre_existing_git = self.search_git_files(package_dump)
             if not pre_existing_git:
                 try:
-                    cmd = ['git', 'svn', 'clone',
-                           '--authors-file=' + self.users_db, package_dump]
+#                    cmd = ['git', 'svn', 'clone',
+#                           '--authors-file=' + self.users_db, package_dump]
+                    cmd = ['git', 'svn', 'clone', package_dump]
                     subprocess.check_call(cmd, cwd=self.temp_git_repo)
                     logging.debug("Finished git-svn clone for package: %s"
                                   % pack)

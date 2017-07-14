@@ -73,20 +73,22 @@ def run_software_transition(configfile, new_svn_dump=False):
 
     logging.info("Bioconductor Software Transition Log File: \n")
 
-    if not os.path.isdir(temp_git_repo):
-        os.mkdir(temp_git_repo)
-
-    # Step 1: Initial set up, get list of packs from trunk
-    dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
-                        remote_svn_server, package_path)
-    packs = dump.get_pack_list(branch="trunk")
-    ###################################################
-    # Create a local dump of SVN packages in a location
-    if new_svn_dump:
-        logging.info("Create a local SVN dump for software packages")
-        # Git svn clone software packages
-        dump.svn_dump(packs)
-    ###################################################
+#    if not os.path.isdir(temp_git_repo):
+#        os.mkdir(temp_git_repo)
+#
+#    # Step 1: Initial set up, get list of packs from trunk
+#    dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
+#                        remote_svn_server, package_path)
+#    packs = dump.get_pack_list(branch="trunk")
+#    ###################################################
+#    # Create a local dump of SVN packages in a location
+#    if new_svn_dump:
+#        logging.info("Create a local SVN dump for software packages")
+#        # Git svn clone software packages
+#        for pack in packs:
+#            logging.info("package to be CLONED: ",pack)
+#        dump.svn_dump(packs)
+#    ###################################################
 
     # Make bare repo, if it does not exist
     if not os.path.isdir(bare_git_repo):
@@ -99,12 +101,11 @@ def run_software_transition(configfile, new_svn_dump=False):
 
     # EOF message
     logging.info("Finished setting up bare git repo")
-    # FIXME: Delete singleton instances
-    try:
-        del dump
-    except Exception as e:
-        logging.error(e)
-        pass
+#    try:
+#        del dump
+#    except Exception as e:
+#        logging.error(e)
+#        pass
     return
 
 

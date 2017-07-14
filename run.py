@@ -45,6 +45,6 @@ def run(config_file):
 if __name__ == '__main__':
     start_time = time.time()
     config_file = "./settings.ini"
-    svn_dump_update(config_file)
+#    svn_dump_update(config_file)
     run(config_file)
     logging.info("--- %s seconds ---" % (time.time() - start_time))
