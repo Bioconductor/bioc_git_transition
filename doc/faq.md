@@ -10,7 +10,7 @@
 
 3. I'm unable to `push` or `merge`  my updates from my GitHub repository to my bioconductor package on `git@git.bioconductor.org` , how do I go about this?
 
-    If you are unable to `push` or `merge` to either your GitHub account or Bioconductor repository, it means you do not have the correct access rights. If you are a developer for Bioconductor, you will need to send packages@bioconductor.org your SSH public key.
+    If you are unable to `push` or `merge` to either your GitHub account or Bioconductor repository, it means you do not have the correct access rights. If you are a developer for Bioconductor, you will need to submit your SSH public key to https://goo.gl/forms/eg36vcBkIUjfZfLe2.
 
     You should also make sure to check that your public key is set up correctly on GitHub. Follow [Adding a new SSH key to your GitHub account][].
 
@@ -38,7 +38,7 @@
 
 8. I'm a Bioconductor package maintainer, but I don't have access to the Bioconductor server where my packages are being maintained. How do I gain access?
 
-    Please email your ssh public key to packages@bioconductor.org. Your key will be added to your our server and you will get read+ write access to your package.
+    Please submit your ssh public key or github ID to https://goo.gl/forms/eg36vcBkIUjfZfLe2. Your key will be added to your our server and you will get read+ write access to your package.
 
     All developers of Bioconductor packages are required to do this, if they don't already have access. Please identify which packages you need read/write access to in the email.
 

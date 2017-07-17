@@ -18,7 +18,7 @@ We use the package "BiocGenerics" as an example.
 
     **https read only access to the world:** `https://git.bioconductor.org`
 
-1. For developers/maintainers, you are required to send your ssh public key to packages@bioconductor.org and you will be added to the server, and given access to your package.
+1. For developers/maintainers, you are required to submit your SSH public key or github ID and your SVN ID to https://goo.gl/forms/eg36vcBkIUjfZfLe2 and you will be added to the server, and given access to your package.
 
 1. The bioconductor core team will make changes on your package for bugs or bumping a version number for a new release. So it becomes essential that you add the Bioconductor repository as another remote to your machine's git repository. You need to add a remote, using:
 
