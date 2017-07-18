@@ -29,14 +29,14 @@ class GitBioconductorRepository(object):
     """Git Bioconductor Repository."""
 
     def __init__(self, svn_root, temp_git_repo, bare_git_repo, remote_url,
-                 package_path):
+                 package_path, manifest_dictionary):
         """Initialize Git Bioconductor repository."""
         self.svn_root = svn_root
         self.temp_git_repo = temp_git_repo
         self.bare_git_repo = bare_git_repo
         self.remote_url = remote_url
         self.package_path = package_path
-        self.manifest_dictionary = {}
+        self.manifest_dictionary = manifest_dictionary
         return
 
     def get_pack_list(self, path):
@@ -67,31 +67,6 @@ class GitBioconductorRepository(object):
                 logging.info("Add remote to package: %s" % os.path.join(
                          self.bare_git_repo, package))
         return
-
-
-	def release_to_manifest(self, release):
-		manifest_file = ('bioc_' +
-						 release.replace("RELEASE_", "").replace("_", ".") +
-						 '.manifest')
-		return manifest_file
-
-	def manifest_package_list(self, release) :
-		"""Get the package list from Bioconductor manifest file."""
-		
-		if release in self.manifest_dictionary.keys():
-			return self.manifest_dictionary[release]
-		
-        manifest = (self.svn_root + "/" + "branches" + "/" + release + "/madman/Rpacks" + 
-                    "/" + self.release_to_manifest(release))
-
-        cmd = ['svn', 'cat', manifest]
-        out = subprocess.check_output(cmd)
-        doc = out.split("\n")
-        package_list = [line.replace("Package: ", "").strip() 
-                        for line in doc if line.startswith("Package")]
-        self.manifest_dictionary[release] = package_list
-        return
- 
 
     def add_orphan_branch_points(self, release, package):
         """Add orphan branch.
@@ -136,19 +111,18 @@ class GitBioconductorRepository(object):
         branch_url = os.path.join(self.svn_root, "branches")
         branch_list = get_branch_list(self.svn_root)
         for branch in branch_list:
-            self.manifest_package_list(branch)
             try:
-                # Special case to avoid badly named branches in SVN
                 package_list_url = (branch_url + "/" +
                                     branch + self.package_path)
                 # Get list of packages for EACH branch
-                # TODO: This is not CORRECT
                 package_list = self.get_pack_list(package_list_url)
                 for package in package_list:
-					# check if package is in manifest before doing
-					# anything related to adding release branches
+                    print branch
                     if package not in self.manifest_dictionary[branch]:
-                        pass
+
+                        continue
+                    # check if package is in manifest before doing
+                    # anything related to adding release branches
                     git_package_dir = os.path.join(self.temp_git_repo, package)
                     package_url = os.path.join(package_list_url, package)
                     logging.info("git_package_dir:\n %s, package_url:\n %s" %

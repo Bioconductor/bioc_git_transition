@@ -44,7 +44,6 @@ class LocalSvnDump(object):
         pack_list = result.split()
         packs = [pack.replace("/", "")
                  for pack in pack_list if pack.endswith("/")]
-        packs = ["mzR"]
         return packs
 
     def search_git_files(self, path):
@@ -72,9 +71,9 @@ class LocalSvnDump(object):
             pre_existing_git = self.search_git_files(package_dump)
             if not pre_existing_git:
                 try:
-#                    cmd = ['git', 'svn', 'clone',
-#                           '--authors-file=' + self.users_db, package_dump]
-                    cmd = ['git', 'svn', 'clone', package_dump]
+                    cmd = ['git', 'svn', 'clone',
+                           '--authors-file=' + self.users_db, package_dump]
+                    # cmd = ['git', 'svn', 'clone', package_dump]
                     subprocess.check_call(cmd, cwd=self.temp_git_repo)
                     logging.debug("Finished git-svn clone for package: %s"
                                   % pack)
@@ -106,6 +105,7 @@ class LocalSvnDump(object):
                                     self.remote_svn_server,
                                     rev, '--incremental'], stdout=f,
                                     stderr=subprocess.PIPE)
+
             ret_code = proc.wait()
             # Write dump update to file
             f.flush()

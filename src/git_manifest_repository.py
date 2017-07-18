@@ -23,6 +23,7 @@ from src.git_api.git_api import git_mv
 from src.git_api.git_api import git_rm
 from src.git_api.git_api import git_remote_remove
 from src.helper.helper import get_branch_list
+from src.helper.helper import release_to_manifest
 import logging
 
 
@@ -55,17 +56,11 @@ class GitManifestRepository(object):
             logging.error("Unexpected error: %s" % e)
         return
 
-    def release_to_manifest(self, release):
-        manifest_file = ('bioc_' +
-                         release.replace("RELEASE_", "").replace("_", ".") +
-                         '.manifest')
-        return manifest_file
-
     def add_config(self, release):
         """Add git config options for manifest repo."""
         package_dir = self.temp_git_repo + "/" + "Rpacks"
         # TODO:Error in RELEASE_1_0_branch
-        manifest_file = self.release_to_manifest(release)
+        manifest_file = release_to_manifest(release)
         try:
             # config add include path
             include_paths = ['git', 'config', '--add',

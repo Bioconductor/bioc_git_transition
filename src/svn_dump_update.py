@@ -24,7 +24,8 @@ def svn_root_update(configfile):
     package_path = Config.get('Software', 'package_path')
 
     logging.debug("Bioconductor SVN Dump Log File: \n")
-
+    # import pdb
+    # pdb.set_trace()
     dump = LocalSvnDump(svn_root, temp_git_repo,
                         users_db, remote_svn_server, package_path)
     dump.svn_get_revision()
