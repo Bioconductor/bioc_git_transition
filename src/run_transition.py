@@ -84,7 +84,6 @@ def run_software_transition(configfile, new_svn_dump=False):
     # packs = dump.get_pack_list(branch="trunk")
     manifest_dictionary = populate_manifest_dictionary(svn_root, package_path)
     packs = get_union(svn_root, package_path, manifest_dictionary)
-    packs = ["mzR"]
     ##################################################
     # Create a local dump of SVN packages in a location
     if new_svn_dump:

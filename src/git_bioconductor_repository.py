@@ -47,7 +47,6 @@ class GitBioconductorRepository(object):
         pack_list = result.split()
         packs = [pack.replace("/", "")
                  for pack in pack_list if pack.endswith("/")]
-        packs = ["mzR"]
         return packs
 
     def add_remote(self):
@@ -99,7 +98,6 @@ class GitBioconductorRepository(object):
         git_checkout('master', cwd=package_dir, new=False)
         return
 
-    # TODO: Look at the Issue #3 on github to speed this up
     def add_release_branches(self):
         """Add release branches to each package.
 
@@ -117,10 +115,6 @@ class GitBioconductorRepository(object):
                 # Get list of packages for EACH branch
                 package_list = self.get_pack_list(package_list_url)
                 for package in package_list:
-                    print branch
-                    if package not in self.manifest_dictionary[branch]:
-
-                        continue
                     # check if package is in manifest before doing
                     # anything related to adding release branches
                     git_package_dir = os.path.join(self.temp_git_repo, package)
