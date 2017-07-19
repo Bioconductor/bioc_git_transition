@@ -1,5 +1,3 @@
-# TODO
-
 ## Public beta
 
 team
@@ -41,7 +39,7 @@ team
     - [x] clean up 'doc' directory so only beta-tester docs present
       (create `admin-doc` or similar)
     - [ ] manifest repository should not be large
-    
+
 - [ ] New packages
 
     - [ ] BiocCheck -- option for new packages only
@@ -87,7 +85,7 @@ public
         commits go away at end of test period
       - Point to [scenarios][]
       - New to github? https://try.github.io
-      
+
 [scenarios]: https://github.com/Bioconductor/bioc_git_transition/tree/master/doc
 
 ## Transition
@@ -122,7 +120,7 @@ What if things go wrong?
 
     - Enable commits to git
     - Switch BBS
-    
+
 1. (T + n hours)
 
     - Hilarity
