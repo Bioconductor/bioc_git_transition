@@ -93,7 +93,6 @@ class ReleaseProcess(object):
         for package in os.listdir(os.path.abspath(self.bare_git_repo)):
             # Create a new release branch
             self.release_branch(new_release, package)
-            # TODO: Push new release branch
             cmd = ['git', 'push', '-u', 'origin', new_release]
             subprocess.check_call(cmd, cwd=os.path.join(self.bare_git_repo,
                                   package))

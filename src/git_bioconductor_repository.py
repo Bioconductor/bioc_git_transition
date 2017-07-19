@@ -101,7 +101,11 @@ class GitBioconductorRepository(object):
     def add_release_branches(self):
         """Add release branches to each package.
 
-        TODO: Extended description of how this works.
+        For each package versioned through, git svn clone,
+        add release branches which are appropriate. This is
+        done by checking each branch to see if the package
+        is present.
+
         svn_root = file:///home/git/hedgehog.fhcrc.org/
         temp_git_repo: '/home/git/temp_packages'
         """
@@ -115,8 +119,6 @@ class GitBioconductorRepository(object):
                 # Get list of packages for EACH branch
                 package_list = self.get_pack_list(package_list_url)
                 for package in package_list:
-                    # check if package is in manifest before doing
-                    # anything related to adding release branches
                     git_package_dir = os.path.join(self.temp_git_repo, package)
                     package_url = os.path.join(package_list_url, package)
                     logging.info("git_package_dir:\n %s, package_url:\n %s" %

@@ -59,7 +59,6 @@ class GitManifestRepository(object):
     def add_config(self, release):
         """Add git config options for manifest repo."""
         package_dir = self.temp_git_repo + "/" + "Rpacks"
-        # TODO:Error in RELEASE_1_0_branch
         manifest_file = release_to_manifest(release)
         try:
             # config add include path
@@ -295,7 +294,7 @@ class GitManifestRepository(object):
                    cwd=software_repo)
         # For rest of the files
         for data_manifest in os.listdir(data_repo):
-            # TODO: This is magic number "3.6" stands for RELEASE_3_6
+            # FIXME: This is magic number "3.6" stands for RELEASE_3_6
             if ((not data_manifest.startswith(".")) and
                ("3.6" not in data_manifest)):
                 release = self.data_manifest_to_release(data_manifest)

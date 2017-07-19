@@ -38,6 +38,11 @@ def get_branch_list(svn_root):
 
 
 def release_to_manifest(release):
+    no_manifest_list = ['RELEASE_1_0', 'RELEASE_1_0_branch',
+                        'RELEASE_1_4', 'RELEASE_1_4_branch',
+                        'RELEASE_1_5']
+    if release in no_manifest_list:
+        return
     manifest_file = ('bioc_' +
                      release.replace("RELEASE_", "").replace("_", ".") +
                      '.manifest')
@@ -46,10 +51,8 @@ def release_to_manifest(release):
 
 def manifest_package_list(release, svn_root, package_path):
     """Get the package list from Bioconductor manifest file."""
-    no_manifest_list = ['RELEASE_1_0',
-                        'RELEASE_1_0_branch',
-                        'RELEASE_1_4',
-                        'RELEASE_1_4_branch',
+    no_manifest_list = ['RELEASE_1_0', 'RELEASE_1_0_branch',
+                        'RELEASE_1_4', 'RELEASE_1_4_branch',
                         'RELEASE_1_5']
     # Return empty if there is not release
     if release in no_manifest_list:
