@@ -206,10 +206,10 @@ class GitManifestRepository(object):
             # after prune checkout new branch
             logging.debug("Add commit history: git_checkout release")
             subprocess.check_call(['git', 'checkout',
-                                  '-b', release, 'git-svn-' + release],
+                                   '-b', release, 'git-svn-' + release],
                                   cwd=package_dir)
             logging.debug("Add commit history:  git_checkout master")
-            git_checkout('master', cwd=package_dir,  new=False)
+            git_checkout('master', cwd=package_dir, new=False)
         # rename repository to manifest
         os.rename(package_dir, self.temp_git_repo + '/' + 'manifest')
         return
@@ -296,7 +296,7 @@ class GitManifestRepository(object):
         for data_manifest in os.listdir(data_repo):
             # FIXME: This is magic number "3.6" stands for RELEASE_3_6
             if ((not data_manifest.startswith(".")) and
-               ("3.6" not in data_manifest)):
+                    ("3.6" not in data_manifest)):
                 release = self.data_manifest_to_release(data_manifest)
                 logging.info("Move data manifest %s to repo" % release)
                 git_checkout(release, cwd=software_repo)

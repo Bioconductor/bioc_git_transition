@@ -102,8 +102,8 @@ class LocalSvnDump(object):
         rev = "-r" + str(self.revision + 1) + ":HEAD"
         with open(update_file, 'w') as f:
             proc = subprocess.Popen(['svnrdump', 'dump',
-                                    self.remote_svn_server,
-                                    rev, '--incremental'], stdout=f,
+                                     self.remote_svn_server,
+                                     rev, '--incremental'], stdout=f,
                                     stderr=subprocess.PIPE)
 
             ret_code = proc.wait()

@@ -42,15 +42,21 @@ class UpdateGitRepository(object):
     def manifest_package_list(self, release="RELEASE_3_5",
                               manifest_file="bioc_3.5.manifest"):
         """Get the package list from Bioconductor manifest file."""
-        manifest = (self.svn_root + "/" + "branches" + "/" + release + "/madman/Rpacks" +
-                    "/" + manifest_file)
+        manifest = (
+            self.svn_root +
+            "/" +
+            "branches" +
+            "/" +
+            release +
+            "/madman/Rpacks" +
+            "/" +
+            manifest_file)
         cmd = ['svn', 'cat', manifest]
         out = subprocess.check_output(cmd)
         doc = out.split("\n")
         package_list = [line.replace("Package: ", "").strip()
                         for line in doc if line.startswith("Package")]
         return package_list
-
 
     def update_temp_git_repo(self):
         """Create bare repos in the repository directory.
@@ -79,7 +85,7 @@ class UpdateGitRepository(object):
                 # Merge release updates WITHOUT edits to commit message
 
                 subprocess.check_call(['git', 'merge', '--no-edit',
-                                      'git-svn-' + recent_release],
+                                       'git-svn-' + recent_release],
                                       cwd=package_dir)
                 # Get the commit id before the merge
                 merge_commit = self.most_recent_commit(cwd=package_dir)

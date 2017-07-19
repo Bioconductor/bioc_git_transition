@@ -43,7 +43,7 @@ class Lfs:
         ans = [os.path.join(root, f)
                for root, subdir, files in os.walk(path)
                for f in files]
-        return [item[len(path)+1:] for item in ans]
+        return [item[len(path) + 1:] for item in ans]
 
     def add_data(self, package):
         """Add data from SVN data source to each package."""
@@ -52,7 +52,7 @@ class Lfs:
         try:
             # Get references from external_data_source.txt
             refs = self.parse_external_refs(package_dir)
-        except IOError, err:
+        except IOError as err:
             logging.info("Missing file %s, in package %s "
                          % (err.filename, package))
             self.lfs_files = []

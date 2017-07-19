@@ -60,11 +60,11 @@ class GitBioconductorRepository(object):
                 remote = self.remote_url + package
                 # Run remote command
                 git_remote_remove('origin', os.path.join(self.bare_git_repo,
-                                  package))
+                                                         package))
                 git_remote_add('origin', remote, os.path.join(
                                self.bare_git_repo, package))
                 logging.info("Add remote to package: %s" % os.path.join(
-                         self.bare_git_repo, package))
+                             self.bare_git_repo, package))
         return
 
     def add_orphan_branch_points(self, release, package):

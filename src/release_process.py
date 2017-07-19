@@ -95,5 +95,5 @@ class ReleaseProcess(object):
             self.release_branch(new_release, package)
             cmd = ['git', 'push', '-u', 'origin', new_release]
             subprocess.check_call(cmd, cwd=os.path.join(self.bare_git_repo,
-                                  package))
+                                                        package))
         return
