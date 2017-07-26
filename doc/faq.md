@@ -119,7 +119,7 @@ If you have additional questions which are not answered here already, please sen
 
 [Scenario 1: Create GitHub repository for existing Bioconductor repository]: scenario-1-svn-to-github.md
 
-[Scenario 2: Push to both GitHub and Bioconductor repositories]: scenario-2-push-to-gitub-gitbioc.md
+[Scenario 2: Push to both GitHub and Bioconductor repositories]: scenario-2-push-to-github-gitbioc.md
 
 [Scenario 3: Get updates from Bioconductor and update GitHub]: scenario-3-pull-from-gitbioc-push-github.md
 
