@@ -29,14 +29,13 @@ class GitBioconductorRepository(object):
     """Git Bioconductor Repository."""
 
     def __init__(self, svn_root, temp_git_repo, bare_git_repo, remote_url,
-                 package_path, manifest_dictionary):
+                 package_path):
         """Initialize Git Bioconductor repository."""
         self.svn_root = svn_root
         self.temp_git_repo = temp_git_repo
         self.bare_git_repo = bare_git_repo
         self.remote_url = remote_url
         self.package_path = package_path
-        self.manifest_dictionary = manifest_dictionary
         return
 
     def get_pack_list(self, path):

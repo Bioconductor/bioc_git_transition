@@ -15,8 +15,8 @@ from src.git_manifest_repository import GitManifestRepository
 from src.git_manifest_repository import GitDataManifestRepository
 from src.update_temp_git_repo import UpdateGitRepository
 from src.helper.helper import get_branch_list
-from src.helper.manifest_helper import get_union
-from src.helper.manifest_helper import populate_manifest_dictionary
+from src.helper.helper import get_union
+from src.helper.helper import populate_manifest_dictionary
 import os
 import shutil
 import logging
@@ -24,11 +24,11 @@ import ConfigParser
 
 
 def make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
-                  package_path, manifest_dictionary, lfs_object=None):
+                  package_path, lfs_object=None):
     # Step 4: Add release branches to all   packages
     gitrepo = GitBioconductorRepository(svn_root, temp_git_repo,
                                         bare_git_repo, remote_url,
-                                        package_path, manifest_dictionary)
+                                        package_path)
     logging.info("Make git repo: Adding release branches")
     gitrepo.add_release_branches()
     # Step 5: Add commit history
@@ -99,7 +99,7 @@ def run_software_transition(configfile, new_svn_dump=False):
     # Make temp git repo, with all commit history
     logging.info("Make git repo")
     make_git_repo(svn_root, temp_git_repo, bare_git_repo, remote_url,
-                  package_path, manifest_dictionary)
+                  package_path)
 
     # EOF message
     logging.info("Finished setting up bare git repo")
@@ -138,6 +138,7 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     # Step 1: Initial set up, get list of packs from trunk
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
                         remote_svn_server, package_path)
+    manifest_dictionary = populate_manifest_dictionary(svn_root, package_path)
     packs = dump.get_pack_list(branch="trunk")
 
     ###################################################
@@ -157,7 +158,7 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     lfs = Lfs(svn_root, trunk, data_store_path, ref_file, temp_git_repo)
     # Run make_git_repo, with new LFS object
     make_git_repo(svn_root, temp_git_repo, bare_git_repo,
-                  remote_url, package_path, lfs_object=lfs)
+                  remote_url, package_path, manifest_dictionary,lfs_object=lfs)
     # EOF message
     logging.info("Completed bare git repo for experiment data packages")
     # FIXME: delete singleton instances
