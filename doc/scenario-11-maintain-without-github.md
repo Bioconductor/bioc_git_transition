@@ -6,7 +6,7 @@
 
 ### Clone and setup the package on your local machine.
 
-1. The _Bioconductor_ developer needs to make sure that they have `SSH` access to the _Bioconductor_ repository hosted on our git server. Please forward your ssh 'public key' to packages@bioconductor.org.
+1. The _Bioconductor_ developer needs to make sure that they have `SSH` access to the _Bioconductor_ repository hosted on our git server. Please submit your SSH public key or github ID and your SVN ID to https://goo.gl/forms/eg36vcBkIUjfZfLe2.
 
 1. Clone your package to your local machine,
 

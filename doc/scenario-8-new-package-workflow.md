@@ -6,7 +6,7 @@
 
 1. _Bioconductor_ needs to know your SSH 'public key'. _Bioconductor_ will use the first key in `https://github.com/<your-github-id>.keys`.
 
-    Alternatively, send your SSH public key and package name to packages@bioconductor.org. Your key and appropriate permissions will be added to the _Bioconductor_ git server.
+    Alternatively, submit your SSH public key or github ID to https://goo.gl/forms/eg36vcBkIUjfZfLe2. Your key and appropriate permissions will be added to the _Bioconductor_ git server.
 
 1. Your package is visible on the [_Bioconductor_ git server][].
 

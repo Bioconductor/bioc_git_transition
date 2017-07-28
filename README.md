@@ -11,9 +11,8 @@ the _Bioconductor_ Project.
 ## Setup
 
 * To participate in the current testing cycle, communicate a single
-  ssh public key to martin.morgan at roswellpark.org. Alternatively,
-  provide a GitHub id and we'll use the first key in
-  `https://github.com/<github_id>.keys`
+  ssh public key to this google form https://goo.gl/forms/eg36vcBkIUjfZfLe2.
+  We will not be accepting keys via email. 
 
 ## Usage: clone, push, pull, etc.
 
