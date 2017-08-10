@@ -225,7 +225,7 @@ class GitManifestRepository(object):
         # For master branch, RELEASE_3_6
         git_checkout('master', cwd=package_dir)
         # Rename, delete other manifests and commit
-        manifest_file = self.release_to_manifest('RELEASE_3_6')
+        manifest_file = release_to_manifest('RELEASE_3_6')
         git_mv(manifest_file, 'software.txt', cwd=package_dir)
         git_rm('bioc*', cwd=package_dir)
         commit_message = ("Change %s to software.txt" % manifest_file)
@@ -233,7 +233,7 @@ class GitManifestRepository(object):
         # In all release branches
         for release in branches:
             git_checkout(release, cwd=package_dir)
-            manifest_file = self.release_to_manifest(release)
+            manifest_file = release_to_manifest(release)
             git_mv(manifest_file, "software.txt", cwd=package_dir)
             commit_message = ("Change %s to software.txt" % manifest_file)
             git_commit(commit_message, cwd=package_dir)

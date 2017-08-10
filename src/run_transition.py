@@ -138,9 +138,7 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     # Step 1: Initial set up, get list of packs from trunk
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
                         remote_svn_server, package_path)
-    manifest_dictionary = populate_manifest_dictionary(svn_root, package_path)
     packs = dump.get_pack_list(branch="trunk")
-
     ###################################################
     # Create a local dump of SVN packages in a location
     if new_svn_dump:
@@ -158,7 +156,7 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     lfs = Lfs(svn_root, trunk, data_store_path, ref_file, temp_git_repo)
     # Run make_git_repo, with new LFS object
     make_git_repo(svn_root, temp_git_repo, bare_git_repo,
-                  remote_url, package_path, manifest_dictionary,lfs_object=lfs)
+                  remote_url, package_path,lfs_object=lfs)
     # EOF message
     logging.info("Completed bare git repo for experiment data packages")
     # FIXME: delete singleton instances
