@@ -42,8 +42,9 @@ class UpdateGitRepository(object):
     def manifest_package_list(self, release="RELEASE_3_5",
                               manifest_file="bioc_3.5.manifest"):
         """Get the package list from Bioconductor manifest file."""
+        svn_root = "file:///home/git/hedgehog.fhcrc.org/bioconductor"
         manifest = (
-            self.svn_root +
+            svn_root +
             "/" +
             "branches" +
             "/" +
