@@ -1,0 +1,67 @@
+---
+title: "Bioconductor Standard Repository Specification"
+author: "Nitesh Turaga"
+date: "8/15/2017"
+output: 
+  BiocStyle::html_document2
+---
+
+## Maintain on Github
+
+1. All packages maintained by the Bioconductor core team will be hosted on 
+   Github under the organization account. 
+   
+1. Maintainers within the core-team are responsible for keeping their Github and 
+   Bioc-git repo in sync. This allows usage of many Github features, like issues,
+   pull requests, continuous integration and testing.
+   
+1. Follow the scenario's to keep your package in sync, and push only to `master`
+   and the most recent release i.e RELEASE_3_5 (as of August 15th 2017).
+
+## Package Structure
+
+Every Bioconductor repository being maintained should look like:
+
+```
+git branch -a
+```
+
+NOTE: `master` is equivalent to SVN `devel`. Release branches, should be named
+      `RELEASE_X_Y`, case-sensitive.
+
+```
+* master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/RELEASE_3_5
+  remotes/upstream/RELEASE_2_12
+  remotes/upstream/RELEASE_2_13
+  remotes/upstream/RELEASE_2_14
+  remotes/upstream/RELEASE_3_0
+  remotes/upstream/RELEASE_3_1
+  remotes/upstream/RELEASE_3_2
+  remotes/upstream/RELEASE_3_3
+  remotes/upstream/RELEASE_3_4
+  remotes/upstream/RELEASE_3_5
+  remotes/upstream/master
+```
+
+Every bioconductor repository should have the remotes configured properly,
+
+eg: BiocParallel package
+
+```
+git remote -v
+```
+
+```
+origin	git@github.com:Bioconductor/BiocParallel (fetch)
+origin	git@github.com:Bioconductor/BiocParallel (push)
+upstream	git@git.bioconductor.org:packages/BiocParallel (fetch)
+upstream	git@git.bioconductor.org:packages/BiocParallel (push)
+```
+
+## Note
+
+- Avoid `git rebase` if you can help it. It is easier to `git fetch` and 
+  then `git merge`. 
