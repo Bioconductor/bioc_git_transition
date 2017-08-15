@@ -2,8 +2,7 @@
 title: "Bioconductor Standard Repository Specification"
 author: "Nitesh Turaga"
 date: "8/15/2017"
-output: 
-  BiocStyle::html_document2
+output: html_document
 ---
 
 ## Maintain on Github

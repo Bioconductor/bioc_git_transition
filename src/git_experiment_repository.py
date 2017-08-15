@@ -15,6 +15,7 @@ import os
 import subprocess
 from git_api.git_api import git_add
 from git_api.git_api import git_commit
+from git_api.git_api import git_checkout
 import logging
 
 
@@ -45,7 +46,7 @@ class Lfs:
                for f in files]
         return [item[len(path) + 1:] for item in ans]
 
-    def add_data(self, package):
+    def add_data(self, package, release_3_5=True):
         """Add data from SVN data source to each package."""
         package_dir = os.path.join(self.temp_git_repo, package)
         before_files = self.list_files(package_dir)
@@ -60,6 +61,10 @@ class Lfs:
         for ref in refs:
             src = (self.svn_root + self.trunk + self.data_store_path + "/" +
                    package + "/" + ref)
+            if release_3_5:
+                src = (self.svn_root + "/" + "RELEASE_3_5" +
+                       self.data_store_path + "/" +
+                       package + "/" + ref)
             dest = "/".join([package_dir, ref])
             try:
                 cmd = ['svn', 'export', '--force', '--username', 'readonly',
@@ -105,6 +110,7 @@ class Lfs:
         """Run data transition on all package."""
         for package in os.listdir(os.path.abspath(temp_git_repo)):
             try:
+                # Skip manifest files, by checking "if"
                 if "bioc-data-experiment" not in package:
                     logging.info("Experiment data: Add data to package %s"
                                  % package)
@@ -120,4 +126,23 @@ class Lfs:
                               % package)
                 logging.error(e)
                 pass
+            # Checkout RELEASE_3_5 and add_data
+            try:
+                if "bioc-data-experiment" not in package:
+                    package_dir = os.path.join(self.temp_git_repo, package)
+                    # checkout RELEASE_3_5 in package dir
+                    git_checkout("RELEASE_3_5", cwd=package_dir)
+                    # Add data from branch release_3_5
+                    logging.info("Add data from RELEASE_3_5 %s" % package)
+                    self.add_data(package, release_3_5=True)
+                    logging.info("git add data to %s" % package)
+                    self.add_data_as_git_objects(package)
+                    logging.info("git commit data to %s" % package)
+                    self.commit_data_as_git_objects(package)
+                    # checkout master in package dir
+                    git_checkout("master", cwd=package_dir)
+            except Exception as e:
+                logging.error("Experiment data: Error in add data to " +
+                              "RELEASE_3_5 branch in " + package)
+                logging.error(e)
         return

@@ -95,6 +95,26 @@ def get_union(svn_root, package_path, manifest_dictionary):
     return list(set(release_3_5 + release_3_6))
 
 
+def union_of_data_manifest():
+    svn_root = "file:///home/git/bioc-data.hedgehog.fhcrc.org/"
+    release_3_5 = (svn_root + "branches/" +
+                   "RELEASE_3_5/experiment/pkgs/" +
+                   "bioc-data-experiment.3.5.manifest")
+    trunk = (svn_root +
+             "trunk/experiment/pkgs/" +
+             "bioc-data-experiment.3.6.manifest")
+
+    def get_list(manifest):
+        cmd = ['svn', 'cat', manifest]
+        out = subprocess.check_output(cmd)
+        out = out.replace("## Blank lines between all entries\nPackage:", "")
+        package_list = [item.strip() for item in out.split("\nPackage:")]
+        return package_list
+    release_3_6 = get_list(trunk)
+    release_3_5 = get_list(release_3_5)
+    return list(set(release_3_6 + release_3_5))
+
+
 def setup_logger(logger_name, log_file):
     l = logging.getLogger(logger_name)
     formatter = logging.Formatter('%(levelname)s : %(asctime)s : %(message)s')
