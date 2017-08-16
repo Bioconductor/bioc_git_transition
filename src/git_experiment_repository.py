@@ -47,7 +47,7 @@ class Lfs:
                for f in files]
         return [item[len(path) + 1:] for item in ans]
 
-    def add_data(self, package, release_3_5=True):
+    def add_data(self, package, release_3_5=False):
         """Add data from SVN data source to each package."""
         package_dir = os.path.join(self.temp_git_repo, package)
         before_files = self.list_files(package_dir)
