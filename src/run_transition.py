@@ -82,7 +82,6 @@ def run_software_transition(configfile, new_svn_dump=False):
     # Step 1: Initial set up, get list of packs from trunk
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
                         remote_svn_server, package_path)
-    # packs = dump.get_pack_list(branch="trunk")
     manifest_dictionary = populate_manifest_dictionary(svn_root, package_path)
     packs = get_union(svn_root, package_path, manifest_dictionary)
     ##################################################
