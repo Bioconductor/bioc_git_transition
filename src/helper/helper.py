@@ -96,7 +96,8 @@ def get_union(svn_root, package_path, manifest_dictionary):
 
 
 def union_of_data_manifest():
-    svn_root = "file:///home/git/bioc-data.hedgehog.fhcrc.org/"
+#    svn_root = "file:///home/git/bioc-data.hedgehog.fhcrc.org/"
+    svn_root = "https://hedgehog.fhcrc.org/bioc-data/"
     release_3_5 = (svn_root + "branches/" +
                    "RELEASE_3_5/experiment/pkgs/" +
                    "bioc-data-experiment.3.5.manifest")
@@ -107,8 +108,9 @@ def union_of_data_manifest():
     def get_list(manifest):
         cmd = ['svn', 'cat', manifest]
         out = subprocess.check_output(cmd)
-        out = out.replace("## Blank lines between all entries\nPackage:", "")
-        package_list = [item.strip() for item in out.split("\nPackage:")]
+        doc = out.split("\n")
+        package_list = [line.replace("Package: ","").strip()
+                        for line in doc if line.startswith("Package")]
         return package_list
     release_3_6 = get_list(trunk)
     release_3_5 = get_list(release_3_5)
