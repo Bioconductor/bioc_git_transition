@@ -83,7 +83,8 @@ def run_software_transition(configfile, new_svn_dump=False):
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
                         remote_svn_server, package_path)
     manifest_dictionary = populate_manifest_dictionary(svn_root, package_path)
-    packs = get_union(svn_root, package_path, manifest_dictionary)
+#    packs = get_union(svn_root, package_path, manifest_dictionary)
+    packs = ["STAN"]
     ##################################################
     # Create a local dump of SVN packages in a location
     if new_svn_dump:
@@ -139,7 +140,6 @@ def run_experiment_data_transition(configfile, new_svn_dump=False):
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
                         remote_svn_server, package_path)
 
-    # packs = dump.get_pack_list(branch="trunk")
     # TODO: replace this hack
     packs = union_of_data_manifest()
     ###################################################
@@ -282,6 +282,8 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     ######################################
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
                         remote_svn_server, package_path)
+    # TODO: Workflow packages should take in union of 
+    # RELEASE_3_5 and RELEASE_3_6 manifest files
     packs = dump.get_pack_list(branch="trunk")
     # Git svn clone workflow packages
     if new_svn_dump:
