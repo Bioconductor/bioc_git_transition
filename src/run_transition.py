@@ -282,6 +282,7 @@ def run_workflow_transition(configfile, new_svn_dump=False):
     ######################################
     dump = LocalSvnDump(svn_root, temp_git_repo, users_db,
                         remote_svn_server, package_path)
+    ## TODO: Use union of manifest files for workflow packages.  
     packs = dump.get_pack_list(branch="trunk")
     # Git svn clone workflow packages
     if new_svn_dump:
