@@ -246,32 +246,22 @@ The gitolite configuration involves
 <a name="sshlocale"></a>
 ### SSH locale 
 
-See this issue for details:
+When a user ran 'git pull' with a non-C and non-US locale, the remote
+server (i.e., git.bioconductor.org) issued a perl warning that 
+setting the locale failed and the fallback locale ("en_US.UTF-8") would
+be used. See this issue for full details:
 
 https://github.com/Bioconductor/bioc_git_transition/issues/34
-
-When a user ran 'git pull' with a non-C and non-US locale, the remote
-server (i.e., git.bioconductor.org) issued a perl warning:
-
-    perl: warning: Setting locale failed.
-    perl: warning: Please check that your locale settings:
-    	LANGUAGE = (unset),
-    	LC_ALL = (unset),
-    	LC_TIME = "en_GB.UTF-8",
-    	LC_MONETARY = "en_GB.UTF-8",
-    	LC_MEASUREMENT = "en_GB.UTF-8",
-    	LC_NUMERIC = "en_GB.UTF-8",
-    	LC_PAPER = "en_GB.UTF-8",
-    	LANG = "en_US.UTF-8"
-        are supported and installed on your system.
-    perl: warning: Falling back to a fallback locale ("en_US.UTF-8").
 
 To prevent this, the git server was modified to prevent clients
 from propagating their locale variables via SSH. 
 
-There are 2 SSH config files, one is for clients connecting to the host and the
-other is for the ssh daemon running on the host. Modify the config file for 
-the daemon, /etc/ssh/sshd_confg, by commenting out this line
+There are 2 SSH config files, one is for clients connecting to the host 
+(/etc/ssh/ssh_config) and another for the ssh daemon running on the host
+(/etc/ssh/sshd_config). 
+
+Modify the config file for the daemon, /etc/ssh/sshd_confg, by commenting out 
+this line
 
     AcceptEnv LANG LC_*
 
