@@ -7,6 +7,8 @@
     - [Smart http](#smarthttp)
     - [Dumb http](#dumbhttp)
 - [Push / Pull access via SSH](#ssh)
+    - [svn 'authz' to gitolite 'conf'](#sshgitolite)
+    - [SSH locale](#sshlocale)
 
 <a name="server"></a>
 ## Server Specs
@@ -209,8 +211,9 @@ out-of-the-box Apache configuration to limit what users can see.
   -- Download a package with `git clone https://git.bioconductor.org/packages/BiocGenerics.git`
 
 <a name="ssh"></a>
-## Push / pull access via ssh
+## Push / pull access via SSH 
 
+<a name="sshitolite"></a>
 ### svn 'authz' to gitolite 'conf'
 
 The gitolite configuration involves
@@ -240,3 +243,38 @@ The gitolite configuration involves
   neaGUI.git netReg.git pairseqsim.git pgUtils.git prism.git spade.git
   stam.git virtualArray.git wiggleplotr.git xcmsGUI.git xmapcore.git
 
+<a name="sshlocale"></a>
+### SSH locale 
+
+See this issue for details:
+
+https://github.com/Bioconductor/bioc_git_transition/issues/34
+
+When a user ran 'git pull' with a non-C and non-US locale, the remote
+server (i.e., git.bioconductor.org) issued a perl warning:
+
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LC_TIME = "en_GB.UTF-8",
+	LC_MONETARY = "en_GB.UTF-8",
+	LC_MEASUREMENT = "en_GB.UTF-8",
+	LC_NUMERIC = "en_GB.UTF-8",
+	LC_PAPER = "en_GB.UTF-8",
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to a fallback locale ("en_US.UTF-8").
+
+To prevent this, the git server was modified to prevent clients
+from propagating their locale variables via SSH. 
+
+There are 2 SSH config files, one is for clients connecting to the host and the
+other is for the ssh daemon running on the host. Modify the config file for 
+the daemon, /etc/ssh/sshd_confg, by commenting out this line
+
+    AcceptEnv LANG LC_*
+
+then restart the service
+
+    sudo service sshd restart
