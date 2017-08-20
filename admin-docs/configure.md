@@ -253,18 +253,18 @@ https://github.com/Bioconductor/bioc_git_transition/issues/34
 When a user ran 'git pull' with a non-C and non-US locale, the remote
 server (i.e., git.bioconductor.org) issued a perl warning:
 
-perl: warning: Setting locale failed.
-perl: warning: Please check that your locale settings:
-	LANGUAGE = (unset),
-	LC_ALL = (unset),
-	LC_TIME = "en_GB.UTF-8",
-	LC_MONETARY = "en_GB.UTF-8",
-	LC_MEASUREMENT = "en_GB.UTF-8",
-	LC_NUMERIC = "en_GB.UTF-8",
-	LC_PAPER = "en_GB.UTF-8",
-	LANG = "en_US.UTF-8"
-    are supported and installed on your system.
-perl: warning: Falling back to a fallback locale ("en_US.UTF-8").
+    perl: warning: Setting locale failed.
+    perl: warning: Please check that your locale settings:
+    	LANGUAGE = (unset),
+    	LC_ALL = (unset),
+    	LC_TIME = "en_GB.UTF-8",
+    	LC_MONETARY = "en_GB.UTF-8",
+    	LC_MEASUREMENT = "en_GB.UTF-8",
+    	LC_NUMERIC = "en_GB.UTF-8",
+    	LC_PAPER = "en_GB.UTF-8",
+    	LANG = "en_US.UTF-8"
+        are supported and installed on your system.
+    perl: warning: Falling back to a fallback locale ("en_US.UTF-8").
 
 To prevent this, the git server was modified to prevent clients
 from propagating their locale variables via SSH. 
