@@ -4,3 +4,6 @@ update*.svn
 extdata
 admin-docs/*Bioc2017*
 .gitignore
+admin-docs/presentations/.ipynb_checkpoints/
+admin-docs/presentations/Demo-bioc2017.ipynb
+admin-docs/presentations/core-team-transition.ipynb

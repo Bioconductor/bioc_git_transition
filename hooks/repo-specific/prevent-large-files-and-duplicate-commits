@@ -4,11 +4,7 @@ import subprocess
 import sys
 import fileinput
 
-#
-# Pre-receive hook that will block any new commits
-# that contain files larger than 5Mb in size and duplicate commits
-#
-
+# Global variables used by pre-recieve hook
 
 ZERO_COMMIT = "0000000000000000000000000000000000000000"
 MAXSIZE = "5000000"  # 5MB limit on file size
@@ -46,11 +42,13 @@ https://bioconductor.org/developers/package-guidelines/.
 """
 
 
-def disable_large_files(oldrev, newrev, refname):
+#
+# Pre-receive hook that will block any new commits
+# that contain files larger than 5Mb in size and duplicate commits
+#
+
+def prevent_large_files(oldrev, newrev, refname):
     """Pre-receive hook to check for large files."""
-    # Check for zero commit, check branch deletions
-    if newrev == ZERO_COMMIT:
-        pass
 
     # set oldrec properly if this is branch creation
     if oldrev == ZERO_COMMIT:
@@ -72,10 +70,8 @@ def disable_large_files(oldrev, newrev, refname):
     return
 
 
-def check_commit_pairs(oldrev, newrev, refname):
+def prevent_duplicate_commits(oldrev, newrev, refname):
     """Pre-receive hook to check for duplicate commits."""
-    if newrev == ZERO_COMMIT:
-        continue
     try:
         commit_list = subprocess.check_output(["git",
                                                "rev-list",
@@ -129,13 +125,17 @@ if False:
     commit_list = subprocess.check_output([
         "git", "rev-list", "HEAD", "-n", "10"
     ])
-    check_commit_pairs(commit_list)
+    prevent_duplicate_commits(commit_list)
     sys.exit(0)
 
 if __name__ == "__main__":
     for line in fileinput.input():
         std_input = line.split(" ")
         oldrev, newrev, refname = std_input[0], std_input[1], std_input[2]
-
-        disable_large_files(oldrev, newrev, refname)
-        check_commit_pairs(oldrev, newrev, refname)
+        # Check for zero commit, check branch deletions
+        if newrev == ZERO_COMMIT:
+            continue
+        # prevent large files from being committed
+        prevent_large_files(oldrev, newrev, refname)
+        # prevent duplicate commits
+        prevent_duplicate_commits(oldrev, newrev, refname)
