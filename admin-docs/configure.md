@@ -202,13 +202,13 @@ out-of-the-box Apache configuration to limit what users can see.
   user: read, write, execute 
   group: read, execute 
   other: none 
-- All files under /home/git/repositories should have the following permissions: 
-  user: read, write 
-  group: read 
-  other: none 
-- Testing: 
-  -- Paste https://git.bioconductor.org/packages/ in a browser and confirm all packages are visible. 
-  -- Download a package with `git clone https://git.bioconductor.org/packages/BiocGenerics.git`
+- All files under /home/git/repositories should have the following permissions:   
+    user: read, write  
+    group: read   
+    other: none   
+- Testing:  
+    -- Paste https://git.bioconductor.org/packages/ in a browser and confirm all packages are visible.   
+    -- Download a package with `git clone https://git.bioconductor.org/packages/BiocGenerics.git`
 
 <a name="ssh"></a>
 ## Push / pull access via SSH 
