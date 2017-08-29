@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+
+import subprocess
+import sys
+import fileinput
+from prevent_large_files import prevent_large_files
+from prevent_duplicate_commits import prevent_duplicate_commits
+
+
+ZERO_COMMIT = "0000000000000000000000000000000000000000"
+
+# This code doesn't run; enable for local testing.
+# to use:
+#
+#   1. Toggle 'False' to 'True'
+#   2. make a git repostiory
+#   3. create invalid commit history
+#   4. run python prevent-duplicate-commits from repository root
+#   5. create branch and repeat for each test
+if False:
+    refname=None
+    revs = subprocess.check_output([
+        "git", "log", "-2", "--format=%H"
+    ]).splitlines()
+    newrev = revs[0].strip()
+    oldrev = revs[1].strip()
+    prevent_large_files(oldrev, newrev, refname)
+    prevent_duplicate_commits(oldrev, newrev, refname)
+    sys.exit(0)
+
+if __name__ == "__main__":
+    for line in fileinput.input():
+        std_input = line.split(" ")
+        oldrev, newrev, refname = std_input[0], std_input[1], std_input[2]
+        # Check for zero commit, check branch deletions
+        if newrev == ZERO_COMMIT:
+            continue
+        # prevent large files
+        prevent_large_files(oldrev, newrev, refname)
+        # prevent duplicate commits
+        prevent_duplicate_commits(oldrev, newrev, refname)
