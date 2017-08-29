@@ -2,7 +2,6 @@
 
 import subprocess
 import sys
-import fileinput
 
 # Global variables used by pre-recieve hook
 
@@ -50,11 +49,18 @@ def prevent_duplicate_commits(oldrev, newrev, refname):
         # else git diff will report no diffs
         body1 = subprocess.check_output(["git", "show",
                                          "--format=%b", first]).strip()
+        if body1.startswith('git-svn-id'):
+            body1 = body1.splitlines()[1:]
+        ## If body1 is empty
         if not body1:
             continue
 
         body2 = subprocess.check_output(["git", "show",
                                          "--format=%b", second]).strip()
+
+        if body2.startswith('git-svn-id'):
+            body2 = body2.splitlines()[1:]
+        ## if body2 is empty
         if not body2:
             continue
 
