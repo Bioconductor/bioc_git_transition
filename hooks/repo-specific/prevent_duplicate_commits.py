@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+import re
 
 # Global variables used by pre-recieve hook
 
@@ -28,6 +29,14 @@ Use
 to see body of commits.
 """
 
+
+def get_revision(commit):
+    revision = ''
+    if commit.startswith("git-svn-id"):
+        revision = re.compile(".*git-svn-id: .*@([0-9]{6})").match(commit).group(1)
+    return revision
+
+
 def prevent_duplicate_commits(oldrev, newrev, refname):
     """Pre-receive hook to check for duplicate commits."""
     try:
@@ -49,26 +58,24 @@ def prevent_duplicate_commits(oldrev, newrev, refname):
         # else git diff will report no diffs
         body1 = subprocess.check_output(["git", "show",
                                          "--format=%b", first]).strip()
-        if body1.startswith('git-svn-id'):
-            body1 = body1.splitlines()[1:]
-        ## If body1 is empty
-        if not body1:
-            continue
-
         body2 = subprocess.check_output(["git", "show",
                                          "--format=%b", second]).strip()
 
-        if body2.startswith('git-svn-id'):
-            body2 = body2.splitlines()[1:]
-        ## if body2 is empty
-        if not body2:
-            continue
-
-        # Get diff of two commits
-        diff = subprocess.check_output(["git", "diff", first, second])
-        # If the diff of two commits is empty, means they are the same.
-        # i.e duplicate
-        if not diff:
-            print(ERROR_DUPLICATE_COMMITS % (first, second))
-            sys.exit(1)
+#        print("revision1: %s, commit: %s"
+#                % (get_revision(body1), first))
+#        print("revision2: %s, commit: %s"
+#                % (get_revision(body2), second))
+        rev1 = get_revision(body1)
+        rev2 = get_revision(body2)
+        if rev1 and rev2:
+            if rev1 == rev2:
+                # Get diff of two commits
+#                print("********body1:******** \n %s" % body1)
+#                print("********body2:******** \n %s" % body2)
+                diff = subprocess.check_output(["git", "diff", first, second])
+                # If the diff of two commits is empty, means they are the same.
+                # i.e duplicate
+                if not diff:
+                    print(ERROR_DUPLICATE_COMMITS % (first, second))
+                    sys.exit(1)
     return
