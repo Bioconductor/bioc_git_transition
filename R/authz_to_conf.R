@@ -13,13 +13,13 @@ fout <- "gitolite-admin/conf/packages.conf"
 stopifnot(file.exists(fin), file.exists(fin2), !file.exists(fout))
 
 remap_re <- "[']"                       # re-map userid characters to '_'
-group_re <- "^[-[:alnum:]]+ *= (.*)"
+group_re <- "^[-.[:alnum:]]+ *= (.*)"
 
 software_template <- paste(
     "repo packages/%s",
     "    RW master = %s",
     "    RW RELEASE_3_5 = %s",
-    "    option hook.pre-receive = disable-large-commits",
+    "    option hook.pre-receive = pre-receive-hook",
     "",
     sep="\n"
 )
@@ -95,14 +95,14 @@ group_merge <-
 
 ## bioconductor.authz
 
-repos_re <- "^\\[/trunk/madman/Rpacks/([[:alnum:]]+)]"
+repos_re <- "^\\[/trunk/madman/Rpacks/([.[:alnum:]]+)]"
 reader_id <- "bioconductor-readers"
 writer_id <- "bioconductor-write0"
 svn_path <- "/bioconductor/trunk/madman/Rpacks"
 bioconductor_authz <-
     process_authz(fin, repos_re, reader_id, writer_id, svn_path)
 
-repos_re <- "^\\[/trunk/experiment/pkgs/([[:alnum:]]+)]"
+repos_re <- "^\\[/trunk/experiment/pkgs/([.[:alnum:]]+)]"
 reader_id <- "bioc-data_readers"
 writer_id <- "bioc-data-writers"
 svn_path <- "/bioc-data/trunk/experiment/pkgs"
