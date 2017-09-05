@@ -34,6 +34,7 @@ if __name__ == "__main__":
         oldrev, newrev, refname = std_input[0], std_input[1], std_input[2]
         # Check for zero commit, check branch deletions
         if newrev == ZERO_COMMIT:
+            print newrev
             continue
         # prevent large files
         prevent_large_files(oldrev, newrev, refname)

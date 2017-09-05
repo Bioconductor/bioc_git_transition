@@ -1,7 +1,5 @@
 import subprocess
 import sys
-import fileinput
-import math
 # Global variables used by pre-recieve hook
 
 ZERO_COMMIT = "0000000000000000000000000000000000000000"
@@ -19,8 +17,15 @@ def prevent_large_files(oldrev, newrev, refname):
     """Pre-receive hook to check for large files."""
 
     # set oldrec properly if this is branch creation
+    print oldrev
+    print newrev
     if oldrev == ZERO_COMMIT:
-        oldrev = "HEAD"
+        output = subprocess.check_output(["git", "rev-list",
+                                       "--max-parents=0",
+                                       newrev])
+        parent_commit = output.strip()
+        print parent_commit
+        # oldrev = "HEAD"
 
     list_files = subprocess.check_output(["git", "diff",
                                        "--name-only", "--diff-filter=ACMRT",
