@@ -17,7 +17,7 @@ ZERO_COMMIT = "0000000000000000000000000000000000000000"
 #   3. create invalid commit history
 #   4. run python prevent-duplicate-commits from repository root
 #   5. create branch and repeat for each test
-if True:
+if False:
     refname=None
     revs = subprocess.check_output([
         "git", "log", "-2", "--format=%H"
@@ -31,10 +31,9 @@ if True:
 if __name__ == "__main__":
     for line in fileinput.input():
         std_input = line.split(" ")
-        oldrev, newrev, refname = std_input[0], std_input[1], std_input[2]
+        oldrev, newrev, refname = [elt.strip() for elt in std_input]
         # Check for zero commit, check branch deletions
         if newrev == ZERO_COMMIT:
-            print newrev
             continue
         # prevent large files
         prevent_large_files(oldrev, newrev, refname)
