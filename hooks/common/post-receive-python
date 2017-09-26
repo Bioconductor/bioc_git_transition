@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+import fileinput
+import subprocess
+import datetime
+
+# Path to feed.xml
+FEED="/Users/ni41435_ca/Documents/bioc_git_transition/hooks/common/feed.xml"
+
+def rss_feed(oldrev, newrev, refname):
+    """Pre-receive hook to check for duplicate SVN commits."""
+    try:
+        latest_commit = subprocess.check_output([
+            "git", "log", oldrev + ".." + newrev,
+            "--pretty=format:'%h|%an|%s|%at'"
+            ])
+    except Exception as e:
+        print("Exception: %s" % e)
+        pass
+    if latest_commit:
+        commit_id, author, message, timestamp = latest_commit.split("|")
+    date = datetime.datetime.fromtimestamp(
+            int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
+    feed = "\<entry\>\n\
+      \<author\>\<name\>%s\<\/name\>\<\/author\>\n\
+      \<title\>%s\<\/title\>\n\
+      \<published\>%s\<\/published\>\n\
+      \<summary type=\"html\"\>\n\
+      \<![CDATA[\n\
+      ]]\>\n\
+      \<\/summary\>\n\
+    \<\/entry\>" % (author, message, date)
+    # Not sure why we add the commits variable after the 3rd line in XML file
+    return feed
+
+
+for line in fileinput.input():
+    std_input = line.split(" ")
+    oldrev, newrev, refname = [item.strip() for item in std_input]
+    rss_feed(oldrev, newrev, refname)
