@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:thr="http://purl.org/syndication/thread/1.0" xml:lang="en">
 <title type="text">Bioconductor GIT feed</title>
+<entry>
+      <commit_id>d83552d</commit_id>
+      <author><name>Nitesh Turaga</name></author>
+      <title>Change</title>
+      <published>2017-09-26 10:11:17</published>
+      <summary type="html">
+      <![CDATA[
+      ]]>
+      </summary>
+    </entry>
 </feed>
