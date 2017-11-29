@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+
+import fileinput
+from rss_feed import rss_feed
+
+
+if __name__ == "__main__":
+    # Path to feed.xml
+    fpath="feed.xml"
+    # Run function for RSS feed
+    for line in fileinput.input():
+        std_input = line.split(" ")
+        oldrev, newrev, refname = [item.strip() for item in std_input]
+        
+        # RSS-feed post-receive hook
+        rss_feed(oldrev, newrev, refname, fpath)
