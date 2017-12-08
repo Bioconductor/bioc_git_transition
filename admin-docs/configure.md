@@ -213,7 +213,7 @@ out-of-the-box Apache configuration to limit what users can see.
 <a name="ssh"></a>
 ## Push / pull access via SSH 
 
-<a name="sshitolite"></a>
+<a name="sshgitolite"></a>
 ### svn 'authz' to gitolite 'conf'
 
 The gitolite configuration involves
