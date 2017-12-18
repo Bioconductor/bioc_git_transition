@@ -1,0 +1,123 @@
+#!/usr/bin/env python
+
+import fileinput
+from rss_feed import rss_feed
+from xml.etree.ElementTree import parse, fromstring
+import subprocess
+import fcntl
+import sys
+import logging
+logging.basicConfig(filename='/tmp/post-recieve.log', level=logging.DEBUG)
+
+ZERO_COMMIT = "0000000000000000000000000000000000000000"
+BASE_PATH = "/home/git/rss/"
+
+
+def indent(elem, level=0):
+    i = "\n" + level*"  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent(elem, level+1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
+
+
+def write_and_limit_feed(entry_list, length, feed):
+    doc = parse(feed)
+    root = doc.getroot()
+
+    # Get items
+    channel_root = root.find("channel")
+    items = channel_root.findall("item")
+    # Write feed
+    for entry in entry_list:
+        # 5 is the entry position in the feed
+        channel_root.insert(5, entry)
+    # Remove extra elements
+    if len(items) > length:
+        extra_items = items[length:]
+        for extra_item in extra_items:
+            channel_root.remove(extra_item)
+    indent(channel_root)
+    feed.seek(0)
+    feed.truncate()
+    doc.write(feed)
+    feed.write("\n")
+    feed.flush()
+    return feed
+
+
+if False:
+    fh = "/tmp/gitlog.xml"
+    feed = open(fh, "r+")
+    refname = None
+    revs = subprocess.check_output([
+        "git", "log", "-2", "--format=%H"
+    ]).splitlines()
+    newrev = revs[0].strip()
+    oldrev = revs[1].strip()
+    rss_feed(oldrev, newrev, refname, 5)
+    sample_entry = """
+    <item>
+      <title>2309fc133512c4e25d8942c3d0ae6fc198bf9ba9</title>
+      <link>https://www.bioconductor.org</link>
+      <description>4: test</description>
+      <author>Nitesh</author>
+      <pubDate>2017-12-08 17:26:18</pubDate>
+    </item>
+    """
+    entry = fromstring(sample_entry)
+    write_and_limit_feed([entry], 5, fh)
+    fh.close()
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    # Path to feed.xml
+    fpath = BASE_PATH + "gitlog.xml"
+    fpath_release = BASE_PATH + "gitlog.release.xml"
+    length = 199
+
+    # Run function for RSS feed
+    feed = open(fpath, "r+")
+    feed_release = open(fpath_release, 'r+')
+
+    # Obtain a lock
+    fcntl.lockf(feed, fcntl.LOCK_EX)
+    fcntl.lockf(feed_release, fcntl.LOCK_EX)
+
+    for line in fileinput.input():
+        std_input = line.split(" ")
+        oldrev, newrev, refname = [item.strip() for item in std_input]
+        # Check for zero commit, check branch deletions
+        # also, avoid new package additions
+        if (oldrev == ZERO_COMMIT or newrev == ZERO_COMMIT):
+            continue
+        # Split feed into correct files
+        if ("RELEASE" in refname):
+            # RSS-feed post-receive hook
+            entry = rss_feed(oldrev, newrev, refname, length)
+            write_and_limit_feed(entry, length, feed_release)
+        else:
+            entry = rss_feed(oldrev, newrev, refname, length)
+            write_and_limit_feed(entry, length, feed)
+
+    cmd = ['scp', 'gitlog.xml', 'gitlog.release.xml',
+           'biocadmin@staging.bioconductor.org:/home/biocadmin/bioc-test-web/bioconductor.org/assets/developers/rss-feeds/.']
+    subprocess.check_call(cmd, cwd=BASE_PATH)
+    
+    # Release the lock
+    fcntl.lockf(feed, fcntl.LOCK_UN)
+    fcntl.lockf(feed_release, fcntl.LOCK_UN)
+    feed.close()
+    feed_release.close()
+
+    logging.info("Exit after removing locks")
+
