@@ -68,7 +68,9 @@ if False:
     <item>
       <title>2309fc133512c4e25d8942c3d0ae6fc198bf9ba9</title>
       <link>https://www.bioconductor.org</link>
-      <description>4: test</description>
+      <description><![CDATA[
+on't import "$<-" method from the IRanges package (the IRanges package
+     does not export such method)]]></description>
       <author>Nitesh</author>
       <pubDate>2017-12-08 17:26:18</pubDate>
     </item>
@@ -83,7 +85,7 @@ if __name__ == "__main__":
     # Path to feed.xml
     fpath = BASE_PATH + "gitlog.xml"
     fpath_release = BASE_PATH + "gitlog.release.xml"
-    length = 199
+    length = 499
 
     # Run function for RSS feed
     feed = open(fpath, "r+")
@@ -91,7 +93,6 @@ if __name__ == "__main__":
 
     # Obtain a lock
     fcntl.lockf(feed, fcntl.LOCK_EX)
-    fcntl.lockf(feed_release, fcntl.LOCK_EX)
 
     for line in fileinput.input():
         std_input = line.split(" ")
@@ -101,21 +102,23 @@ if __name__ == "__main__":
         if (oldrev == ZERO_COMMIT or newrev == ZERO_COMMIT):
             continue
         # Split feed into correct files
-        if ("RELEASE" in refname):
-            # RSS-feed post-receive hook
-            entry = rss_feed(oldrev, newrev, refname, length)
-            write_and_limit_feed(entry, length, feed_release)
-        else:
-            entry = rss_feed(oldrev, newrev, refname, length)
-            write_and_limit_feed(entry, length, feed)
-
+        try:
+            if ("RELEASE" in refname):
+                # RSS-feed post-receive hook
+                entry = rss_feed(oldrev, newrev, refname, length)
+                write_and_limit_feed(entry, length, feed_release)
+            else:
+                entry = rss_feed(oldrev, newrev, refname, length)
+                write_and_limit_feed(entry, length, feed)
+        except Exception as e:
+            print("Note: failed to update RSS feed; git repository updated successfully.")
+            logging.error(e)
     cmd = ['scp', 'gitlog.xml', 'gitlog.release.xml',
            'biocadmin@staging.bioconductor.org:/home/biocadmin/bioc-test-web/bioconductor.org/assets/developers/rss-feeds/.']
     subprocess.check_call(cmd, cwd=BASE_PATH)
     
     # Release the lock
     fcntl.lockf(feed, fcntl.LOCK_UN)
-    fcntl.lockf(feed_release, fcntl.LOCK_UN)
     feed.close()
     feed_release.close()
 

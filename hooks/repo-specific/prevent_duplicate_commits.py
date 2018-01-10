@@ -6,7 +6,7 @@ import re
 
 # Global variables used by pre-recieve hook
 
-GIT_COMMIT_LIST_LENGTH = "10"
+GIT_COMMIT_LIST_LENGTH = "50"
 SVN_COMMIT_REGEX = re.compile(".*git-svn-id: .*@([0-9]{6})")
 ZERO_COMMIT = "0000000000000000000000000000000000000000"
 ERROR_DUPLICATE_COMMITS = """Error: duplicate commits.
