@@ -1,6 +1,4 @@
 import subprocess
-import datetime
-# import re
 from os.path import basename, abspath
 from xml.etree.ElementTree import fromstring
 import logging
