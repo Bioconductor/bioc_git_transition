@@ -48,23 +48,23 @@ def test_master_check_version_bump():
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         check_version_bump("0.25.1", "0.26.1", refname)
         assert pytest_wrapped_e.type == SystemExit
-        assert pytest_wrapped_e.value.code == 1
+        assert pytest_wrapped_e.value.code != 0
 
     # x should not change
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         check_version_bump("0.25.1", "1.25.1", refname)
         assert pytest_wrapped_e.type == SystemExit
-        assert pytest_wrapped_e.value.code == 1
+        assert pytest_wrapped_e.value.code != 0
 
     #  z should change by increment only
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         check_version_bump("0.25.5", "0.25.4", refname)
         assert pytest_wrapped_e.type == SystemExit
-        assert pytest_wrapped_e.value.code == 1
+        assert pytest_wrapped_e.value.code != 0
 
     # z can be 99
     res = check_version_bump("0.25.4", "0.99.0", refname)
-    assert res == None
+    assert res == 0
 
     return
 
@@ -75,39 +75,170 @@ def test_release_check_version_bump():
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         check_version_bump("0.26.1", "0.27.1", refname)
         assert pytest_wrapped_e.type == SystemExit
-        assert pytest_wrapped_e.value.code == 1
+        assert pytest_wrapped_e.value.code != 0
     # x should not change
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         check_version_bump("0.26.1", "1.26.1", refname)
         assert pytest_wrapped_e.type == SystemExit
-        assert pytest_wrapped_e.value.code == 1
+        assert pytest_wrapped_e.value.code != 0
     # x should not change, even if y changes, it should
     # throw the same error.
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         check_version_bump("0.25.1", "1.25.1", refname)
         assert pytest_wrapped_e.type == SystemExit
-        assert pytest_wrapped_e.value.code == 1
+        assert pytest_wrapped_e.value.code != 0
     # z should not decrement
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         check_version_bump("0.26.4", "0.25.3", refname)
         assert pytest_wrapped_e.type == SystemExit
-        assert pytest_wrapped_e.value.code == 1
+        assert pytest_wrapped_e.value.code != 0
 
     # z can be 99
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         res = check_version_bump("0.26.4", "0.99.0", refname)
         assert pytest_wrapped_e.type == SystemExit
-        assert pytest_wrapped_e.value.code == 1
+        assert pytest_wrapped_e.value.code != 0
     return
 
-def test_integration_version_bump_in_master():
-    refname = "master"
-    change_version("1.25.61")
-    git_add(DESC)
+
+def test_version_bumps_martin():
+    refname = "RELEASE_3_6"
+    ## Tests with bad version number format
     with pytest.raises(SystemExit) as pytest_wrapped_e:
-        change_version("2.25.61")
-        git_add(DESC)
-        git_commit("Fail test", cwd=CWD)
-        out = git_push()
-        assert "error" in out
-        assert pytest_wrapped_e.value.code == 1
+        check_version_bump("2.2.2", "2.2.2-1", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.2.2", "2.2", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.2.2", "2.2.2.2", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.2.2", "2.2-1.2-1", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.2.2", "2.2.a", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    ## x0 != x1
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.2.2", "1.2.2", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    res = check_version_bump("2.2.2", "2.2.2", refname)
+    assert res == 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.2.2", "0.2.2", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+    return
+
+
+def test_release_version_bumps_martin():
+    refname = "RELEASE_3_6"
+
+    res = check_version_bump("2.2.2", "2.2.2", refname)
+    assert res == 0
+
+    res = check_version_bump("2.2.2", "2.2.3", refname)
+    assert res == 0
+
+    res = check_version_bump("2.2.2", "2.2.10", refname)
+    assert res == 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.2.2", "2.1.2", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.2.2", "2.3.2", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.2.2", "2.99.0", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.3.2", "2.3.2", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.3.2", "2.3.3", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+    return
+
+
+def test_devel_version_bumps_martin():
+    refname = "master"
+
+    res = check_version_bump("2.3.2", "2.3.2", refname)
+    assert res == 0
+
+    res = check_version_bump("2.3.2", "2.3.3", refname)
+    assert res == 0
+
+    res = check_version_bump("2.3.2", "2.3.10", refname)
+    assert res == 0
+
+    res = check_version_bump("2.3.2", "2.99.0", refname)
+    assert res == 0
+
+    res = check_version_bump("2.3.2", "2.99.2", refname)
+    assert res == 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.3.2", "2.4.0", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.3.2", "2.4.2", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.3.2", "2.2.2", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.3.2", "2.3.1", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("2.3.2", "2.3.0", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+    return
+
+
+# def test_integration_version_bump_in_master():
+#     refname = "master"
+#     change_version("1.25.61")
+#     git_add(DESC)
+#     with pytest.raises(SystemExit) as pytest_wrapped_e:
+#         change_version("2.25.61")
+#         git_add(DESC)
+#         git_commit("Fail test", cwd=CWD)
+#         out = git_push()
+#         assert "error" in out
+#         assert pytest_wrapped_e.value.code == 1

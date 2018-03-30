@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Pre-receive hook to check legality of version bumps.
 
 This version check follows the guidelines of the Bioconductor
@@ -5,11 +6,11 @@ project. The guidelines are given at this link,
 http://bioconductor.org/developers/how-to/version-numbering/.
 """
 
-#!/usr/bin/env python
-
 from __future__ import print_function
 import subprocess
 import sys
+import re
+
 
 ZERO_COMMIT = "0000000000000000000000000000000000000000"
 
@@ -26,6 +27,7 @@ def throw_error(prev_version, new_version):
                "for details" % (prev_version, new_version))
     sys.exit(message)
     return
+
 
 def git_diff(oldrev, newrev, fname):
     """Git diff between two commits."""
@@ -67,39 +69,68 @@ def get_version_bump(diff):
     return prev_version[0].strip(), new_version[0].strip()
 
 
-def check_version_bump(prev_version, new_version, refname):
-    """Check the version bump for legality."""
+def check_version_format(prev_version, new_version):
+    """Check format of version."""
+    regex = re.compile('\d{1}\.\d{1,2}\.\d{1,3}$')
+    if not regex.match(new_version):
+        throw_error(prev_version, new_version)
+    try:
+        x0, y0, z0 = map(int, prev_version.split("."))
+        x, y, z = map(int, new_version.split("."))
+    except ValueError as e:
+        print('format of version number is wrong')
+        throw_error(prev_version, new_version)
+    return prev_version, new_version
+
+
+def check_version_in_release(prev_version, new_version):
+    """Check version in RELEASE_branch."""
     x0, y0, z0 = map(int, prev_version.split("."))
     x, y, z = map(int, new_version.split("."))
-    if "RELEASE" in refname:
-        # x should never change
-        if x != x0:
-            throw_error(prev_version, new_version)
+    # x should never change
+    if x != x0:
+        throw_error(prev_version, new_version)
         # y should be even
-        if y % 2 != 0:
-            # y should not be 99 i.e no major version change
-            if y == 99:
-                throw_error(prev_version, new_version)
+    if y % 2 != 0:
+        # y should not be 99 i.e no major version change
+        if y == 99:
             throw_error(prev_version, new_version)
-        # z should be incremented
-        if not z - z0 >= 0:
-            throw_error(prev_version, new_version)
+        throw_error(prev_version, new_version)
+    # z should be incremented
+    if not z - z0 >= 0:
+        throw_error(prev_version, new_version)
+    return
+
+
+def check_version_in_master(prev_version, new_version):
+    """Check version in master branch."""
+    x0, y0, z0 = map(int, prev_version.split("."))
+    x, y, z = map(int, new_version.split("."))
+    # x should never change
+    if x != x0:
+        throw_error(prev_version, new_version)
+    # y should be odd
+    if y % 2 == 0:
+        throw_error(prev_version, new_version)
+    # y should not be the same, and can be 99
+    if (y != y0) and (y != 99):
+        throw_error(prev_version, new_version)
+    # z should be incremented and cannot be 99
+    # to indicate major version change
+    if not (z - z0 >= 0) and (y != 99):
+        throw_error(prev_version, new_version)
+    return
+
+def check_version_bump(prev_version, new_version, refname):
+    """Check the version bump for legality."""
+    # Check format of version
+    prev_version, new_version = check_version_format(prev_version, new_version)
+    if "RELEASE" in refname:
+        check_version_in_release(prev_version, new_version)
 
     if "master" in refname:
-        # x should never change
-        if x != x0:
-            throw_error(prev_version, new_version)
-        # y should be odd
-        if y % 2 == 0:
-            throw_error(prev_version, new_version)
-        # y should not be the same, and can be 99
-        if (y != y0) and (y != 99):
-            throw_error(prev_version, new_version)
-        # z should be incremented and cannot be 99
-        # to indicate major version change
-        if not (z - z0 >= 0) and (y != 99):
-            throw_error(prev_version, new_version)
-    return
+        check_version_in_master(prev_version, new_version)
+    return 0
 
 
 def prevent_bad_version_numbers(oldrev, newrev, refname):
