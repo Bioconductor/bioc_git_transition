@@ -46,13 +46,12 @@ def git_diff_pre_commit(fname):
     return diff.splitlines()
 
 
-def git_diff_files(commit):
+def git_diff_files(oldrev, newrev):
     """Get list of files in diff."""
     files_modified = subprocess.check_output(["git",
-                                              "diff-index",
+                                              "diff",
                                               "--name-only",
-                                              "--cached",
-                                              commit])
+                                              oldrev + ".." + newrev])
     return files_modified.splitlines()
 
 
@@ -61,10 +60,16 @@ def get_version_bump(diff):
     prev_version = [line.replace("-Version:", "")
                     for line in diff
                     if line.startswith("-Version")]
+    eprint("prev", prev_version)
     new_version = [line.replace("+Version:", "")
                    for line in diff
                    if line.startswith("+Version")]
+    eprint("new", new_version)
+    ## If versions are equal, no version change
     if prev_version == new_version:
+        return None, None
+    ## No change in DESCRIPTION file from new package push
+    if not prev_version or not new_version:
         return None, None
     return prev_version[0].strip(), new_version[0].strip()
 
@@ -78,7 +83,7 @@ def check_version_format(prev_version, new_version):
         x0, y0, z0 = map(int, prev_version.split("."))
         x, y, z = map(int, new_version.split("."))
     except ValueError as e:
-        print('format of version number is wrong')
+        print('format of version number is wrong', e)
         throw_error(prev_version, new_version)
     return prev_version, new_version
 
@@ -138,11 +143,17 @@ def prevent_bad_version_numbers(oldrev, newrev, refname):
 
     This function acts as the wrapper for all the helper functions.
     """
-    files_modified = git_diff_files(newrev)
+    if oldrev == ZERO_COMMIT:
+        if refname == "refs/heads/master":
+            oldrev = subprocess.check_output([
+                "git", "rev-list", "--max-parents=0", newrev
+            ]).split().pop().strip()
+        else:
+            oldrev = "HEAD"
+    files_modified = git_diff_files(oldrev, newrev)
     for fname in files_modified:
         if "DESCRIPTION" in fname:
             diff = git_diff(oldrev, newrev, fname)
-            # eprint("DIFF: \n", "\n".join(diff))
             prev_version, new_version = get_version_bump(diff)
             if (prev_version is None) and (new_version is None):
                 continue
