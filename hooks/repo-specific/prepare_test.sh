@@ -6,26 +6,26 @@ test_repo() {
     gittestpath=/tmp/test_bad_version_numbers.git
     hooks=/Users/ni41435_ca/Documents/bioc_git_transition/hooks/repo-specific
     gittestrepopath=/tmp/test_bad_version_numbers
-    
+
     ## Clean up
     if [ -d "$gittestpath" ]; then
 	rm -rf $gittestpath
     fi
-    
+
     if [ -d "$gittestrepopath" ]; then
 	rm -rf $gittestrepopath
     fi
-    
+
     mkdir $gittestpath
     cd $gittestpath
-    
+
     ## Make bare clone
     git init --bare
-    
+
     ## Copy hooks
     cp $hooks/prevent_bad_version_numbers.py $hooks/prevent_duplicate_commits.py $hooks/prevent_large_files.py hooks/
     cp $hooks/pre-receive-hook hooks/pre-receive
-    
+
     ## Make clone of bare repo
     cd /tmp
     git clone $gittestpath

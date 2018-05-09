@@ -144,12 +144,9 @@ def prevent_bad_version_numbers(oldrev, newrev, refname):
     This function acts as the wrapper for all the helper functions.
     """
     if oldrev == ZERO_COMMIT:
-        if refname == "refs/heads/master":
-            oldrev = subprocess.check_output([
-                "git", "rev-list", "--max-parents=0", newrev
-            ]).split().pop().strip()
-        else:
-            oldrev = "HEAD"
+        oldrev = subprocess.check_output([
+            "git", "rev-list", "--max-parents=0", newrev
+        ]).split().pop().strip()
     files_modified = git_diff_files(oldrev, newrev)
     for fname in files_modified:
         if "DESCRIPTION" in fname:
