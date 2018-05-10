@@ -60,11 +60,9 @@ def get_version_bump(diff):
     prev_version = [line.replace("-Version:", "")
                     for line in diff
                     if line.startswith("-Version")]
-    eprint("prev", prev_version)
     new_version = [line.replace("+Version:", "")
                    for line in diff
                    if line.startswith("+Version")]
-    eprint("new", new_version)
     ## If versions are equal, no version change
     if prev_version == new_version:
         return None, None
@@ -144,9 +142,11 @@ def prevent_bad_version_numbers(oldrev, newrev, refname):
     This function acts as the wrapper for all the helper functions.
     """
     if oldrev == ZERO_COMMIT:
-        oldrev = subprocess.check_output([
-            "git", "rev-list", "--max-parents=0", newrev
-        ]).split().pop().strip()
+        ## https://stackoverflow.com/questions/40883798/how-to-get-git-diff-of-the-first-commit
+        ## 4b825dc642cb6eb9a060e54bf8d69288fbee4904 is the
+        ## id of the "empty tree" in Git and it's always
+        ## available in every repository.
+        oldrev = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
     files_modified = git_diff_files(oldrev, newrev)
     for fname in files_modified:
         if "DESCRIPTION" in fname:
