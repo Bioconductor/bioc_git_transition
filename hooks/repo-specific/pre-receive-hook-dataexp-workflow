@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+
+import subprocess
+import sys
+import fileinput
+from prevent_duplicate_commits import prevent_duplicate_commits
+from prevent_bad_version_numbers import prevent_bad_version_numbers
+
+ZERO_COMMIT = "0000000000000000000000000000000000000000"
+
+if __name__ == "__main__":
+    newestrev = ZERO_COMMIT
+    oldestrev = ZERO_COMMIT
+    for line in fileinput.input():
+        std_input = line.split(" ")
+        oldrev, newrev, refname = [elt.strip() for elt in std_input]
+        # Check for zero commit, check branch deletions
+        if newrev == ZERO_COMMIT:
+            continue
+        # prevent duplicate commits
+        prevent_duplicate_commits(oldrev, newrev, refname)
+        # prevent bad version numbers
+        if newestrev == ZERO_COMMIT:
+            newestrev = newrev
+        oldestrev = oldrev
+    if newestrev != ZERO_COMMIT:
+        prevent_bad_version_numbers(oldestrev, newestrev, refname)

@@ -1,4 +1,6 @@
 import subprocess
+import datetime
+# import re
 from os.path import basename, abspath
 from xml.etree.ElementTree import fromstring
 import logging
@@ -55,4 +57,3 @@ def rss_feed(oldrev, newrev, refname, length):
             # Add entry as element in xml.etree
             entry_list.append(fromstring(entry))
     return entry_list
-
