@@ -42,7 +42,7 @@ Hooks applied to Software packages:
 		
 * Prevent bad version numbers
 	
- Prevent duplicate commits 
+* Prevent duplicate commits 
 	
 * RSS feed 	
 	
