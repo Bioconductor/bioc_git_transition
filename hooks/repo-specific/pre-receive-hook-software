@@ -2,12 +2,16 @@
 
 import subprocess
 import sys
+import os
+import re
 import fileinput
 from prevent_large_files import prevent_large_files
 from prevent_duplicate_commits import prevent_duplicate_commits
 from prevent_bad_version_numbers import prevent_bad_version_numbers
 
 ZERO_COMMIT = "0000000000000000000000000000000000000000"
+HOOKS_CONF = "file:///home/git/repositories/admin/hook_maintainer.git"
+LOCAL_HOOKS_CONF = "file:////Users/ni41435_ca/Documents/hook_maintainer.git"
 
 # This code doesn't run; enable for local testing.
 # to use:
@@ -28,23 +32,66 @@ if False:
     prevent_duplicate_commits(oldrev, newrev, refname)
     sys.exit(0)
 
-        
-if __name__ == "__main__":
+
+# TODO: Change LOCAL_HOOKS_CONF to HOOKS_CONF
+def get_hooks_conf():
+    cmd = "git archive --remote=" + LOCAL_HOOKS_CONF + " HEAD hooks.conf | tar -x"
+    res = subprocess.check_output(cmd, shell=True, cwd="/tmp")
+    if os.path.exists("/tmp/hooks.conf"):
+        with open("/tmp/hooks.conf") as f:
+            conf = f.read()
+    return conf
+
+
+def read_bioc_conf(conf = get_hooks_conf()):
+    d = {}
+    res = [pack.strip().split("\n") for pack in conf.split("\n\n")]
+    for item in res:
+        d[item[0]] = item[1:]
+    # Get package name, this works because the script is run inside the package
+    package_name = re.search('/.*/(.+?.git).*',
+                             os.getcwd()).group(1).replace(".git", "")
+    package = "Package: " + package_name
+    large_files = True
+    version_numbers = True
+    duplicate_commits = True
+    if "pre-receive-hook-large-files: False" in d[package]:
+        large_files = False
+    if "pre-receive-hook-version-numbers: False" in d[package]:
+        version_numbers = False
+    if "pre-receive-hook-duplicate-commits: False" in d[package]:
+        duplicate_commits = False
+    return (large_files, version_numbers, duplicate_commits)
+
+
+def apply_hooks(large_files, version_numbers, duplicate_commits):
     newestrev = ZERO_COMMIT
     oldestrev = ZERO_COMMIT
     for line in fileinput.input():
         std_input = line.split(" ")
+        print(std_input)
         oldrev, newrev, refname = [elt.strip() for elt in std_input]
         # Check for zero commit, check branch deletions
         if newrev == ZERO_COMMIT:
             continue
         # prevent large files
-        prevent_large_files(oldrev, newrev, refname)
+        if large_files: # enable hook
+            print("large_files: ", large_files)
+            prevent_large_files(oldrev, newrev, refname)
         # prevent duplicate commits
-        prevent_duplicate_commits(oldrev, newrev, refname)
-        # prevent bad version numbers
+        if duplicate_commits: # enable hook
+            print("duplicate commit: ", duplicate_commits)
+            prevent_duplicate_commits(oldrev, newrev, refname)
         if newestrev == ZERO_COMMIT:
             newestrev = newrev
         oldestrev = oldrev
-    if newestrev != ZERO_COMMIT:
+        # prevent bad version numbers
+    print("version_numbers and newestrev != ZERO_COMMIT", version_numbers and newestrev != ZERO_COMMIT)
+    if (version_numbers and newestrev != ZERO_COMMIT): # enable hook
+        print("version_numbers: ", version_numbers)
         prevent_bad_version_numbers(oldestrev, newestrev, refname)
+
+
+if __name__ == "__main__":
+    large_files, version_numbers, duplicate_commits = read_bioc_conf()
+    apply_hooks(large_files, version_numbers, duplicate_commits)
