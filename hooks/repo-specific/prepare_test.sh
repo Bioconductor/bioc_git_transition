@@ -24,7 +24,7 @@ test_repo() {
 
     ## Copy hooks
     cp $hooks/prevent_bad_version_numbers.py $hooks/prevent_duplicate_commits.py $hooks/prevent_large_files.py hooks/
-    cp $hooks/pre-receive-hook hooks/pre-receive
+    cp $hooks/pre-receive-hook-software hooks/pre-receive
 
     cp $hooks/test_prevent_bad_version_numbers.py hooks/
     touch hooks/__init__.py

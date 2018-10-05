@@ -6,7 +6,6 @@ import os
 import pytest
 from hooks.prevent_bad_version_numbers import check_version_bump
 
-
 CWD = "/Users/ni41435_ca/Documents/bioc_git_transition/hooks/repo-specific/test_proj"
 DESC = "DESCRIPTION"
 
@@ -21,25 +20,30 @@ def change_version(new_version, cwd=CWD):
     f.close()
     return
 
+
 def git_add(path, cwd=CWD):
     cmd = ['git', 'add', path]
     subprocess.check_call(cmd, cwd=cwd)
     return
+
 
 def git_checkout(branch, cwd=CWD):
     cmd = ['git', 'checkout', branch]
     subprocess.check_call(cmd, cwd=cwd)
     return
 
+
 def git_commit(message, cwd=CWD):
     cmd = ['git', 'commit', '-m', message]
     subprocess.check_call(cmd, cwd=cwd)
     return
 
+
 def git_push(cwd=CWD):
     cmd = ['git', 'push']
     out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     return out
+
 
 def test_master_check_version_bump():
     # Master
@@ -103,7 +107,7 @@ def test_release_check_version_bump():
 
 def test_version_bumps_martin():
     refname = "RELEASE_3_6"
-    ## Tests with bad version number format
+    # Tests with bad version number format
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         check_version_bump("2.2.2", "2.2.2-1", refname)
         assert pytest_wrapped_e.type == SystemExit
@@ -113,7 +117,6 @@ def test_version_bumps_martin():
         check_version_bump("2.2.2", "2.2", refname)
         assert pytest_wrapped_e.type == SystemExit
         assert pytest_wrapped_e.value.code != 0
-
 
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         check_version_bump("2.2.2", "2.2.2.2", refname)
@@ -130,8 +133,7 @@ def test_version_bumps_martin():
         assert pytest_wrapped_e.type == SystemExit
         assert pytest_wrapped_e.value.code != 0
 
-    ## x0 != x1
-
+    # x0 != x1
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         check_version_bump("2.2.2", "1.2.2", refname)
         assert pytest_wrapped_e.type == SystemExit
