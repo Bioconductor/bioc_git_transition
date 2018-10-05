@@ -7,5 +7,6 @@ admin-docs/*Bioc2017*
 admin-docs/presentations/.ipynb_checkpoints/
 admin-docs/presentations/Demo-bioc2017.ipynb
 admin-docs/presentations/core-team-transition.ipynb
-hooks/repo-specific/test_proj.git/*
+hooks/repo-specific/test_proj*
 hooks/repo-specific/tests/*
+hooks/repo-specific/BiocGenerics_test*
