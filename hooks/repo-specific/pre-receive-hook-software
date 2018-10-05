@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import subprocess
-import sys
-import os
-import re
+from os import path, getcwd
 import fileinput
 from prevent_large_files import prevent_large_files
 from prevent_duplicate_commits import prevent_duplicate_commits
@@ -13,85 +11,86 @@ ZERO_COMMIT = "0000000000000000000000000000000000000000"
 HOOKS_CONF = "file:///home/git/repositories/admin/hook_maintainer.git"
 LOCAL_HOOKS_CONF = "file:////Users/ni41435_ca/Documents/hook_maintainer.git"
 
-# This code doesn't run; enable for local testing.
-# to use:
-#
-#   1. Toggle 'False' to 'True'
-#   2. make a git repostiory
-#   3. create invalid commit history
-#   4. run python prevent-duplicate-commits from repository root
-#   5. create branch and repeat for each test
-if False:
-    refname=None
-    revs = subprocess.check_output([
-        "git", "log", "-2", "--format=%H"
-    ]).splitlines()
-    newrev = revs[0].strip()
-    oldrev = revs[1].strip()
-    prevent_large_files(oldrev, newrev, refname)
-    prevent_duplicate_commits(oldrev, newrev, refname)
-    sys.exit(0)
 
-
-# TODO: Change LOCAL_HOOKS_CONF to HOOKS_CONF
 def get_hooks_conf():
+    """This function does a simple 'git archive' clone process of hooks.conf.
+
+    It clones the file in the /tmp directory.
+    """
+    # FIXME: Change LOCAL_HOOKS_CONF to HOOKS_CONF
     cmd = "git archive --remote=" + LOCAL_HOOKS_CONF + " HEAD hooks.conf | tar -x"
-    res = subprocess.check_output(cmd, shell=True, cwd="/tmp")
-    if os.path.exists("/tmp/hooks.conf"):
+    subprocess.check_output(cmd, shell=True, cwd="/tmp")
+    if path.exists("/tmp/hooks.conf"):
         with open("/tmp/hooks.conf") as f:
             conf = f.read()
     return conf
 
 
-def read_bioc_conf(conf = get_hooks_conf()):
+def read_bioc_conf(conf):
+    """ Read the bioc hooks configuration file.
+
+    This code is run within the 'hooks' folder inside a bare git repo.
+
+    This function reads the hooks.conf file and returns a three tuple
+    of boolean values, one for each hook if it is toggled False or True.
+
+    Default is (True, True, True)
+    """
+    # Make dictionary with package name as key, values are [list of hooks]
     d = {}
     res = [pack.strip().split("\n") for pack in conf.split("\n\n")]
     for item in res:
         d[item[0]] = item[1:]
-    # Get package name, this works because the script is run inside the package
-    package_name = re.search('/.*/(.+?.git).*',
-                             os.getcwd()).group(1).replace(".git", "")
+    # Get package name, it works because the script is run inside the package.
+    package_name = path.basename(path.dirname(getcwd())).replace(".git", "")
     package = "Package: " + package_name
-    large_files = True
-    version_numbers = True
-    duplicate_commits = True
-    if "pre-receive-hook-large-files: False" in d[package]:
-        large_files = False
-    if "pre-receive-hook-version-numbers: False" in d[package]:
-        version_numbers = False
-    if "pre-receive-hook-duplicate-commits: False" in d[package]:
-        duplicate_commits = False
-    return (large_files, version_numbers, duplicate_commits)
+    # Default values for hooks is (True, True, True)
+    hooks_dict = {"pre-receive-hook-large-files": True,
+                  "pre-receive-hook-version-numbers": True,
+                  "pre-receive-hook-duplicate-commits": True}
+    # Change values for specific hooks mentioned in hooks.conf
+    for hook in d[package]:
+        [hook, val] = hook.split(": ")
+        hooks_dict[hook] = (val != "False")
+
+    return hooks_dict
 
 
-def apply_hooks(large_files, version_numbers, duplicate_commits):
+def apply_hooks(hooks_dict):
+    """Apply hooks to each package.
+
+    This function takes in a boolean list of arguments, one for each hook,
+    1. prevent_large_files,
+    2. prevent_bad_version_numbers,
+    3. prevent_duplicate_commits in that order.
+
+    The boolean values toggle True/False to indicate which hook has to be
+    applied to the package.
+    """
     newestrev = ZERO_COMMIT
     oldestrev = ZERO_COMMIT
     for line in fileinput.input():
         std_input = line.split(" ")
-        print(std_input)
         oldrev, newrev, refname = [elt.strip() for elt in std_input]
         # Check for zero commit, check branch deletions
         if newrev == ZERO_COMMIT:
             continue
         # prevent large files
-        if large_files: # enable hook
-            print("large_files: ", large_files)
+        if hooks_dict["pre-receive-hook-large-files"]:  # enable hook
             prevent_large_files(oldrev, newrev, refname)
         # prevent duplicate commits
-        if duplicate_commits: # enable hook
-            print("duplicate commit: ", duplicate_commits)
+        if hooks_dict["pre-receive-hook-duplicate-commits"]:  # enable hook
             prevent_duplicate_commits(oldrev, newrev, refname)
         if newestrev == ZERO_COMMIT:
             newestrev = newrev
         oldestrev = oldrev
-        # prevent bad version numbers
-    print("version_numbers and newestrev != ZERO_COMMIT", version_numbers and newestrev != ZERO_COMMIT)
-    if (version_numbers and newestrev != ZERO_COMMIT): # enable hook
-        print("version_numbers: ", version_numbers)
+    # prevent bad version numbers (enable hook)
+    if (hooks_dict["pre-receive-hook-version-numbers"] and newestrev != ZERO_COMMIT):
         prevent_bad_version_numbers(oldestrev, newestrev, refname)
+    return
 
 
 if __name__ == "__main__":
-    large_files, version_numbers, duplicate_commits = read_bioc_conf()
-    apply_hooks(large_files, version_numbers, duplicate_commits)
+    conf = get_hooks_conf()
+    hooks_dict = read_bioc_conf(conf)
+    apply_hooks(hooks_dict)
