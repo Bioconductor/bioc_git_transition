@@ -1,14 +1,71 @@
 #!/usr/bin/env python
 
 import subprocess
-import sys
+from os import path, getcwd
 import fileinput
 from prevent_duplicate_commits import prevent_duplicate_commits
 from prevent_bad_version_numbers import prevent_bad_version_numbers
 
 ZERO_COMMIT = "0000000000000000000000000000000000000000"
+HOOKS_CONF = "file:///home/git/repositories/admin/hook_maintainer.git"
+LOCAL_HOOKS_CONF = "file:////Users/ni41435_ca/Documents/hook_maintainer.git"
 
-if __name__ == "__main__":
+
+def get_hooks_conf():
+    """This function does a simple 'git archive' clone process of hooks.conf.
+
+    It clones the file in the /tmp directory.
+    """
+    # FIXME: Change LOCAL_HOOKS_CONF to HOOKS_CONF
+    cmd = "git archive --remote=" + LOCAL_HOOKS_CONF + \
+          " HEAD hooks.conf | tar -x"
+    subprocess.check_output(cmd, shell=True, cwd="/tmp")
+    if path.exists("/tmp/hooks.conf"):
+        with open("/tmp/hooks.conf") as f:
+            conf = f.read()
+    return conf
+
+
+def read_bioc_conf(conf):
+    """ Read the bioc hooks configuration file.
+
+    This code is run within the 'hooks' folder inside a bare git repo.
+
+    This function reads the hooks.conf file and returns a three tuple
+    of boolean values, one for each hook if it is toggled False or True.
+
+    Default is (True, True, True)
+    """
+    # Make dictionary with package name as key, values are [list of hooks]
+    d = {}
+    res = [pack.strip().split("\n") for pack in conf.split("\n\n")]
+    for item in res:
+        d[item[0]] = item[1:]
+    # Get package name, it works because the script is run inside the package.
+    package_name = path.basename(path.dirname(getcwd())).replace(".git", "")
+    package = "Package: " + package_name
+    # Default values for hooks is (True, True)
+    hooks_dict = {"pre-receive-hook-version-numbers": True,
+                  "pre-receive-hook-duplicate-commits": True}
+    # Change values for specific hooks mentioned in hooks.conf
+    for hook in d[package]:
+        [hook, val] = hook.split(": ")
+        hooks_dict[hook] = (val != "False")
+
+    return hooks_dict
+
+
+def apply_hooks(hooks_dict):
+    """Apply hooks to each package in the category data-experiement or
+    workflow.
+
+    This function takes in a boolean list of arguments, one for each hook,
+    1. prevent_bad_version_numbers,
+    2. prevent_duplicate_commits in that order.
+
+    The boolean values toggle True/False to indicate which hook has to be
+    applied to the package.
+    """
     newestrev = ZERO_COMMIT
     oldestrev = ZERO_COMMIT
     for line in fileinput.input():
@@ -18,10 +75,19 @@ if __name__ == "__main__":
         if newrev == ZERO_COMMIT:
             continue
         # prevent duplicate commits
-        prevent_duplicate_commits(oldrev, newrev, refname)
+        if hooks_dict["pre-receive-hook-duplicate-commits"]:  # enable hook
+            prevent_duplicate_commits(oldrev, newrev, refname)
         # prevent bad version numbers
         if newestrev == ZERO_COMMIT:
             newestrev = newrev
         oldestrev = oldrev
-    if newestrev != ZERO_COMMIT:
+    if (hooks_dict["pre-receive-hook-version-numbers"] and
+            newestrev != ZERO_COMMIT):
         prevent_bad_version_numbers(oldestrev, newestrev, refname)
+    return
+
+
+if __name__ == "__main__":
+    conf = get_hooks_conf()
+    hooks_dict = read_bioc_conf()
+    apply_hooks(hooks_dict)
