@@ -18,7 +18,8 @@ def get_hooks_conf():
     It clones the file in the /tmp directory.
     """
     # FIXME: Change LOCAL_HOOKS_CONF to HOOKS_CONF
-    cmd = "git archive --remote=" + LOCAL_HOOKS_CONF + " HEAD hooks.conf | tar -x"
+    cmd = "git archive --remote=" + LOCAL_HOOKS_CONF + \
+          " HEAD hooks.conf | tar -x"
     subprocess.check_output(cmd, shell=True, cwd="/tmp")
     if path.exists("/tmp/hooks.conf"):
         with open("/tmp/hooks.conf") as f:
@@ -85,7 +86,8 @@ def apply_hooks(hooks_dict):
             newestrev = newrev
         oldestrev = oldrev
     # prevent bad version numbers (enable hook)
-    if (hooks_dict["pre-receive-hook-version-numbers"] and newestrev != ZERO_COMMIT):
+    if (hooks_dict["pre-receive-hook-version-numbers"] and
+            newestrev != ZERO_COMMIT):
         prevent_bad_version_numbers(oldestrev, newestrev, refname)
     return
 
