@@ -13,9 +13,12 @@ LOCAL_HOOKS_CONF = "file:////Users/ni41435_ca/Documents/hook_maintainer.git"
 
 
 def get_hooks_conf():
-    """This function does a simple 'git archive' clone process of hooks.conf.
+    """This function does a simple 'git archive' clone process of
+    hooks.conf.
 
-    It clones the file in the /tmp directory.
+    It clones the file in the /tmp directory. This function ignores
+    the '#' characters in the file.
+
     """
     # FIXME: Change LOCAL_HOOKS_CONF to HOOKS_CONF
     cmd = "git archive --remote=" + LOCAL_HOOKS_CONF + \
@@ -23,7 +26,11 @@ def get_hooks_conf():
     subprocess.check_output(cmd, shell=True, cwd="/tmp")
     if path.exists("/tmp/hooks.conf"):
         with open("/tmp/hooks.conf") as f:
-            conf = f.read()
+            txt = f.read()
+        txt = txt.splitlines()
+        # Ignore '#' in the file
+        conf = "\n".join([line for line in txt
+                          if not line.startswith("#")])
     return conf
 
 
@@ -39,7 +46,7 @@ def read_bioc_conf(conf):
     """
     # Make dictionary with package name as key, values are [list of hooks]
     d = {}
-    res = [pack.strip().split("\n") for pack in conf.split("\n\n")]
+    res = [pack.strip().split("\n") for pack in conf.split("\n\n") ]
     for item in res:
         d[item[0]] = item[1:]
     # Get package name, it works because the script is run inside the package.
