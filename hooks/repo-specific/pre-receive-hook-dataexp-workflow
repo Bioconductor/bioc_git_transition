@@ -20,8 +20,7 @@ def get_hooks_conf():
 
     """
     # FIXME: Change LOCAL_HOOKS_CONF to HOOKS_CONF
-    cmd = "git archive --remote=" + LOCAL_HOOKS_CONF + \
-          " HEAD hooks.conf | tar -x"
+    cmd = "git archive --remote=" + HOOKS_CONF + " HEAD hooks.conf | tar -x"
     subprocess.check_output(cmd, shell=True, cwd="/tmp")
     if path.exists("/tmp/hooks.conf"):
         with open("/tmp/hooks.conf") as f:
@@ -49,16 +48,16 @@ def read_bioc_conf(conf):
     for item in res:
         d[item[0]] = item[1:]
     # Get package name, it works because the script is run inside the package.
-    package_name = path.basename(path.dirname(getcwd())).replace(".git", "")
+    package_name = path.basename(getcwd()).replace(".git", "")
     package = "Package: " + package_name
     # Default values for hooks is (True, True)
     hooks_dict = {"pre-receive-hook-version-numbers": True,
                   "pre-receive-hook-duplicate-commits": True}
     # Change values for specific hooks mentioned in hooks.conf
-    for hook in d[package]:
-        [hook, val] = hook.split(": ")
-        hooks_dict[hook] = (val != "False")
-
+    if package in d.keys():
+        for hook in d[package]:
+            [hook, val] = hook.split(": ")
+            hooks_dict[hook] = (val != "False")
     return hooks_dict
 
 
