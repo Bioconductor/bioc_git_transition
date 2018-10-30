@@ -13,8 +13,11 @@ import sys
 
 def find_description(directory):
     description_files = []
-    for f in os.listdir(directory):
-        description_files.append(os.path.join(directory, f, "DESCRIPTION"))
+    # Walk directories only; skip those without DESCRIPTION files
+    for f in os.walk(directory).next()[1]:
+        dfile = os.path.join(directory, f, "DESCRIPTION")
+        if os.path.exists(dfile):
+            description_files.append(dfile)
     return description_files
 
 
