@@ -90,14 +90,9 @@ def check_version_in_release(prev_version, new_version):
     """Check version in RELEASE_branch."""
     x0, y0, z0 = map(int, prev_version.split("."))
     x, y, z = map(int, new_version.split("."))
-    # x should never change
-    if x != x0:
-        throw_error(prev_version, new_version)
-        # y should be even
-    if y % 2 != 0:
-        # y should not be 99 i.e no major version change
-        if y == 99:
-            throw_error(prev_version, new_version)
+    # x should never change, y should be even, y should not be 99 i.e
+    # no major version change
+    if (x != x0) or (y % 2 != 0) or (y!=y0):
         throw_error(prev_version, new_version)
     # z should be incremented
     if not z - z0 >= 0:
@@ -115,7 +110,7 @@ def check_version_in_master(prev_version, new_version):
     # y should be odd
     if y % 2 == 0:
         throw_error(prev_version, new_version)
-    # y should not be the same, and can be 99
+    # y should be the same, and can be 99
     if (y != y0) and (y != 99):
         throw_error(prev_version, new_version)
     # z should be incremented and cannot be 99
