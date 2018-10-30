@@ -1,8 +1,10 @@
 """
 Usage:
 
-    python detect_bad_version.py <directory with all packages>
+    python detect_bad_version.py <directory with all packages> <even|odd>
 
+    Passing 'even' as the second argument results in a success if the
+    version is even. Packages with odd versions will be output.
 """
 
 import os
@@ -16,16 +18,21 @@ def find_description(directory):
     return description_files
 
 
-def check_version(version):
+def check_version(version, parity):
     version_number = version.replace("Version :","").split(".")
-    y = int(version_number[1])    
-    correct = True
+    y = int(version_number[1]) 
     ## Add rules here
-    if y % 2 == 0:
-        correct = False
+    if parity == "odd":
+        if y % 2 == 0:
+            return False
+    elif parity == "even":
+        if y % 2 != 0:
+            return False
+
     if y > 99:
-        correct = False
-    return correct
+        return False
+    else: 
+        return True 
 
 
 def read_description(DESCRIPTION_path):
@@ -37,15 +44,15 @@ def read_description(DESCRIPTION_path):
     return (package_name, version)
 
 
-def run(directory):
+def run(directory, parity):
     descriptions = find_description(directory)
-    for description in descriptions:    
+    for description in descriptions: 
         package_name, version = read_description(description)
-        if not check_version(version):
+        if not check_version(version, parity):
             print(package_name, version)
     return
 
 
 if __name__ == "__main__":
-    print("Directory passed: ", sys.argv[1])
-    run(str(sys.argv[1]))
+    print("Directory passed: ", sys.argv[1], sys.argv[2])
+    run(str(sys.argv[1]), str(sys.argv[2]))
