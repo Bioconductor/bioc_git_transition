@@ -31,7 +31,6 @@ def check_version(version, parity):
     elif parity == "even":
         if y % 2 != 0:
             return False
-
     if y > 99:
         return False
     else: 
@@ -49,13 +48,16 @@ def read_description(DESCRIPTION_path):
 
 def run(directory, parity):
     descriptions = find_description(directory)
+    counter = []
     for description in descriptions: 
         package_name, version = read_description(description)
         if not check_version(version, parity):
             print(package_name, version)
-    return
+            counter.append(package_name)
+    return counter
 
 
 if __name__ == "__main__":
     print("Directory passed: ", sys.argv[1], sys.argv[2])
-    run(str(sys.argv[1]), str(sys.argv[2]))
+    counter = run(str(sys.argv[1]), str(sys.argv[2]))
+    print(len(counter), " packages have version which is not ", sys.argv[2])
