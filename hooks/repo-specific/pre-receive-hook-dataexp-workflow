@@ -24,7 +24,7 @@ def get_hooks_conf():
     subprocess.check_output(cmd, shell=True, cwd="/tmp")
     if path.exists("/tmp/hooks.conf"):
         with open("/tmp/hooks.conf") as f:
-            conf = f.read()
+            txt = f.read()
         txt = txt.splitlines()
         # Ignore '#' in the file
         conf = "\n".join([line for line in txt
@@ -95,5 +95,5 @@ def apply_hooks(hooks_dict):
 
 if __name__ == "__main__":
     conf = get_hooks_conf()
-    hooks_dict = read_bioc_conf()
+    hooks_dict = read_bioc_conf(conf)
     apply_hooks(hooks_dict)

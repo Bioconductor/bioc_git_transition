@@ -6,6 +6,7 @@ import fileinput
 from prevent_large_files import prevent_large_files
 from prevent_duplicate_commits import prevent_duplicate_commits
 from prevent_bad_version_numbers import prevent_bad_version_numbers
+from prevent_merge_markers import prevent_merge_markers
 
 ZERO_COMMIT = "0000000000000000000000000000000000000000"
 HOOKS_CONF = "file:///home/git/repositories/admin/hook_maintainer.git"
@@ -41,7 +42,7 @@ def read_bioc_conf(conf):
     This function reads the hooks.conf file and returns a three tuple
     of boolean values, one for each hook if it is toggled False or True.
 
-    Default is (True, True, True)
+    Default is (True, True, True, True)
     """
     # Make dictionary with package name as key, values are [list of hooks]
     d = {}
@@ -52,7 +53,8 @@ def read_bioc_conf(conf):
     package_name = path.basename(getcwd()).replace(".git", "")
     package = "Package: " + package_name
     # Default values for hooks is (True, True, True)
-    hooks_dict = {"pre-receive-hook-large-files": True,
+    hooks_dict = {"pre-receive-hook-merge-markers": True,
+                  "pre-receive-hook-large-files": True,
                   "pre-receive-hook-version-numbers": True,
                   "pre-receive-hook-duplicate-commits": True}
     # Change values for specific hooks mentioned in hooks.conf
@@ -67,9 +69,10 @@ def apply_hooks(hooks_dict):
     """Apply hooks to each package.
 
     This function takes in a boolean list of arguments, one for each hook,
-    1. prevent_large_files,
-    2. prevent_bad_version_numbers,
-    3. prevent_duplicate_commits in that order.
+    1. prevent_merge_markers
+    2. prevent_large_files
+    3. prevent_bad_version_numbers,
+    4. prevent_duplicate_commits in that order.
 
     The boolean values toggle True/False to indicate which hook has to be
     applied to the package.
@@ -82,6 +85,9 @@ def apply_hooks(hooks_dict):
         # Check for zero commit, check branch deletions
         if newrev == ZERO_COMMIT:
             continue
+        # prevent merge conflict markers
+        if hooks_dict["pre-receive-hook-merge-markers"]: # enable hook
+            prevent_merge_markers(oldrev, newrev, refname)
         # prevent large files
         if hooks_dict["pre-receive-hook-large-files"]:  # enable hook
             prevent_large_files(oldrev, newrev, refname)
