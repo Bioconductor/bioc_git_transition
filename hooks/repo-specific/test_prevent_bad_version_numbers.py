@@ -4,7 +4,7 @@ import subprocess
 import re
 import os
 import pytest
-from hooks.prevent_bad_version_numbers import check_version_bump
+from prevent_bad_version_numbers import check_version_bump
 
 CWD = "/Users/ni41435_ca/Documents/bioc_git_transition/hooks/repo-specific/test_proj"
 DESC = "DESCRIPTION"
@@ -233,14 +233,24 @@ def test_devel_version_bumps_martin():
     return
 
 
-# def test_integration_version_bump_in_master():
-#     refname = "master"
-#     change_version("1.25.61")
-#     git_add(DESC)
-#     with pytest.raises(SystemExit) as pytest_wrapped_e:
-#         change_version("2.25.61")
-#         git_add(DESC)
-#         git_commit("Fail test", cwd=CWD)
-#         out = git_push()
-#         assert "error" in out
-#         assert pytest_wrapped_e.value.code == 1
+def test_devel_version_bumps_sep2019():
+    refname = "master"
+
+    res = check_version_bump("2.3.2", "2.3.999", refname)
+    assert res == 0
+
+    res = check_version_bump("1.7.999", "1.7.1000", refname)
+    assert res == 0
+
+    res = check_version_bump("1.7.999", "1.7.9991", refname)
+    assert res == 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("1.7.999", "1.7.10", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        check_version_bump("a1.7.999", "a1.7.1000", refname)
+        assert pytest_wrapped_e.type == SystemExit
+        assert pytest_wrapped_e.value.code != 0

@@ -74,7 +74,7 @@ def get_version_bump(diff):
 
 def check_version_format(prev_version, new_version):
     """Check format of version."""
-    regex = re.compile('\d{1}\.\d{1,2}\.\d{1,3}$')
+    regex = re.compile(r'\d+\.\d+\.\d+$')
     if not regex.match(new_version):
         throw_error(prev_version, new_version)
     try:
