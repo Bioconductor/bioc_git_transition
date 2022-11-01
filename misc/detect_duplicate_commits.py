@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import subprocess
 import sys
@@ -32,13 +32,22 @@ Use
 to see body of commits.
 """
 
+def bytes2str(line):
+    if isinstance(line, str):
+        return line
+    try:
+        line = line.decode()  # decode() uses utf-8 encoding by default
+    except UnicodeDecodeError:
+        line = line.decode("iso8859")  # typical Windows encoding
+    return line
+
 def get_svn_revision(commit):
     body = subprocess.check_output([ "git", "show", "--format=%b", commit ])
+    body = bytes2str(body)
     revision = SVN_COMMIT_REGEX.match(body)
     if revision != None:
         revision = revision.group(1)
     return revision
-
 
 def prevent_duplicate_commits(newrev):
     """Pre-receive hook to check for duplicate SVN commits."""
@@ -49,11 +58,12 @@ def prevent_duplicate_commits(newrev):
     except Exception as e:
         print("Exception: %s" % e)
         pass
+    commit_list = bytes2str(commit_list)
     commit_list = commit_list.split("\n")
     commit_list = [item for item in commit_list if len(item)>0]
 
     # For each of the first GIT_COMMIT_LIST_LENGTH pairs, check diff
-    for i in xrange(len(commit_list) - 1):
+    for i in range(len(commit_list) - 1):
         first = commit_list[i]
         second = commit_list[i+1]
 
